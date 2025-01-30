@@ -1,0 +1,224 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>de.tgmz.discogs</groupId>
+	<artifactId>de.tgmz.discogs</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>21</maven.compiler.source>
+		<maven.compiler.target>21</maven.compiler.target>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<jacoco.version>0.8.11</jacoco.version>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.29</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate.orm</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<version>6.6.4.Final</version>
+			<exclusions>
+				<exclusion>
+					<groupId>xml-apis</groupId>
+					<artifactId>xml-apis</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+			<version>1.12.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-text</artifactId>
+			<version>1.12.0</version>
+		</dependency>
+		<dependency>
+			<groupId>javassist</groupId>
+			<artifactId>javassist</artifactId>
+			<version>3.12.1.GA</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>2.2.224</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/java</directory>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.1</version>
+				<configuration>
+					<release>21</release>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	<profiles>
+		<profile>
+			<id>cc</id>
+			<properties>
+				<!-- Properties to enable jacoco code coverage analysis -->
+				<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
+				<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+				<sonar.coverage.jacoco.xmlReportPaths>
+					${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+			</properties>
+			<build>
+				<plugins>
+					<!-- Enabling use of jacoco -->
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<version>${jacoco.version}</version>
+						<executions>
+							<execution>
+								<id>prepare-agent</id>
+								<goals>
+									<goal>prepare-agent</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>report</id>
+								<goals>
+									<goal>report</goal>
+								</goals>
+								<phase>test</phase>
+								<configuration>
+									<formats>
+										<format>XML</format>
+									</formats>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>dc</id>
+			<properties>
+				<dependency-check.suppressionFile></dependency-check.suppressionFile>
+				<sonar.dependencyCheck.htmlReportPath>
+					${project.build.directory}/dependency-check-report.html</sonar.dependencyCheck.htmlReportPath>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.owasp</groupId>
+						<artifactId>dependency-check-maven</artifactId>
+						<version>10.0.4</version>
+						<configuration>
+							<assemblyAnalyzerEnabled>false</assemblyAnalyzerEnabled>
+							<centralAnalyzerEnabled>false</centralAnalyzerEnabled>
+							<!-- Make sure xinfo plugins are shipped w/o
+							vulnerabilities -->
+							<failBuildOnCVSS>0</failBuildOnCVSS>
+							<!-- Vulnerabilities in provided dependencies are
+							not our business :-) -->
+							<skipProvidedScope>true</skipProvidedScope>
+							<failOnError>true</failOnError>
+							<nvdApiKey>${nvdApiKey}</nvdApiKey>
+							<formats>
+								<format>HTML</format>
+							</formats>
+							<suppressionFiles>
+								<suppressionFile>project-suppression.xml</suppressionFile>
+							</suppressionFiles>
+						</configuration>
+						<executions>
+							<execution>
+								<id>dependency-check</id>
+								<phase>package</phase>
+								<goals>
+									<goal>aggregate</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>rat</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.rat</groupId>
+						<artifactId>apache-rat-plugin</artifactId>
+						<version>0.13</version>
+						<executions>
+							<execution>
+								<id>rat-check</id>
+								<goals>
+									<goal>check</goal>
+								</goals>
+								<configuration>
+									<consoleOutput>true</consoleOutput>
+									<ignoreErrors>false</ignoreErrors>
+									<licenses>
+										<license
+											implementation="org.apache.rat.analysis.license.SimplePatternBasedLicense">
+											<licenseFamilyCategory>TGMZ</licenseFamilyCategory>
+											<licenseFamilyName>this</licenseFamilyName>
+											<notes></notes>
+											<patterns>
+												<pattern>Thomas Zierer</pattern>
+											</patterns>
+										</license>
+									</licenses>
+									<licenseFamilies>
+										<licenseFamily
+											implementation="org.apache.rat.license.SimpleLicenseFamily">
+											<familyName>this</familyName>
+										</licenseFamily>
+									</licenseFamilies>
+									<excludes combine.children="append">
+										<!-- Eclipse stuff -->
+										<!-- z/OS stuff w/o comments -->
+										<!-- Generated -->
+										<!-- Maven -->
+										<!-- Not distributed -->
+										<!-- Templates -->
+										<!-- Test resources -->
+										<exclude>src/test/resources/</exclude>
+										<!-- Sonarsource stuff -->
+										<exclude>
+											src/main/xsd/sonar/sonar-generic-coverage.xsd</exclude>
+										<!-- Dummies -->
+										<!-- Binaries -->
+										<!-- GitHub -->
+										<exclude>env.MAVEN_CACHE_FOLDER/**</exclude>
+									</excludes>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>
