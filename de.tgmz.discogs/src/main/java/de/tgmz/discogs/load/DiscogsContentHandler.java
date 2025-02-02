@@ -1,3 +1,12 @@
+/*********************************************************************
+* Copyright (c) 02.02.2025 Thomas Zierer
+*
+* This program and the accompanying materials are made
+* available under the terms of the Eclipse Public License 2.0
+* which is available at https://www.eclipse.org/legal/epl-2.0/
+*
+* SPDX-License-Identifier: EPL-2.0
+**********************************************************************/
 package de.tgmz.discogs.load;
 
 import java.util.Arrays;
@@ -23,27 +32,25 @@ import de.tgmz.discogs.database.DatabaseService;
 import jakarta.persistence.EntityManager;
 
 public class DiscogsContentHandler extends DefaultHandler {
-	private static final String P = "^(.*)(\\s+\\(\\d+\\))$";
-	protected static final Pattern PA = Pattern.compile(P);
+	protected static final Pattern PA = Pattern.compile("^(.*)(\\s+\\(\\d+\\))$");
 	protected static final Logger LOG = LoggerFactory.getLogger(DiscogsContentHandler.class);
 	protected static final int MAX_LENGTH_TITLE = 254;
 	protected static final int MAX_LENGTH_DISPLAY = 510;
 	protected Deque<String> stack;
-	private StringBuilder chars;
 	protected EntityManager em;
 	protected XMLReader xmlReader;
 	protected int count;
+	private StringBuilder chars;
 
 	public DiscogsContentHandler() {
 		try {
 			SAXParserFactory spf = SAXParserFactory.newInstance();
 			spf.setNamespaceAware(true);
+			
 			SAXParser saxParser = spf.newSAXParser();
 
 			xmlReader = saxParser.getXMLReader();
 		} catch (ParserConfigurationException | SAXException e) {
-			LOG.error("Cannot setup contenthandler", e);
-			
 			throw new RuntimeException(e);
 		}
 	}
@@ -63,6 +70,7 @@ public class DiscogsContentHandler extends DefaultHandler {
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		stack.push(qName);
+		
 		chars = new StringBuilder();
 	}
 
@@ -101,10 +109,10 @@ public class DiscogsContentHandler extends DefaultHandler {
 		DatabaseService.getInstance().inTransaction(x -> x.merge(o));
 		
 		++count;
-
 	}
 
 	public String getChars() {
+		// Remove superflous blanks
 		return chars.toString().trim().replaceAll("\\s{2,}", "\\s");
 	}
 }

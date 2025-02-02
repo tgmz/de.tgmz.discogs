@@ -1,3 +1,12 @@
+/*********************************************************************
+* Copyright (c) 02.02.2025 Thomas Zierer
+*
+* This program and the accompanying materials are made
+* available under the terms of the Eclipse Public License 2.0
+* which is available at https://www.eclipse.org/legal/epl-2.0/
+*
+* SPDX-License-Identifier: EPL-2.0
+**********************************************************************/
 package de.tgmz.discogs.load;
 
 import java.io.IOException;
@@ -185,14 +194,13 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	}
 	@Override
 	public void endDocument() throws SAXException {
-		Object o = em.createQuery("SELECT COUNT(*) FROM Release").getSingleResult();
-		
-		long count = (o == null) ? 0L : (long) o;
-		
-		LOG.info("{} releases inserted/updated", String.format("%,d", count));
+		if (LOG.isErrorEnabled()) {
+			LOG.info("{} releases inserted/updated", String.format("%,d", count));
+		}
 		
 		super.endDocument();
 	}
+	
 	private void setArtists() {
 		release.setArtists(getArtists(release.getArtistIds()));
 		
@@ -200,6 +208,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			t.setArtists(getArtists(t.getArtistIds()));
 		}
 	}
+	
 	private Set<Artist> getArtists(List<Long> artistIds) {
 		Set<Artist> result = new HashSet<>();
 		
