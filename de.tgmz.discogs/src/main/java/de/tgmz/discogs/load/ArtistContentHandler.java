@@ -20,7 +20,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Artist;
 
 public class ArtistContentHandler extends DiscogsContentHandler {
@@ -80,18 +79,22 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 			break;
 		
 		case TAG_ARTIST:
-			if (artist.getName() == null) {
-				LOG.error("Name is null for {}", artist);
-			} else {
-				DatabaseService.getInstance().inTransaction(x -> x.merge(artist));
-			}
-		
 			if (artist.getId() % 10_000 == 0) {
 				LOG.info("Save {}", artist);
 			}
 			
+			save(artist);
+		
 			break;
 		default:
 		}
+	}
+	@Override
+	public void endDocument() throws SAXException {
+		if (LOG.isInfoEnabled()) {
+			LOG.info("{} artists inserted/updated", String.format("%,d", count));
+		}
+		
+		super.endDocument();
 	}
 }

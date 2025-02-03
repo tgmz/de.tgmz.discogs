@@ -9,17 +9,14 @@
 **********************************************************************/
 package de.tgmz.discogs.domain;
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
@@ -31,58 +28,24 @@ import jakarta.persistence.Transient;
 
 @Entity
 @Table(indexes = {
-	@Index(columnList = "title", name = "title_idx"), 
-	@Index(columnList = "displayArtist", name = "displayArtist_idx"),
-})
-public class Release implements IRelease {
+		@Index(columnList = "title", name = "title_idx"), 
+		@Index(columnList = "displayArtist", name = "displayArtist_idx"),
+	})
+public class Release extends Discogs {
 	private static final long serialVersionUID = -8124211768010344837L;
 	@Id
 	private long id;
-	private String title;
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-	private Set<Artist> artists;
-	@Column(length = 512)
-	private String displayArtist;
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	@OrderBy(value = "position")
 	private List<Track> tracklist;
+	private boolean _main;
+	@ManyToOne
+	private Master master;
 	@Transient
-	private List<Long> artistIds;
+	private long masterId;
 
-	public Release() {
-		artistIds = new LinkedList<>();
-	}
-
-	/**
-	 * The releases id obtained from discogs &lt;id&gt; tag.
-	 * @return the id
-	 */
 	public long getId() {
 		return id;
-	}
-
-	/**
-	 * The masters title obtained from discogs &lt;title&gt; tag.
-	 * @return the title
-	 */
-	public String getTitle() {
-		return title;
-	}
-
-	/**
-	 * The artists involved.
-	 * @return the artists
-	 */
-	public Set<Artist> getArtists() {
-		return artists;
-	}
-
-	/**
-	 * The artist(s) as displayed on the cover. Important for collaborations e.g. &apos;Prince And The New Power Generation&apos;
-	 * @return
-	 */
-	public String getDisplayArtist() {
-		return displayArtist;
 	}
 
 	/**
@@ -93,40 +56,40 @@ public class Release implements IRelease {
 		return tracklist;
 	}
 
-	/**
-	 * The ids of the artists involved. Useful in ReleaseContentHandler if we decide not to persist a release.
-	 * @return the artists
-	 */
-	public List<Long> getArtistIds() {
-		return artistIds;
+	public boolean isMain() {
+		return _main;
 	}
 
 	public void setId(long id) {
 		this.id = id;
 	}
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public void setArtists(Set<Artist> artists) {
-		this.artists = artists;
-	}
-
-	public void setDisplayArtist(String displayArtist) {
-		this.displayArtist = displayArtist;
-	}
-
 	public void setTracklist(List<Track> tracklist) {
 		this.tracklist = tracklist;
 	}
 
-	public void setArtistIds(List<Long> artistIds) {
-		this.artistIds = artistIds;
+	public Master getMaster() {
+		return master;
 	}
 
+	public void setMain(boolean newMain) {
+		this._main = newMain;
+	}
+
+	public void setMaster(Master master) {
+		this.master = master;
+	}
+
+	public long getMasterId() {
+		return masterId;
+	}
+
+	public void setMasterId(long masterId) {
+		this.masterId = masterId;
+	}
 	@Override
 	public String toString() {
-		return "Release [id=" + String.format("%,d", id) + ", title=" + title +  ", displayArtist=" + displayArtist + ", artists=" + artists + ", tracklist=" + tracklist + "]";
+		return "Release [id=" + String.format("%,d", id) + ", Discogs=" + super.toString() + ", tracklist=" + tracklist + "]";
 	}
+
 }

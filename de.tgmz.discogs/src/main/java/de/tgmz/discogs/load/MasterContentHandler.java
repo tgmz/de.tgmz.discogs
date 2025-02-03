@@ -149,7 +149,7 @@ public class MasterContentHandler extends DiscogsContentHandler {
 	}
 	@Override
 	public void endDocument() throws SAXException {
-		if (LOG.isErrorEnabled()) {
+		if (LOG.isInfoEnabled()) {
 			LOG.info("{} masters inserted/updated", String.format("%,d", count));
 		}
 		

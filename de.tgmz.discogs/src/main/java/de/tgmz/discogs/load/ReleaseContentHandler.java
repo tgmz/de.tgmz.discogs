@@ -23,6 +23,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import de.tgmz.discogs.domain.Artist;
+import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
 import de.tgmz.discogs.domain.Track;
 
@@ -73,6 +74,10 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			}
 			
 			break;
+		case "master_id":
+			release.setMain(Boolean.valueOf(attributes.getValue("is_main_release")));
+
+			break;
 		case TAG_ARTIST:
 			artist = new Artist();
 			
@@ -105,6 +110,10 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 				artist.setId(Long.valueOf(getChars()));
 			}
 			
+			break;
+		case "master_id":
+			release.setMasterId(Long.parseLong(getChars()));
+
 			break;
 		case "name":
 			if (!inTrack) {
@@ -180,9 +189,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			release.setTitle(StringUtils.left(release.getTitle(),  MAX_LENGTH_TITLE));
 			
-			setArtists();
-				
-			LOG.debug("Save {}", release);
+			fillAtributes();
 				
 			save(release);
 			
@@ -194,19 +201,20 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	}
 	@Override
 	public void endDocument() throws SAXException {
-		if (LOG.isErrorEnabled()) {
+		if (LOG.isInfoEnabled()) {
 			LOG.info("{} releases inserted/updated", String.format("%,d", count));
 		}
 		
 		super.endDocument();
 	}
-	
-	private void setArtists() {
+	private void fillAtributes() {
 		release.setArtists(getArtists(release.getArtistIds()));
 		
 		for (Track t : release.getTracklist()) {
 			t.setArtists(getArtists(t.getArtistIds()));
 		}
+		
+		release.setMaster(em.find(Master.class, release.getMasterId()));
 	}
 	
 	private Set<Artist> getArtists(List<Long> artistIds) {

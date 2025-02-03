@@ -20,9 +20,9 @@
         </description>
 
 		<class>de.tgmz.discogs.domain.Artist</class>
-		<class>de.tgmz.discogs.domain.Master</class>
 		<class>de.tgmz.discogs.domain.Release</class>
 		<class>de.tgmz.discogs.domain.Track</class>
+		<class>de.tgmz.discogs.domain.Master</class>
 
 		<properties>
 			<!-- Database connection settings -->

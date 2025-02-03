@@ -72,5 +72,6 @@ public class DiscogsTest {
 		Release r = em.find(Release.class, 10222L);
 
 		assertEquals("World In My Eyes", r.getTracklist().getFirst().getTitle());
+		assertEquals(m, r.getMaster());
 	}
 }

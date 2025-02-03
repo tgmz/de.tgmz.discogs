@@ -106,6 +106,8 @@ public class DiscogsContentHandler extends DefaultHandler {
 	}
 	
 	public void save(Object o) {
+		LOG.debug("Save {}", o);
+
 		DatabaseService.getInstance().inTransaction(x -> x.merge(o));
 		
 		++count;
