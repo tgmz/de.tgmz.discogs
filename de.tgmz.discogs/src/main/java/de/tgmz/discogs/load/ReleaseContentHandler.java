@@ -181,7 +181,18 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			inTrack = false;
 			
 			break;
-		
+		case "released":
+			release.setReleased(getChars());
+			
+			break;
+		case "data_quality":
+			release.setDataQuality(getChars());
+			
+			break;
+		case "country":
+			release.setCountry(getChars());
+			
+			break;
 		case TAG_RELEASE:
 			if (release.getId() % 10_000 == 0 && LOG.isInfoEnabled()) {
 				LOG.info("Save {}", release);

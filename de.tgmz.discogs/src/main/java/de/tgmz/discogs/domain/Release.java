@@ -41,6 +41,9 @@ public class Release extends Discogs {
 	private boolean _main;
 	@ManyToOne
 	private Master master;
+	private String country;
+	private String released;
+	private String dataQuality;
 	@Transient
 	private long masterId;
 
@@ -60,6 +63,18 @@ public class Release extends Discogs {
 		return _main;
 	}
 
+	public String getCountry() {
+		return country;
+	}
+
+	public String getReleased() {
+		return released;
+	}
+
+	public String getDataQuality() {
+		return dataQuality;
+	}
+
 	public void setId(long id) {
 		this.id = id;
 	}
@@ -76,6 +91,18 @@ public class Release extends Discogs {
 		this._main = newMain;
 	}
 
+	public void setCountry(String country) {
+		this.country = country;
+	}
+
+	public void setReleased(String released) {
+		this.released = released;
+	}
+
+	public void setDataQuality(String dataQuality) {
+		this.dataQuality = dataQuality;
+	}
+
 	public void setMaster(Master master) {
 		this.master = master;
 	}
@@ -87,6 +114,7 @@ public class Release extends Discogs {
 	public void setMasterId(long masterId) {
 		this.masterId = masterId;
 	}
+
 	@Override
 	public String toString() {
 		return "Release [id=" + String.format("%,d", id) + ", Discogs=" + super.toString() + ", tracklist=" + tracklist + "]";

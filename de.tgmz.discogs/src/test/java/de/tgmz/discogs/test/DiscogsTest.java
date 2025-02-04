@@ -73,5 +73,8 @@ public class DiscogsTest {
 
 		assertEquals("World In My Eyes", r.getTracklist().getFirst().getTitle());
 		assertEquals(m, r.getMaster());
+		assertEquals("US", r.getCountry());
+		assertEquals("1990-03-20", r.getReleased());
+		assertEquals("Correct", r.getDataQuality());
 	}
 }
