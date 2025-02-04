@@ -11,8 +11,10 @@ package de.tgmz.discogs.load;
 
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,17 +31,22 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
 import de.tgmz.discogs.database.DatabaseService;
+import de.tgmz.discogs.domain.Discogs;
+import de.tgmz.discogs.domain.Genre;
+import de.tgmz.discogs.domain.Style;
 import jakarta.persistence.EntityManager;
 
 public class DiscogsContentHandler extends DefaultHandler {
 	protected static final Pattern PA = Pattern.compile("^(.*)(\\s+\\(\\d+\\))$");
 	protected static final Logger LOG = LoggerFactory.getLogger(DiscogsContentHandler.class);
-	protected static final int MAX_LENGTH_TITLE = 254;
+	protected static final int MAX_LENGTH_DEFAULT = 254;
 	protected static final int MAX_LENGTH_DISPLAY = 510;
 	protected Deque<String> stack;
 	protected EntityManager em;
 	protected XMLReader xmlReader;
+	protected Discogs discogs;
 	protected int count;
+	protected boolean complete;
 	private StringBuilder chars;
 
 	public DiscogsContentHandler() {
@@ -60,6 +67,8 @@ public class DiscogsContentHandler extends DefaultHandler {
 		em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager();
 		
 		stack = new LinkedList<>();
+
+		complete = false;
 	}
 	
 	@Override
@@ -72,11 +81,35 @@ public class DiscogsContentHandler extends DefaultHandler {
 		stack.push(qName);
 		
 		chars = new StringBuilder();
+		
+		switch (qName) {
+		case "genres":
+			discogs.setGenres(new HashSet<>());
+
+			break;
+		case "styles":
+			discogs.setStyles(new HashSet<>());
+
+			break;
+		default:
+		}
 	}
 
 	@Override
 	public void endElement(String uri, String localName, String qName) {
 		stack.pop();
+
+		switch (qName) {
+		case "genre":
+			discogs.getGenreNames().add(getChars());
+		
+			break;
+		case "style":
+			discogs.getStyleNames().add(getChars());
+		
+			break;
+		default:
+		}
 	}
 
 	@Override
@@ -104,9 +137,44 @@ public class DiscogsContentHandler extends DefaultHandler {
 		
 		return StringUtils.left(display, MAX_LENGTH_DISPLAY);
 	}
-	
+
 	public void save(Object o) {
 		LOG.debug("Save {}", o);
+
+		if (o instanceof Discogs d) {
+			if (!d.getGenreNames().isEmpty()) {
+				Set<Genre> gs = new HashSet<>();
+			
+				for (String s : d.getGenreNames()) {
+					List<Genre> gl = em.createNamedQuery("Genre.getByName", Genre.class).setParameter(1, s).getResultList();
+				
+					if (!gl.isEmpty()) {
+						gs.add(gl.getFirst());
+					} else {
+						gs.add(new Genre(s));
+					}
+				}
+				
+				d.setGenres(gs);
+			}
+			
+			if (!d.getStyleNames().isEmpty()) {
+				Set<Style> ss = new HashSet<>();
+			
+				for (String s : d.getStyleNames()) {
+					List<Style> sl = em.createNamedQuery("Style.getByName", Style.class).setParameter(1, s).getResultList();
+				
+					if (!sl.isEmpty()) {
+						ss.add(sl.getFirst());
+					} else {
+						ss.add(new Style(s));
+					}
+				}
+				
+				d.setStyles(ss);
+			}
+		}
+
 
 		DatabaseService.getInstance().inTransaction(x -> x.merge(o));
 		

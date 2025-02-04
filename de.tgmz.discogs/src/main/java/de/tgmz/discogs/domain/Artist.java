@@ -12,12 +12,10 @@ package de.tgmz.discogs.domain;
 import java.io.Serializable;
 import java.util.Set;
 
-import jakarta.persistence.CollectionTable;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
@@ -35,7 +33,6 @@ public class Artist implements Serializable {
 	private long id;
 	private String name;
 	@ElementCollection
-	@CollectionTable(name = "Variations" , joinColumns = @JoinColumn(name = "artist_id"))
 	private Set<String> variations;
 
 	public Artist() {

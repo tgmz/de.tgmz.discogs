@@ -23,6 +23,8 @@
 		<class>de.tgmz.discogs.domain.Release</class>
 		<class>de.tgmz.discogs.domain.Track</class>
 		<class>de.tgmz.discogs.domain.Master</class>
+		<class>de.tgmz.discogs.domain.Genre</class>
+		<class>de.tgmz.discogs.domain.Style</class>
 
 		<properties>
 			<!-- Database connection settings -->

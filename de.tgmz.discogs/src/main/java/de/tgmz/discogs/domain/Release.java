@@ -43,7 +43,6 @@ public class Release extends Discogs {
 	private Master master;
 	private String country;
 	private String released;
-	private String dataQuality;
 	@Transient
 	private long masterId;
 
@@ -71,10 +70,6 @@ public class Release extends Discogs {
 		return released;
 	}
 
-	public String getDataQuality() {
-		return dataQuality;
-	}
-
 	public void setId(long id) {
 		this.id = id;
 	}
@@ -97,10 +92,6 @@ public class Release extends Discogs {
 
 	public void setReleased(String released) {
 		this.released = released;
-	}
-
-	public void setDataQuality(String dataQuality) {
-		this.dataQuality = dataQuality;
 	}
 
 	public void setMaster(Master master) {

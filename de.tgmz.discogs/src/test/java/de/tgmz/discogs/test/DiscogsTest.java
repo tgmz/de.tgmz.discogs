@@ -10,6 +10,7 @@
 package de.tgmz.discogs.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,6 +57,7 @@ public class DiscogsTest {
 		Artist a = em.find(Artist.class, 2725L);
 		
 		assertEquals("Depeche Mode", a.getName());
+		assertTrue(a.getVariations().contains("D M"));
 		
 		try (InputStream is = this.getClass().getClassLoader().getResourceAsStream("discogs_20250101_masters_Violator.xml")) {
 			new MasterContentHandler().run(is);
@@ -64,6 +66,9 @@ public class DiscogsTest {
 		Master m = em.find(Master.class, 18080L);
 
 		assertEquals("Violator", m.getTitle());
+		assertEquals("Correct", m.getDataQuality());
+		assertTrue(m.getGenres().stream().allMatch(x -> x.getName().equals("Electronic")));
+		assertTrue(m.getStyles().stream().allMatch(x -> x.getName().equals("Synth-pop")));
 		
 		try (InputStream is = this.getClass().getClassLoader().getResourceAsStream("discogs_20250101_releases_Violator.xml")) {
 			new ReleaseContentHandler().run(is);
@@ -76,5 +81,7 @@ public class DiscogsTest {
 		assertEquals("US", r.getCountry());
 		assertEquals("1990-03-20", r.getReleased());
 		assertEquals("Correct", r.getDataQuality());
+		assertTrue(r.getGenres().stream().allMatch(x -> x.getName().equals("Electronic")));
+		assertTrue(r.getStyles().stream().allMatch(x -> x.getName().equals("Synth-pop")));
 	}
 }

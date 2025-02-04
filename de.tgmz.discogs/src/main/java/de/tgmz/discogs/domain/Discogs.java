@@ -24,16 +24,27 @@ import jakarta.persistence.Transient;
 @MappedSuperclass
 public abstract class Discogs implements Serializable {
 	private static final long serialVersionUID = -8920772069254927533L;
+	private String dataQuality;
 	private String title;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private Set<Artist> artists;
 	@Column(length = 512)
 	private String displayArtist;
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	private Set<Genre> genres;
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	private Set<Style> styles;
 	@Transient
 	private List<Long> artistIds;
+	@Transient
+	private List<String> genreNames;
+	@Transient
+	private List<String> styleNames;
 
 	protected Discogs() {
 		artistIds = new LinkedList<>();
+		genreNames = new LinkedList<>();
+		styleNames = new LinkedList<>();
 	}
 
 	/**
@@ -60,6 +71,30 @@ public abstract class Discogs implements Serializable {
 		return displayArtist;
 	}
 
+	public Set<Genre> getGenres() {
+		return genres;
+	}
+
+	public Set<Style> getStyles() {
+		return styles;
+	}
+
+	public void setGenres(Set<Genre> genres) {
+		this.genres = genres;
+	}
+
+	public void setStyles(Set<Style> styles) {
+		this.styles = styles;
+	}
+
+	public String getDataQuality() {
+		return dataQuality;
+	}
+
+	public void setDataQuality(String dataQuality) {
+		this.dataQuality = dataQuality;
+	}
+
 	/**
 	 * The ids of the artists involved. Useful in ReleaseContentHandler if we decide not to persist a release.
 	 * @return the artistIds
@@ -82,6 +117,22 @@ public abstract class Discogs implements Serializable {
 
 	public void setArtistIds(List<Long> artistIds) {
 		this.artistIds = artistIds;
+	}
+
+	public List<String> getGenreNames() {
+		return genreNames;
+	}
+
+	public List<String> getStyleNames() {
+		return styleNames;
+	}
+
+	public void setGenreNames(List<String> genreNames) {
+		this.genreNames = genreNames;
+	}
+
+	public void setStyleNames(List<String> styleNames) {
+		this.styleNames = styleNames;
 	}
 
 	@Override

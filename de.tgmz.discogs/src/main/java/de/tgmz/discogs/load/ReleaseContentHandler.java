@@ -31,13 +31,11 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	private static final String TAG_RELEASE = "release";
 	private static final String TAG_ARTISTS = "artists";
 	private static final String TAG_ARTIST = "artist";
-	private Release release;
 	private Artist artist;
 	private Track track;
 	private List<String> displayArtists;
 	private List<String> displayJoins;
 	private boolean inTrack;
-	private boolean complete;
 
 	public void run(InputStream is) throws IOException, SAXException {
 		xmlReader.setContentHandler(this);
@@ -62,9 +60,9 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 		
 		switch (qName) {
 		case TAG_RELEASE:
-			release = new Release();
+			discogs = new Release();
 			
-			release.setId(Long.parseLong(attributes.getValue("id")));
+			((Release) discogs).setId(Long.parseLong(attributes.getValue("id")));
 			
 			break;
 		case TAG_ARTISTS:
@@ -75,7 +73,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "master_id":
-			release.setMain(Boolean.valueOf(attributes.getValue("is_main_release")));
+			((Release) discogs).setMain(Boolean.valueOf(attributes.getValue("is_main_release")));
 
 			break;
 		case TAG_ARTIST:
@@ -85,7 +83,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 		case "tracklist":
 			inTrack = true;
 			
-			release.setTracklist(new LinkedList<>());
+			((Release) discogs).setTracklist(new LinkedList<>());
 			
 			break;
 		case "track":
@@ -112,7 +110,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "master_id":
-			release.setMasterId(Long.parseLong(getChars()));
+			((Release) discogs).setMasterId(Long.parseLong(getChars()));
 
 			break;
 		case "name":
@@ -132,7 +130,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 				if (inTrack) {
 					track.getArtistIds().add(artist.getId());
 				} else {
-					release.getArtistIds().add(artist.getId());
+					discogs.getArtistIds().add(artist.getId());
 				}
 			}
 			
@@ -149,7 +147,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			break;
 		case TAG_ARTISTS:
 			if (!inTrack) {
-				release.setDisplayArtist(getDisplayArtist(displayArtists, displayJoins));
+				discogs.setDisplayArtist(getDisplayArtist(displayArtists, displayJoins));
 			}
 			
 			break;
@@ -160,15 +158,15 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 		case "title":
 			switch (stack.peek()) {
 			case TAG_RELEASE:
-				if (release.getTitle() == null) {
-					release.setTitle(getChars());
+				if (discogs.getTitle() == null) {
+					discogs.setTitle(getChars());
 				}
 				
 				break;
 			case "track":
-				track.setTitle(StringUtils.left(getChars(), MAX_LENGTH_TITLE));
+				track.setTitle(StringUtils.left(getChars(), MAX_LENGTH_DEFAULT));
 				
-				release.getTracklist().add(track);
+				((Release) discogs).getTracklist().add(track);
 				
 				break;
 			default:
@@ -182,27 +180,27 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "released":
-			release.setReleased(getChars());
+			((Release) discogs).setReleased(getChars());
 			
 			break;
 		case "data_quality":
-			release.setDataQuality(getChars());
+			discogs.setDataQuality(getChars());
 			
 			break;
 		case "country":
-			release.setCountry(getChars());
+			((Release) discogs).setCountry(getChars());
 			
 			break;
 		case TAG_RELEASE:
-			if (release.getId() % 10_000 == 0 && LOG.isInfoEnabled()) {
-				LOG.info("Save {}", release);
+			if (((Release) discogs).getId() % 10_000 == 0 && LOG.isInfoEnabled()) {
+				LOG.info("Save {}", discogs);
 			}
 			
-			release.setTitle(StringUtils.left(release.getTitle(),  MAX_LENGTH_TITLE));
-			
+			discogs.setTitle(StringUtils.left(discogs.getTitle(),  MAX_LENGTH_DEFAULT));
+
 			fillAtributes();
 				
-			save(release);
+			save(discogs);
 			
 			complete = false;
 			
@@ -218,14 +216,19 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 		
 		super.endDocument();
 	}
+	
+	public Release getRelease() {
+		return (Release) discogs;
+	}
+	
 	private void fillAtributes() {
-		release.setArtists(getArtists(release.getArtistIds()));
+		discogs.setArtists(getArtists(discogs.getArtistIds()));
 		
-		for (Track t : release.getTracklist()) {
+		for (Track t : ((Release) discogs).getTracklist()) {
 			t.setArtists(getArtists(t.getArtistIds()));
 		}
 		
-		release.setMaster(em.find(Master.class, release.getMasterId()));
+		((Release) discogs).setMaster(em.find(Master.class, ((Release) discogs).getMasterId()));
 	}
 	
 	private Set<Artist> getArtists(List<Long> artistIds) {
