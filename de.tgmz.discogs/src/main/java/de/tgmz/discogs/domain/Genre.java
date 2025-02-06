@@ -9,42 +9,32 @@
 **********************************************************************/
 package de.tgmz.discogs.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.NamedQuery;
+import java.io.Serializable;
+
+import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Transient;
 
 /**
  * GenreSpec entity
  */
-@Entity
-@NamedQuery(name="Style.getByName", query="FROM Style WHERE name = ?1")
-public class Style extends Genre {
+@MappedSuperclass
+public abstract class Genre implements Serializable {
 	@Transient
 	private static final long serialVersionUID = 5684918391708831387L;
-	@Id
-	@GeneratedValue
-	private long id;
+	private String name;
 
-	public Style() {
-		super();
+	protected Genre() {
 	}
 
-	public Style(String name) {
-		super(name);
+	protected Genre(String name) {
+		this.name = name;
 	}
 
-	public long getId() {
-		return id;
+	public String getName() {
+		return name;
 	}
 
-	public void setId(long id) {
-		this.id = id;
-	}
-
-	@Override
-	public String toString() {
-		return "GenreSpec [id=" + id + ", name=" + getName() + "]";
+	public void setName(String name) {
+		this.name = name;
 	}
 }
