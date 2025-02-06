@@ -47,16 +47,11 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 		super.startDocument();
 		
 		inTrack = false;
-		complete = false;
 	}
 
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		super.startElement(uri, localName, qName, attributes);
-		
-		if (complete) {
-			return;
-		}
 		
 		switch (qName) {
 		case TAG_RELEASE:
@@ -97,10 +92,6 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	@Override
 	public void endElement(String uri, String localName, String qName) {
 		super.endElement(uri, localName, qName);
-		
-		if (complete && !TAG_RELEASE.equals(qName)) {
-			return;
-		}
 		
 		switch (qName) {
 		case "id":
@@ -175,7 +166,6 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 				
 			break;
 		case "tracklist":
-			complete = true;
 			inTrack = false;
 			
 			break;
@@ -201,8 +191,6 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			fillAtributes();
 				
 			save(discogs);
-			
-			complete = false;
 			
 			break;
 		default:

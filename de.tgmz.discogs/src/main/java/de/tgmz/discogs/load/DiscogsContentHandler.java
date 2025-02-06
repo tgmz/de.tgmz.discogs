@@ -46,7 +46,6 @@ public class DiscogsContentHandler extends DefaultHandler {
 	protected XMLReader xmlReader;
 	protected Discogs discogs;
 	protected int count;
-	protected boolean complete;
 	private StringBuilder chars;
 
 	public DiscogsContentHandler() {
@@ -67,8 +66,6 @@ public class DiscogsContentHandler extends DefaultHandler {
 		em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager();
 		
 		stack = new LinkedList<>();
-
-		complete = false;
 	}
 	
 	@Override
@@ -114,7 +111,9 @@ public class DiscogsContentHandler extends DefaultHandler {
 
 	@Override
 	public void characters(char[] ch, int start, int length) {
-		chars.append(String.valueOf(Arrays.copyOfRange(ch, start, start + length)));
+		if (!"notes".equals(stack.peek())) {
+			chars.append(String.valueOf(Arrays.copyOfRange(ch, start, start + length)));
+		}
 	}
 	
 	protected String getDisplayArtist(List<String> artists, List<String> joins) {
