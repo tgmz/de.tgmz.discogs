@@ -32,7 +32,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Discogs;
-import de.tgmz.discogs.domain.GenreSpec;
+import de.tgmz.discogs.domain.Genre;
 import de.tgmz.discogs.domain.Style;
 import jakarta.persistence.EntityManager;
 
@@ -146,15 +146,15 @@ public class DiscogsContentHandler extends DefaultHandler {
 
 		if (o instanceof Discogs d) {
 			if (!d.getGenreNames().isEmpty()) {
-				Set<GenreSpec> gs = new HashSet<>();
+				Set<Genre> gs = new HashSet<>();
 			
 				for (String s : d.getGenreNames()) {
-					List<GenreSpec> gl = em.createNamedQuery("GenreSpec.getByName", GenreSpec.class).setParameter(1, s).getResultList();
+					List<Genre> gl = em.createNamedQuery("Genre.getByName", Genre.class).setParameter(1, s).getResultList();
 				
 					if (!gl.isEmpty()) {
 						gs.add(gl.getFirst());
 					} else {
-						gs.add(new GenreSpec(s));
+						gs.add(new Genre(s));
 					}
 				}
 				
