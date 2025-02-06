@@ -23,19 +23,17 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import de.tgmz.discogs.domain.Artist;
+import de.tgmz.discogs.domain.ExtraArtist;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
 import de.tgmz.discogs.domain.Track;
 
 public class ReleaseContentHandler extends DiscogsContentHandler {
-	private static final String TAG_RELEASE = "release";
-	private static final String TAG_ARTISTS = "artists";
-	private static final String TAG_ARTIST = "artist";
 	private Artist artist;
+	private ExtraArtist extraArtist;
 	private Track track;
 	private List<String> displayArtists;
 	private List<String> displayJoins;
-	private boolean inTrack;
 
 	public void run(InputStream is) throws IOException, SAXException {
 		xmlReader.setContentHandler(this);
@@ -45,43 +43,38 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	@Override
 	public void startDocument() throws SAXException {
 		super.startDocument();
-		
-		inTrack = false;
 	}
 
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		super.startElement(uri, localName, qName, attributes);
 		
-		switch (qName) {
-		case TAG_RELEASE:
+		switch (path) {
+		case "[release, releases]":
 			discogs = new Release();
 			
 			((Release) discogs).setId(Long.parseLong(attributes.getValue("id")));
 			
 			break;
-		case TAG_ARTISTS:
-			if (!inTrack) {
-				displayArtists = new ArrayList<>();
-				displayJoins = new ArrayList<>();
-			}
+		case "[artists, release, releases]":
+			displayArtists = new ArrayList<>();
+			displayJoins = new ArrayList<>();
 			
 			break;
-		case "master_id":
+		case "[master_id, release, releases]":
 			((Release) discogs).setMain(Boolean.valueOf(attributes.getValue("is_main_release")));
 
 			break;
-		case TAG_ARTIST:
+		case "[artist, artists, release, releases]":
+		case "[artist, artists, track, tracklist, release, releases]":
 			artist = new Artist();
 			
 			break;
-		case "tracklist":
-			inTrack = true;
-			
+		case "[tracklist, release, releases]":
 			((Release) discogs).setTracklist(new LinkedList<>());
 			
 			break;
-		case "track":
+		case "[track, tracklist, release, releases]":
 			track = new Track();
 			
 			break;
@@ -91,97 +84,71 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 
 	@Override
 	public void endElement(String uri, String localName, String qName) {
-		super.endElement(uri, localName, qName);
-		
-		switch (qName) {
-		case "id":
-			if (TAG_ARTIST.equals(stack.peek())) {
-				artist.setId(Long.valueOf(getChars()));
-			}
+		switch (path) {
+		case "[id, artist, artists, release, releases]":
+		case "[id, artist, artists, track, tracklist, release, releases]":
+			artist.setId(Long.valueOf(getChars()));
 			
 			break;
-		case "master_id":
+		case "[master_id, release, releases]":
 			((Release) discogs).setMasterId(Long.parseLong(getChars()));
 
 			break;
-		case "name":
-			if (!inTrack) {
-				displayArtists.add(getChars());
-			}
+		case "[name, artist, artists, release, releases]":
+			displayArtists.add(getChars());
 			
 			break;
-		case "anv":
-			if (!inTrack) {
-				displayArtists.set(displayArtists.size() - 1, getChars());
-			}
+		case "[anv, artist, artists, release, releases]":
+			displayArtists.set(displayArtists.size() - 1, getChars());
 			
 			break;
-		case TAG_ARTIST:
-			if (!stack.contains("extraartists")) {
-				if (inTrack) {
-					track.getArtistIds().add(artist.getId());
-				} else {
-					discogs.getArtistIds().add(artist.getId());
-				}
-			}
+		case "[artist, artists, release, releases]":
+			discogs.getArtistIds().add(artist.getId());
+			break;
+		case "[artist, artists, track, tracklist, release, releases]":
+			track.getArtistIds().add(artist.getId());
+			break;
+		case "[join, artist, artists, release, releases]":
+			displayJoins.add(getChars());
 			
 			break;
-		case "join":
-			if (!inTrack) {
-				displayJoins.add(getChars());
-			}
-			
-			break;
-		case "position":
+		case "[position, track, tracklist, release, releases]":
 			track.setPosition(getChars());
 			
 			break;
-		case TAG_ARTISTS:
-			if (!inTrack) {
-				discogs.setDisplayArtist(getDisplayArtist(displayArtists, displayJoins));
-			}
+		case "[artists, release, releases]":
+			discogs.setDisplayArtist(getDisplayArtist(displayArtists, displayJoins));
 			
 			break;
-		case "duration":
+		case "[duration, track, tracklist, release, releases]":
 			track.setDuration(getChars());
 			
 			break;
-		case "title":
-			switch (stack.peek()) {
-			case TAG_RELEASE:
-				if (discogs.getTitle() == null) {
-					discogs.setTitle(getChars());
-				}
-				
-				break;
-			case "track":
-				track.setTitle(StringUtils.left(getChars(), MAX_LENGTH_DEFAULT));
-				
-				((Release) discogs).getTracklist().add(track);
-				
-				break;
-			default:
-				break;
+		case "[title, release, releases]":
+			if (discogs.getTitle() == null) {
+				discogs.setTitle(getChars());
 			}
+			break;
+				
+		case "[title, track, tracklist, release, releases]":
+			track.setTitle(StringUtils.left(getChars(), MAX_LENGTH_DEFAULT));
+				
+			((Release) discogs).getTracklist().add(track);
 				
 			break;
-		case "tracklist":
-			inTrack = false;
-			
-			break;
-		case "released":
+		case "[released, release, releases]":
 			((Release) discogs).setReleased(getChars());
 			
 			break;
-		case "data_quality":
+		case "[data_quality, release, releases]":
 			discogs.setDataQuality(getChars());
 			
 			break;
-		case "country":
+		case "[country, release, releases]":
 			((Release) discogs).setCountry(getChars());
 			
 			break;
-		case TAG_RELEASE:
+		case "[release, releases]":
 			if (((Release) discogs).getId() % 10_000 == 0 && LOG.isInfoEnabled()) {
 				LOG.info("Save {}", discogs);
 			}
@@ -195,6 +162,8 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			break;
 		default:
 		}
+		
+		super.endElement(uri, localName, qName);
 	}
 	@Override
 	public void endDocument() throws SAXException {

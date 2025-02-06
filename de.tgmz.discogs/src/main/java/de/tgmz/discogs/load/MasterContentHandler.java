@@ -24,9 +24,6 @@ import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.Master;
 
 public class MasterContentHandler extends DiscogsContentHandler {
-	private static final String TAG_MASTER = "master";
-	private static final String TAG_ARTISTS = "artists";
-	private static final String TAG_ARTIST = "artist";
 	private Artist artist;
 	private List<String> artists;
 	private List<String> joins;
@@ -40,21 +37,21 @@ public class MasterContentHandler extends DiscogsContentHandler {
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		super.startElement(uri, localName, qName, attributes);
 		
-		switch (qName) {
-		case TAG_MASTER:
+		switch (path) {
+		case "[master, masters]":
 			discogs = new Master();
 			
 			((Master) discogs).setId(Long.parseLong(attributes.getValue("id")));
 			
 			break;
-		case TAG_ARTISTS:
+		case "[artists, master, masters]":
 			discogs.setArtists(new HashSet<>());
 			
 			artists = new ArrayList<>();
 			joins = new ArrayList<>();
 			
 			break;
-		case TAG_ARTIST:
+		case "[artist, artists, master, masters]":
 			artist = new Artist();
 			
 			break;
@@ -64,24 +61,22 @@ public class MasterContentHandler extends DiscogsContentHandler {
 
 	@Override
 	public void endElement(String uri, String localName, String qName) {
-		super.endElement(uri, localName, qName);
-		
-		switch (qName) {
-		case "id":
+		switch (path) {
+		case "[id, artist, artists, master, masters]":
 			long id = Long.parseLong(getChars());
 			
 			artist.setId(id);
 			
 			break;
-		case "name":
+		case "[name, artist, artists, master, masters]":
 			artists.add(getChars());
 			
 			break;
-		case "anv":
+		case "[anv, artist, artists, master, masters]":
 			artists.set(artists.size() - 1, getChars());
 			
 			break;
-		case TAG_ARTIST:
+		case "[artist, artists, master, masters]":
 			Artist a0 = em.find(Artist.class, artist.getId());
 			
 			if (a0 == null) {
@@ -92,33 +87,31 @@ public class MasterContentHandler extends DiscogsContentHandler {
 			
 			break;
 			
-		case "year":
+		case "[year, master, masters]":
 			((Master) discogs).setPublished(Integer.parseInt(getChars()));
 			
 			break;
 			
-		case "join":
+		case "[join, artist, artists, master, masters]":
 			joins.add(getChars());
 			
 			break;
 
-		case "data_quality":
+		case "[data_quality, master, masters]":
 			discogs.setDataQuality(getChars());
 			
 			break;
 
-		case TAG_ARTISTS:
+		case "[artists, master, masters]":
 			discogs.setDisplayArtist(getDisplayArtist(artists, joins));
 			
 			break;
 			
-		case "title":
-			if (stack.size() == 2) {
-				discogs.setTitle(getChars());
-			}
+		case "[title, master, masters]":
+			discogs.setTitle(getChars());
 			
 			break;
-		case TAG_MASTER:
+		case "[master, masters]":
 			if (((Master) discogs).getId() % 10_000 == 0 && LOG.isInfoEnabled()) {
 				LOG.info("Save {}", discogs);
 			}
@@ -130,6 +123,8 @@ public class MasterContentHandler extends DiscogsContentHandler {
 			break;
 		default:
 		}
+		
+		super.endElement(uri, localName, qName);
 	}
 	@Override
 	public void endDocument() throws SAXException {

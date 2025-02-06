@@ -24,7 +24,6 @@ import de.tgmz.discogs.domain.Artist;
 
 public class ArtistContentHandler extends DiscogsContentHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(ArtistContentHandler.class);
-	private static final String TAG_ARTIST = "artist";
 	private Artist artist;
 
 	public void run(InputStream is) throws IOException, SAXException {
@@ -36,49 +35,40 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		super.startElement(uri, localName, qName, attributes);
 
-		if (TAG_ARTIST.equals(qName)) {
+		switch (path) {
+		case "[artist, artists]":
 			artist = new Artist();
-		}
-		
-		if ("namevariations".equals(qName)) {
+			break;
+		case "[namevariations, artist, artists]":
 			artist.setVariations(new TreeSet<>());
+			break;
+		default:
 		}
 	}
 
 	@Override
 	public void endElement(String uri, String localName, String qName) {
-		super.endElement(uri, localName, qName);
-		
-		switch (qName) {
-		case "id":
+		switch (path) {
+		case "[id, artist, artists]":
 			artist.setId(Long.parseLong(getChars()));
-			
 			break;
-
-		case "name":
-			switch (stack.peek()) {
-			case TAG_ARTIST:
-				String s = getChars();
-				
-				Matcher m = PA.matcher(s);
-				
-				if (m.matches() && m.groupCount() > 1) {
-					s = m.group(1);
-				}
-				
-				artist.setName(s.trim());
-				
-				break;
-			case "namevariations":
-				artist.getVariations().add(getChars());
-				
-				break;
-			default:
+		case "[name, artist, artists]":
+			String s = getChars();
+			
+			Matcher m = PA.matcher(s);
+			
+			if (m.matches() && m.groupCount() > 1) {
+				s = m.group(1);
 			}
 			
+			artist.setName(s.trim());
+			
 			break;
-		
-		case TAG_ARTIST:
+		case "[name, namevariations, artist, artists]":
+			artist.getVariations().add(getChars());
+				
+			break;
+		case "[artist, artists]":
 			if (artist.getId() % 10_000 == 0) {
 				LOG.info("Save {}", artist);
 			}
@@ -88,6 +78,8 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 			break;
 		default:
 		}
+		
+		super.endElement(uri, localName, qName);
 	}
 	@Override
 	public void endDocument() throws SAXException {

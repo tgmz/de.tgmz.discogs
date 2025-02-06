@@ -41,7 +41,8 @@ public class DiscogsContentHandler extends DefaultHandler {
 	protected static final Logger LOG = LoggerFactory.getLogger(DiscogsContentHandler.class);
 	protected static final int MAX_LENGTH_DEFAULT = 254;
 	protected static final int MAX_LENGTH_DISPLAY = 510;
-	protected Deque<String> stack;
+	private Deque<String> stack;
+	protected String path;
 	protected EntityManager em;
 	protected XMLReader xmlReader;
 	protected Discogs discogs;
@@ -66,6 +67,7 @@ public class DiscogsContentHandler extends DefaultHandler {
 		em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager();
 		
 		stack = new LinkedList<>();
+		path = "";
 	}
 	
 	@Override
@@ -76,6 +78,7 @@ public class DiscogsContentHandler extends DefaultHandler {
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		stack.push(qName);
+		path = stack.toString();
 		
 		chars = new StringBuilder();
 		
@@ -95,6 +98,7 @@ public class DiscogsContentHandler extends DefaultHandler {
 	@Override
 	public void endElement(String uri, String localName, String qName) {
 		stack.pop();
+		path = stack.toString();
 
 		switch (qName) {
 		case "genre":
@@ -173,7 +177,6 @@ public class DiscogsContentHandler extends DefaultHandler {
 				d.setStyles(ss);
 			}
 		}
-
 
 		DatabaseService.getInstance().inTransaction(x -> x.merge(o));
 		
