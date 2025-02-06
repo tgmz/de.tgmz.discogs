@@ -37,6 +37,8 @@ public class Track implements Serializable {
 	private String duration;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private Set<Artist> artists;
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	private Set<ExtraArtist> extraArtists;
 	@Transient
 	private List<Long> artistIds;
 
@@ -86,6 +88,14 @@ public class Track implements Serializable {
 
 	public void setDuration(String duration) {
 		this.duration = duration;
+	}
+
+	public Set<ExtraArtist> getExtraArtists() {
+		return extraArtists;
+	}
+
+	public void setExtraArtists(Set<ExtraArtist> extraArtists) {
+		this.extraArtists = extraArtists;
 	}
 
 	public void setArtists(Set<Artist> artists) {

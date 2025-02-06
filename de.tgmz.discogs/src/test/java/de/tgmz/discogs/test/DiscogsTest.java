@@ -10,10 +10,15 @@
 package de.tgmz.discogs.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -22,8 +27,10 @@ import org.xml.sax.SAXException;
 
 import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Artist;
+import de.tgmz.discogs.domain.ExtraArtist;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
+import de.tgmz.discogs.domain.Track;
 import de.tgmz.discogs.load.ArtistContentHandler;
 import de.tgmz.discogs.load.MasterContentHandler;
 import de.tgmz.discogs.load.ReleaseContentHandler;
@@ -78,10 +85,32 @@ public class DiscogsTest {
 
 		assertEquals("World In My Eyes", r.getTracklist().getFirst().getTitle());
 		assertEquals(m, r.getMaster());
+		assertEquals("Depeche Mode", r.getDisplayArtist());
 		assertEquals("US", r.getCountry());
 		assertEquals("1990-03-20", r.getReleased());
 		assertEquals("Correct", r.getDataQuality());
+		assertFalse(r.isMain());
 		assertTrue(r.getGenres().stream().allMatch(x -> x.getName().equals("Electronic")));
 		assertTrue(r.getStyles().stream().allMatch(x -> x.getName().equals("Synth-pop")));
+		assertTrue(r.getExtraArtists().stream().filter(x -> x.getArtist() != null && "Alan Gregorie".equals(x.getArtist().getName())).findFirst().isPresent());
+		
+		List<Track> tracklist = r.getTracklist();
+		
+		assertEquals(9, tracklist.size());
+		
+		Track t = tracklist.get(5);
+		
+		assertNotNull(t);
+		assertEquals("6", t.getPosition());
+		assertEquals("6:12", t.getDuration());
+		//assertNull(t.getArtists());TODO
+		
+		Set<ExtraArtist> eas = t.getExtraArtists();
+		
+		Optional<ExtraArtist> any = eas.stream().filter(x -> x.getArtist() != null && "Flood".equals(x.getArtist().getName())).findAny();
+		
+		assertTrue(any.isPresent());
+		assertEquals("Mixed By", any.get().getRole());
+		assertEquals("Flood", any.get().getArtist().getName());
 	}
 }

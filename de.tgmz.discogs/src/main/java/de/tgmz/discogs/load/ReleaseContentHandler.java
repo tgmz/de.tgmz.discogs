@@ -41,11 +41,6 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	}
 
 	@Override
-	public void startDocument() throws SAXException {
-		super.startDocument();
-	}
-
-	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		super.startElement(uri, localName, qName, attributes);
 		
@@ -65,8 +60,8 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			((Release) discogs).setMain(Boolean.valueOf(attributes.getValue("is_main_release")));
 
 			break;
-		case "[artist, artists, release, releases]":
-		case "[artist, artists, track, tracklist, release, releases]":
+		case "[artist, artists, release, releases]"
+		   , "[artist, artists, track, tracklist, release, releases]":
 			artist = new Artist();
 			
 			break;
@@ -78,6 +73,17 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			track = new Track();
 			
 			break;
+		case "[extraartists, release, releases]":
+			((Release) discogs).setExtraArtists(new HashSet<>());
+			break;
+		case "[extraartists, track, tracklist, release, releases]":
+			track.setExtraArtists(new HashSet<>());
+			break;
+		case "[artist, extraartists, release, releases]"
+		   , "[artist, extraartists, track, tracklist, release, releases]":
+			extraArtist = new ExtraArtist();
+			
+			break;
 		default:
 		}
 	}
@@ -85,8 +91,8 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	@Override
 	public void endElement(String uri, String localName, String qName) {
 		switch (path) {
-		case "[id, artist, artists, release, releases]":
-		case "[id, artist, artists, track, tracklist, release, releases]":
+		case "[id, artist, artists, release, releases]"
+		   , "[id, artist, artists, track, tracklist, release, releases]":
 			artist.setId(Long.valueOf(getChars()));
 			
 			break;
@@ -148,6 +154,25 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			((Release) discogs).setCountry(getChars());
 			
 			break;
+		case "[id, artist, extraartists, release, releases]"
+		  ,  "[id, artist, extraartists, track, tracklist, release, releases]":
+			extraArtist.setArtist(new Artist());
+			extraArtist.getArtist().setId(Long.parseLong(getChars()));
+			break;
+		case "[role, artist, extraartists, release, releases]"
+		   , "[role, artist, extraartists, track, tracklist, release, releases]":
+			extraArtist.setRole(getChars());
+			break;
+		case "[artist, extraartists, release, releases]":
+			((Release) discogs).getExtraArtists().add(extraArtist);
+			
+			extraArtist = null;
+			break;
+		case "[artist, extraartists, track, tracklist, release, releases]":
+			track.getExtraArtists().add(extraArtist);
+			
+			extraArtist = null;
+			break;
 		case "[release, releases]":
 			if (((Release) discogs).getId() % 10_000 == 0 && LOG.isInfoEnabled()) {
 				LOG.info("Save {}", discogs);
@@ -183,9 +208,28 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 		
 		for (Track t : ((Release) discogs).getTracklist()) {
 			t.setArtists(getArtists(t.getArtistIds()));
+			
+			if (t.getExtraArtists() != null) {
+				for (ExtraArtist ea : t.getExtraArtists()) {
+					Artist a = ea.getArtist();
+				
+					if ( a != null) {
+						ea.setArtist(em.find(Artist.class, a.getId()));
+					}
+				}
+			}
 		}
 		
 		((Release) discogs).setMaster(em.find(Master.class, ((Release) discogs).getMasterId()));
+		
+		for (ExtraArtist ea : ((Release) discogs).getExtraArtists()) {
+			Artist a = ea.getArtist();
+			
+			
+			if ( a != null) {
+				ea.setArtist(em.find(Artist.class, a.getId()));
+			}
+		}
 	}
 	
 	private Set<Artist> getArtists(List<Long> artistIds) {

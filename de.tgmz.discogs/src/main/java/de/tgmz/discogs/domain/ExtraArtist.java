@@ -1,5 +1,5 @@
 /*********************************************************************
-* Copyright (c) 02.02.2025 Thomas Zierer
+* Copyright (c) 06.02.2025 Thomas Zierer
 *
 * This program and the accompanying materials are made
 * available under the terms of the Eclipse Public License 2.0
@@ -11,50 +11,42 @@ package de.tgmz.discogs.domain;
 
 import java.io.Serializable;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.NamedQuery;
-import jakarta.persistence.Transient;
+import jakarta.persistence.ManyToOne;
 
-/**
- * Genre entity
- */
 @Entity
-@NamedQuery(name="Genre.getByName", query="FROM Genre WHERE name = ?1")
-public class Genre implements Serializable {
-	@Transient
-	private static final long serialVersionUID = 5684918391708831387L;
+public class ExtraArtist implements Serializable { 
+	private static final long serialVersionUID = 2296552658329482485L;
 	@Id
 	@GeneratedValue
 	private long id;
-	private String name;
-
-	public Genre() {
-	}
-
-	public Genre(String name) {
-		this.name = name;
-	}
-
+	private String role;
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	private Artist artist;
 	public long getId() {
 		return id;
 	}
-
-	public String getName() {
-		return name;
-	}
-
 	public void setId(long id) {
 		this.id = id;
 	}
-
-	public void setName(String name) {
-		this.name = name;
+	public String getRole() {
+		return role;
 	}
-
+	public void setRole(String role) {
+		this.role = role;
+	}
+	public Artist getArtist() {
+		return artist;
+	}
+	public void setArtist(Artist extraArtists) {
+		this.artist = extraArtists;
+	}
 	@Override
 	public String toString() {
-		return "Genre [id=" + id + ", name=" + name + "]";
+		return "ExtraArtist [id=" + id + ", role=" + role + ", artist=" + artist + "]";
 	}
 }

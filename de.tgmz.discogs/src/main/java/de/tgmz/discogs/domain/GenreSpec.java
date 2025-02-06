@@ -21,8 +21,8 @@ import jakarta.persistence.Transient;
  * GenreSpec entity
  */
 @Entity
-@NamedQuery(name="Style.getByName", query="FROM Style WHERE name = ?1")
-public class Style implements Serializable {
+@NamedQuery(name="GenreSpec.getByName", query="FROM GenreSpec WHERE name = ?1")
+public class GenreSpec implements Serializable {
 	@Transient
 	private static final long serialVersionUID = 5684918391708831387L;
 	@Id
@@ -30,10 +30,10 @@ public class Style implements Serializable {
 	private long id;
 	private String name;
 
-	public Style() {
+	public GenreSpec() {
 	}
 
-	public Style(String name) {
+	public GenreSpec(String name) {
 		this.name = name;
 	}
 

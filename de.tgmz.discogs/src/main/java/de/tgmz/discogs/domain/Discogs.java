@@ -31,7 +31,7 @@ public abstract class Discogs implements Serializable {
 	@Column(length = 512)
 	private String displayArtist;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-	private Set<Genre> genres;
+	private Set<GenreSpec> genreSpecs;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private Set<Style> styles;
 	@Transient
@@ -71,16 +71,16 @@ public abstract class Discogs implements Serializable {
 		return displayArtist;
 	}
 
-	public Set<Genre> getGenres() {
-		return genres;
+	public Set<GenreSpec> getGenres() {
+		return genreSpecs;
 	}
 
 	public Set<Style> getStyles() {
 		return styles;
 	}
 
-	public void setGenres(Set<Genre> genres) {
-		this.genres = genres;
+	public void setGenres(Set<GenreSpec> genreSpecs) {
+		this.genreSpecs = genreSpecs;
 	}
 
 	public void setStyles(Set<Style> styles) {

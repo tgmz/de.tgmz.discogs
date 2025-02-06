@@ -10,12 +10,14 @@
 package de.tgmz.discogs.domain;
 
 import java.util.List;
+import java.util.Set;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
@@ -43,6 +45,8 @@ public class Release extends Discogs {
 	private Master master;
 	private String country;
 	private String released;
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	private Set<ExtraArtist> extraArtists;
 	@Transient
 	private long masterId;
 
@@ -96,6 +100,14 @@ public class Release extends Discogs {
 
 	public void setMaster(Master master) {
 		this.master = master;
+	}
+
+	public Set<ExtraArtist> getExtraArtists() {
+		return extraArtists;
+	}
+
+	public void setExtraArtists(Set<ExtraArtist> extraArtists) {
+		this.extraArtists = extraArtists;
 	}
 
 	public long getMasterId() {
