@@ -10,9 +10,7 @@
 package de.tgmz.discogs.domain;
 
 import java.io.Serializable;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -36,15 +34,9 @@ public class Track implements Serializable {
 	private String position;
 	private String duration;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-	private Set<Artist> artists;
+	private List<Artist> artists;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-	private Set<ExtraArtist> extraArtists;
-	@Transient
-	private List<Long> artistIds;
-
-	public Track() {
-		artistIds = new LinkedList<>();
-	}
+	private List<ExtraArtist> extraArtists;
 
 	public long getId() {
 		return id;
@@ -62,16 +54,8 @@ public class Track implements Serializable {
 		return duration;
 	}
 
-	public Set<Artist> getArtists() {
+	public List<Artist> getArtists() {
 		return artists;
-	}
-
-	/**
-	 * The ids of the artists involved. Useful in ReleaseContentHandler if we decide not to persist a release.
-	 * @return the artists
-	 */
-	public List<Long> getArtistIds() {
-		return artistIds;
 	}
 
 	public void setId(long id) {
@@ -90,24 +74,20 @@ public class Track implements Serializable {
 		this.duration = duration;
 	}
 
-	public Set<ExtraArtist> getExtraArtists() {
+	public List<ExtraArtist> getExtraArtists() {
 		return extraArtists;
 	}
 
-	public void setExtraArtists(Set<ExtraArtist> extraArtists) {
+	public void setExtraArtists(List<ExtraArtist> extraArtists) {
 		this.extraArtists = extraArtists;
 	}
 
-	public void setArtists(Set<Artist> artists) {
+	public void setArtists(List<Artist> artists) {
 		this.artists = artists;
-	}
-
-	public void setArtistIds(List<Long> artistIds) {
-		this.artistIds = artistIds;
 	}
 
 	@Override
 	public String toString() {
-		return "Track [position=" + position + ", title=" + title + ", duration=" + duration + "]";
+		return "Track [position=" + position + ", title=" + title + ", duration=" + duration + ", extraArtists=" + extraArtists + "]";
 	}
 }

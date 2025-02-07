@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -62,36 +61,44 @@ public class DiscogsTest {
 		}
 		
 		Artist a = em.find(Artist.class, 2725L);
-		
-		assertEquals("Depeche Mode", a.getName());
-		assertTrue(a.getVariations().contains("D M"));
+		checkArtist(a);
 		
 		try (InputStream is = this.getClass().getClassLoader().getResourceAsStream("discogs_20250101_masters_Violator.xml")) {
 			new MasterContentHandler().run(is);
 		}
 		
 		Master m = em.find(Master.class, 18080L);
+		checkMaster(m);
 
-		assertEquals("Violator", m.getTitle());
-		assertEquals("Correct", m.getDataQuality());
-		assertTrue(m.getGenres().stream().allMatch(x -> x.getName().equals("Electronic")));
-		assertTrue(m.getStyles().stream().allMatch(x -> x.getName().equals("Synth-pop")));
-		
 		try (InputStream is = this.getClass().getClassLoader().getResourceAsStream("discogs_20250101_releases_Violator.xml")) {
 			new ReleaseContentHandler().run(is);
 		}
 		
 		Release r = em.find(Release.class, 10222L);
-
-		assertEquals("World In My Eyes", r.getTracklist().getFirst().getTitle());
+		checkRelease(r, m);
+	}
+	private void checkArtist(Artist a) {
+		assertEquals("Depeche Mode", a.getName());
+		assertTrue(a.getVariations().contains("D M"));
+	}
+	private void checkMaster(Master m) {
+		assertEquals("Violator", m.getTitle());
+		assertEquals("Correct", m.getDataQuality());
+		assertEquals(1990, m.getPublished().intValue());
+		assertTrue(m.getGenres().stream().allMatch(x -> x.getName().equals("Electronic")));
+		assertTrue(m.getStyles().stream().allMatch(x -> x.getName().equals("Synth-pop")));
+	}
+	private void checkRelease(Release r, Master m) {
 		assertEquals(m, r.getMaster());
 		assertEquals("Depeche Mode", r.getDisplayArtist());
 		assertEquals("US", r.getCountry());
 		assertEquals("1990-03-20", r.getReleased());
 		assertEquals("Correct", r.getDataQuality());
+		assertEquals("Accepted", r.getStatus());
 		assertFalse(r.isMain());
-		assertTrue(r.getGenres().stream().allMatch(x -> x.getName().equals("Electronic")));
-		assertTrue(r.getStyles().stream().allMatch(x -> x.getName().equals("Synth-pop")));
+		assertEquals("World In My Eyes", r.getTracklist().getFirst().getTitle());
+		assertTrue(r.getGenres().stream().allMatch(x -> "Electronic".equals(x.getName())));
+		assertTrue(r.getStyles().stream().allMatch(x -> "Synth-pop".equals(x.getName())));
 		assertTrue(r.getExtraArtists().stream().filter(x -> x.getArtist() != null && "Alan Gregorie".equals(x.getArtist().getName())).findFirst().isPresent());
 		
 		List<Track> tracklist = r.getTracklist();
@@ -103,9 +110,9 @@ public class DiscogsTest {
 		assertNotNull(t);
 		assertEquals("6", t.getPosition());
 		assertEquals("6:12", t.getDuration());
-		//assertNull(t.getArtists());TODO
+		assertTrue(t.getArtists().isEmpty());
 		
-		Set<ExtraArtist> eas = t.getExtraArtists();
+		List<ExtraArtist> eas = t.getExtraArtists();
 		
 		Optional<ExtraArtist> any = eas.stream().filter(x -> x.getArtist() != null && "Flood".equals(x.getArtist().getName())).findAny();
 		

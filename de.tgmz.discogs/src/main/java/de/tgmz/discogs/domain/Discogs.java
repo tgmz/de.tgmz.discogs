@@ -10,16 +10,13 @@
 package de.tgmz.discogs.domain;
 
 import java.io.Serializable;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.Transient;
 
 @MappedSuperclass
 public abstract class Discogs implements Serializable {
@@ -27,24 +24,15 @@ public abstract class Discogs implements Serializable {
 	private String dataQuality;
 	private String title;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-	private Set<Artist> artists;
+	private List<Artist> artists;
 	@Column(length = 512)
 	private String displayArtist;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-	private Set<Genre> genres;
+	private List<Genre> genres;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-	private Set<Style> styles;
-	@Transient
-	private List<Long> artistIds;
-	@Transient
-	private List<String> genreNames;
-	@Transient
-	private List<String> styleNames;
+	private List<Style> styles;
 
 	protected Discogs() {
-		artistIds = new LinkedList<>();
-		genreNames = new LinkedList<>();
-		styleNames = new LinkedList<>();
 	}
 
 	/**
@@ -59,55 +47,47 @@ public abstract class Discogs implements Serializable {
 	 * The artists involved.
 	 * @return the artists
 	 */
-	public Set<Artist> getArtists() {
+	public List<Artist> getArtists() {
 		return artists;
 	}
 
 	/**
 	 * The artist(s) as displayed on the cover. Important for collaborations e.g. &apos;Prince And The New Power Generation&apos;
-	 * @return
+	 * @return the artist(s) as displayed on the cover
 	 */
 	public String getDisplayArtist() {
 		return displayArtist;
 	}
 
-	public Set<Genre> getGenres() {
+	/**
+	 * The genres e.g. &apos;Electronic&apos;
+	 * @return the genres
+	 */
+	public List<Genre> getGenres() {
 		return genres;
 	}
 
-	public Set<Style> getStyles() {
+	/**
+	 * The styles e.g. &apos;Synth-pop&apos;
+	 * @return the styles
+	 */
+	public List<Style> getStyles() {
 		return styles;
 	}
 
-	public void setGenres(Set<Genre> genres) {
-		this.genres = genres;
-	}
-
-	public void setStyles(Set<Style> styles) {
-		this.styles = styles;
-	}
-
+	/**
+	 * The data quality e.g. &apos;Correct&apos;, &apos;Needs vote&apos
+	 * @return the styles
+	 */
 	public String getDataQuality() {
 		return dataQuality;
-	}
-
-	public void setDataQuality(String dataQuality) {
-		this.dataQuality = dataQuality;
-	}
-
-	/**
-	 * The ids of the artists involved. Useful in ReleaseContentHandler if we decide not to persist a release.
-	 * @return the artistIds
-	 */
-	public List<Long> getArtistIds() {
-		return artistIds;
 	}
 
 	public void setTitle(String title) {
 		this.title = title;
 	}
 
-	public void setArtists(Set<Artist> artists) {
+	public void setArtists(List<Artist> artists) {
 		this.artists = artists;
 	}
 
@@ -115,24 +95,16 @@ public abstract class Discogs implements Serializable {
 		this.displayArtist = displayArtist;
 	}
 
-	public void setArtistIds(List<Long> artistIds) {
-		this.artistIds = artistIds;
+	public void setGenres(List<Genre> genres) {
+		this.genres = genres;
 	}
 
-	public List<String> getGenreNames() {
-		return genreNames;
+	public void setStyles(List<Style> styles) {
+		this.styles = styles;
 	}
 
-	public List<String> getStyleNames() {
-		return styleNames;
-	}
-
-	public void setGenreNames(List<String> genreNames) {
-		this.genreNames = genreNames;
-	}
-
-	public void setStyleNames(List<String> styleNames) {
-		this.styleNames = styleNames;
+	public void setDataQuality(String dataQuality) {
+		this.dataQuality = dataQuality;
 	}
 
 	@Override

@@ -9,15 +9,12 @@
 **********************************************************************/
 package de.tgmz.discogs.load;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import de.tgmz.discogs.domain.Artist;
@@ -25,13 +22,8 @@ import de.tgmz.discogs.domain.Master;
 
 public class MasterContentHandler extends DiscogsContentHandler {
 	private Artist artist;
-	private List<String> artists;
+	private List<String> artistNames;
 	private List<String> joins;
-
-	public void run(InputStream is) throws IOException, SAXException {
-		xmlReader.setContentHandler(this);
-		xmlReader.parse(new InputSource(is));
-	}
 
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
@@ -45,9 +37,9 @@ public class MasterContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[artists, master, masters]":
-			discogs.setArtists(new HashSet<>());
+			discogs.setArtists(new LinkedList<>());
 			
-			artists = new ArrayList<>();
+			artistNames = new ArrayList<>();
 			joins = new ArrayList<>();
 			
 			break;
@@ -69,11 +61,11 @@ public class MasterContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[name, artist, artists, master, masters]":
-			artists.add(getChars());
+			artistNames.add(getChars());
 			
 			break;
 		case "[anv, artist, artists, master, masters]":
-			artists.set(artists.size() - 1, getChars());
+			artistNames.set(artistNames.size() - 1, getChars());
 			
 			break;
 		case "[artist, artists, master, masters]":
@@ -103,7 +95,7 @@ public class MasterContentHandler extends DiscogsContentHandler {
 			break;
 
 		case "[artists, master, masters]":
-			discogs.setDisplayArtist(getDisplayArtist(artists, joins));
+			discogs.setDisplayArtist(getDisplayArtist(artistNames, joins));
 			
 			break;
 			
@@ -112,7 +104,7 @@ public class MasterContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[master, masters]":
-			if (((Master) discogs).getId() % 10_000 == 0 && LOG.isInfoEnabled()) {
+			if (((Master) discogs).getId() % threshold == 0) {
 				LOG.info("Save {}", discogs);
 			}
 			
@@ -135,7 +127,11 @@ public class MasterContentHandler extends DiscogsContentHandler {
 		super.endDocument();
 	}
 	
-	public Master getMaster() {
+	/**
+	 * For use in filtered handlers
+	 * @return the master
+	 */
+	protected Master getMaster() {
 		return (Master) discogs;
 	}
 }

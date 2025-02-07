@@ -35,10 +35,6 @@ public class Artist implements Serializable {
 	@ElementCollection
 	private Set<String> variations;
 
-	public Artist() {
-		super();
-	}
-
 	/**
 	 * The artists id obtained from discogs <id> tag.
 	 * @return the id

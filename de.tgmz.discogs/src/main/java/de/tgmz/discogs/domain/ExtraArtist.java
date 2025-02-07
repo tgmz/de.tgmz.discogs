@@ -27,24 +27,44 @@ public class ExtraArtist implements Serializable {
 	private String role;
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private Artist artist;
+	
+	
+	/**
+	 * The id (generated)
+	 * @return the id
+	 */
 	public long getId() {
 		return id;
 	}
-	public void setId(long id) {
-		this.id = id;
-	}
+	
+	/**
+	 * The role e.g. &apos;Engeneer&apos;
+	 * @return the role
+	 */
 	public String getRole() {
 		return role;
 	}
-	public void setRole(String role) {
-		this.role = role;
-	}
+	
+	/**
+	 * The artist
+	 * @return the artist
+	 */
 	public Artist getArtist() {
 		return artist;
 	}
+	
+	public void setId(long id) {
+		this.id = id;
+	}
+	
+	public void setRole(String role) {
+		this.role = role;
+	}
+	
 	public void setArtist(Artist extraArtists) {
 		this.artist = extraArtists;
 	}
+	
 	@Override
 	public String toString() {
 		return "ExtraArtist [id=" + id + ", role=" + role + ", artist=" + artist + "]";

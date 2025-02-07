@@ -10,7 +10,6 @@
 package de.tgmz.discogs.domain;
 
 import java.util.List;
-import java.util.Set;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -20,9 +19,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 
 /**
  * Release entity.
@@ -37,8 +34,8 @@ public class Release extends Discogs {
 	private static final long serialVersionUID = -8124211768010344837L;
 	@Id
 	private long id;
+	private String status;
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-	@OrderBy(value = "position")
 	private List<Track> tracklist;
 	private boolean _main;
 	@ManyToOne
@@ -46,9 +43,7 @@ public class Release extends Discogs {
 	private String country;
 	private String released;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-	private Set<ExtraArtist> extraArtists;
-	@Transient
-	private long masterId;
+	private List<ExtraArtist> extraArtists;
 
 	public long getId() {
 		return id;
@@ -64,6 +59,14 @@ public class Release extends Discogs {
 
 	public boolean isMain() {
 		return _main;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 	public String getCountry() {
@@ -102,25 +105,17 @@ public class Release extends Discogs {
 		this.master = master;
 	}
 
-	public Set<ExtraArtist> getExtraArtists() {
+	public List<ExtraArtist> getExtraArtists() {
 		return extraArtists;
 	}
 
-	public void setExtraArtists(Set<ExtraArtist> extraArtists) {
+	public void setExtraArtists(List<ExtraArtist> extraArtists) {
 		this.extraArtists = extraArtists;
-	}
-
-	public long getMasterId() {
-		return masterId;
-	}
-
-	public void setMasterId(long masterId) {
-		this.masterId = masterId;
 	}
 
 	@Override
 	public String toString() {
-		return "Release [id=" + String.format("%,d", id) + ", Discogs=" + super.toString() + ", tracklist=" + tracklist + "]";
+		return "Release [id=" + String.format("%,d", id) + ", Discogs=" + super.toString() + ", country=" + country  + ", extraArtists=" + extraArtists + ", tracklist=" + tracklist + "]";
 	}
 
 }

@@ -9,15 +9,12 @@
 **********************************************************************/
 package de.tgmz.discogs.load;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import de.tgmz.discogs.domain.Artist;
@@ -25,11 +22,6 @@ import de.tgmz.discogs.domain.Artist;
 public class ArtistContentHandler extends DiscogsContentHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(ArtistContentHandler.class);
 	private Artist artist;
-
-	public void run(InputStream is) throws IOException, SAXException {
-		xmlReader.setContentHandler(this);
-		xmlReader.parse(new InputSource(is));
-	}
 
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
