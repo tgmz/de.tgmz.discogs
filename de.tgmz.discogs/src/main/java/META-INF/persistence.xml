@@ -26,6 +26,7 @@
 		<class>de.tgmz.discogs.domain.Genre</class>
 		<class>de.tgmz.discogs.domain.Style</class>
 		<class>de.tgmz.discogs.domain.ExtraArtist</class>
+		<class>de.tgmz.discogs.domain.SubTrack</class>
 
 		<properties>
 			<!-- Database connection settings -->

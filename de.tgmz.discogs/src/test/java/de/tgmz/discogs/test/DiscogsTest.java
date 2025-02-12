@@ -55,7 +55,7 @@ public class DiscogsTest {
 	}
 	
 	@Test
-	public void test() throws IOException, SAXException {
+	public void testViolator() throws IOException, SAXException {
 		try (InputStream is = this.getClass().getClassLoader().getResourceAsStream("discogs_20250101_artists_Depeche_Mode.xml")) {
 			new ArtistContentHandler().run(is);
 		}
@@ -76,6 +76,16 @@ public class DiscogsTest {
 		
 		Release r = em.find(Release.class, 10222L);
 		checkRelease(r, m);
+	}
+	@Test
+	public void testSubtrack() throws IOException, SAXException {
+		try (InputStream is = this.getClass().getClassLoader().getResourceAsStream("discogs_20250101_r2460568.xml")) {
+			new ReleaseContentHandler().run(is);
+		}
+		
+		Release r = em.find(Release.class, 2460568L);
+		assertTrue(r.getTracklist().get(10).getSubTracklist().isEmpty());
+		assertEquals("Sometimes I Feel Like A Motherless Child", r.getTracklist().get(11).getSubTracklist().get(0).getTitle());
 	}
 	private void checkArtist(Artist a) {
 		assertEquals("Depeche Mode", a.getName());

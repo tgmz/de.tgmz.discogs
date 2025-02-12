@@ -22,12 +22,14 @@ import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.ExtraArtist;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
+import de.tgmz.discogs.domain.SubTrack;
 import de.tgmz.discogs.domain.Track;
 
 public class ReleaseContentHandler extends DiscogsContentHandler {
 	private List<String> displayArtists;
 	private List<String> displayJoins;
 	private int trackNumber;
+	private int subTrackNumber;
 	protected boolean ignore;
 
 	@Override
@@ -92,6 +94,17 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 		case "[artist, extraartists, track, tracklist, release, releases]":
 			((Release) discogs).getTracklist().getLast().getExtraArtists().add(new ExtraArtist());
 			((Release) discogs).getTracklist().getLast().getExtraArtists().getLast().setArtist(new Artist());
+			
+			break;
+		case "[sub_tracks, track, tracklist, release, releases]":
+			((Release) discogs).getTracklist().getLast().setSubTracklist(new LinkedList<>());
+			subTrackNumber = 1;
+			
+			break;
+		case "[track, sub_tracks, track, tracklist, release, releases]":
+			SubTrack st = new SubTrack();
+			st.setTrackNumber(subTrackNumber++);
+			((Release) discogs).getTracklist().getLast().getSubTracklist().add(st);
 			
 			break;
 		default:
@@ -175,6 +188,14 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			break;
 		case "[role, artist, extraartists, track, tracklist, release, releases]":
 			((Release) discogs).getTracklist().getLast().getExtraArtists().getLast().setRole(StringUtils.left(getChars(), MAX_LENGTH_DEFAULT));
+			
+			break;
+		case "[position, track, sub_tracks, track, tracklist, release, releases]":
+			((Release) discogs).getTracklist().getLast().getSubTracklist().getLast().setPosition(getChars());
+			
+			break;
+		case "[title, track, sub_tracks, track, tracklist, release, releases]":
+			((Release) discogs).getTracklist().getLast().getSubTracklist().getLast().setTitle(getChars());
 			
 			break;
 		case "[release, releases]":

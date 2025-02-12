@@ -18,6 +18,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Transient;
 
 /**
@@ -38,6 +40,9 @@ public class Track implements Serializable {
 	private List<Artist> artists;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private List<ExtraArtist> extraArtists;
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	@OrderBy(value = "trackNumber")
+	private List<SubTrack> subTracklist;
 
 	public long getId() {
 		return id;
@@ -63,6 +68,14 @@ public class Track implements Serializable {
 		return artists;
 	}
 
+	public List<ExtraArtist> getExtraArtists() {
+		return extraArtists;
+	}
+
+	public List<SubTrack> getSubTracklist() {
+		return subTracklist;
+	}
+
 	public void setId(long id) {
 		this.id = id;
 	}
@@ -83,16 +96,16 @@ public class Track implements Serializable {
 		this.duration = duration;
 	}
 
-	public List<ExtraArtist> getExtraArtists() {
-		return extraArtists;
-	}
-
 	public void setExtraArtists(List<ExtraArtist> extraArtists) {
 		this.extraArtists = extraArtists;
 	}
 
 	public void setArtists(List<Artist> artists) {
 		this.artists = artists;
+	}
+
+	public void setSubTracklist(List<SubTrack> subTracklist) {
+		this.subTracklist = subTracklist;
 	}
 
 	@Override
