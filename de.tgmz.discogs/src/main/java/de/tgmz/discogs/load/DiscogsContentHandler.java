@@ -192,7 +192,7 @@ public class DiscogsContentHandler extends DefaultHandler {
 
 	public String getChars() {
 		// Remove superflous blanks
-		return chars.toString().trim().replaceAll("\\s{2,}", "\\s");
+		return chars.toString().trim().replaceAll("\\s{2,}", " ");
 	}
 	protected void popStack() {
 		stack.pop();
