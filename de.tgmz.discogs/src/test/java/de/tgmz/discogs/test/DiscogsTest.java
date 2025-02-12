@@ -14,6 +14,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -56,24 +57,14 @@ public class DiscogsTest {
 	
 	@Test
 	public void testViolator() throws IOException, SAXException {
-		try (InputStream is = this.getClass().getClassLoader().getResourceAsStream("discogs_20250101_artists_Depeche_Mode.xml")) {
-			new ArtistContentHandler().run(is);
-		}
+		load("Violator");
 		
 		Artist a = em.find(Artist.class, 2725L);
 		checkArtist(a);
 		
-		try (InputStream is = this.getClass().getClassLoader().getResourceAsStream("discogs_20250101_masters_Violator.xml")) {
-			new MasterContentHandler().run(is);
-		}
-		
 		Master m = em.find(Master.class, 18080L);
 		checkMaster(m);
 
-		try (InputStream is = this.getClass().getClassLoader().getResourceAsStream("discogs_20250101_releases_Violator.xml")) {
-			new ReleaseContentHandler().run(is);
-		}
-		
 		Release r = em.find(Release.class, 10222L);
 		checkRelease(r, m);
 	}
@@ -86,6 +77,30 @@ public class DiscogsTest {
 		Release r = em.find(Release.class, 2460568L);
 		assertTrue(r.getTracklist().get(10).getSubTracklist().isEmpty());
 		assertEquals("Sometimes I Feel Like A Motherless Child", r.getTracklist().get(11).getSubTracklist().get(0).getTitle());
+	}
+	@Test
+	public void testLilaWolken() throws IOException, SAXException {
+		load("Lila_Wolken");
+		
+		assertEquals("Yasha Conen", em.find(Artist.class, 910685L).getName());
+		
+		String displayArtist = "Marteria • Yasha • Miss Platnum";
+		
+		assertEquals(displayArtist, em.find(Master.class, 482870L).getDisplayArtist());
+		assertEquals(displayArtist, em.find(Release.class, 3870362L).getDisplayArtist());
+	}
+	private void load(String title) throws IOException,SAXException {
+		try (InputStream is = this.getClass().getClassLoader().getResourceAsStream(title + File.separator + "discogs_20250101_artists_" + title + ".xml")) {
+			new ArtistContentHandler().run(is);
+		}
+		
+		try (InputStream is = this.getClass().getClassLoader().getResourceAsStream(title + File.separator + "discogs_20250101_masters_" + title + ".xml")) {
+			new MasterContentHandler().run(is);
+		}
+		
+		try (InputStream is = this.getClass().getClassLoader().getResourceAsStream(title + File.separator + "discogs_20250101_releases_" + title + ".xml")) {
+			new ReleaseContentHandler().run(is);
+		}
 	}
 	private void checkArtist(Artist a) {
 		assertEquals("Depeche Mode", a.getName());
