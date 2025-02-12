@@ -86,7 +86,7 @@ public class DiscogsContentHandler extends DefaultHandler {
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		stack.push(qName);
-		path = stack.toString();
+		path = stack.reversed().toString();
 		
 		chars = new StringBuilder();
 		
@@ -196,6 +196,6 @@ public class DiscogsContentHandler extends DefaultHandler {
 	}
 	protected void popStack() {
 		stack.pop();
-		path = stack.toString();
+		path = stack.reversed().toString();
 	}
 }

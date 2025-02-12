@@ -28,10 +28,10 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 		super.startElement(uri, localName, qName, attributes);
 
 		switch (path) {
-		case "[artist, artists]":
+		case "[artists, artist]":
 			artist = new Artist();
 			break;
-		case "[namevariations, artist, artists]":
+		case "[artists, artist, namevariations]":
 			artist.setVariations(new TreeSet<>());
 			break;
 		default:
@@ -41,10 +41,10 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 	@Override
 	public void endElement(String uri, String localName, String qName) {
 		switch (path) {
-		case "[id, artist, artists]":
+		case "[artists, artist, id]":
 			artist.setId(Long.parseLong(getChars()));
 			break;
-		case "[name, artist, artists]":
+		case "[artists, artist, name]":
 			String s = getChars();
 			
 			Matcher m = PA.matcher(s);
@@ -56,11 +56,11 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 			artist.setName(s.trim());
 			
 			break;
-		case "[name, namevariations, artist, artists]":
+		case "[artists, artist, namevariations, name]":
 			artist.getVariations().add(getChars());
 				
 			break;
-		case "[artist, artists]":
+		case "[artists, artist]":
 			if (artist.getId() % 10_000 == 0) {
 				LOG.info("Save {}", artist);
 			}

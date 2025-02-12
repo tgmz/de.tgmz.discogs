@@ -30,20 +30,20 @@ public class MasterContentHandler extends DiscogsContentHandler {
 		super.startElement(uri, localName, qName, attributes);
 		
 		switch (path) {
-		case "[master, masters]":
+		case "[masters, master]":
 			discogs = new Master();
 			
 			((Master) discogs).setId(Long.parseLong(attributes.getValue("id")));
 			
 			break;
-		case "[artists, master, masters]":
+		case "[masters, master, artists]":
 			discogs.setArtists(new LinkedList<>());
 			
 			artistNames = new ArrayList<>();
 			joins = new ArrayList<>();
 			
 			break;
-		case "[artist, artists, master, masters]":
+		case "[masters, master, artists, artist]":
 			artist = new Artist();
 			
 			break;
@@ -54,21 +54,29 @@ public class MasterContentHandler extends DiscogsContentHandler {
 	@Override
 	public void endElement(String uri, String localName, String qName) {
 		switch (path) {
-		case "[id, artist, artists, master, masters]":
+		case "[masters, master, artists, artist, id]":
 			long id = Long.parseLong(getChars());
 			
 			artist.setId(id);
 			
 			break;
-		case "[name, artist, artists, master, masters]":
-			artistNames.add(getChars());
+		case "[masters, master, title]":
+			discogs.setTitle(getChars());
 			
 			break;
-		case "[anv, artist, artists, master, masters]":
-			artistNames.set(artistNames.size() - 1, getChars());
+		case "[masters, master, year]":
+			((Master) discogs).setPublished(Integer.parseInt(getChars()));
 			
 			break;
-		case "[artist, artists, master, masters]":
+		case "[masters, master, data_quality]":
+			discogs.setDataQuality(getChars());
+			
+			break;
+		case "[masters, master, artists]":
+			discogs.setDisplayArtist(getDisplayArtist(artistNames, joins));
+			
+			break;
+		case "[masters, master, artists, artist]":
 			Artist a0 = em.find(Artist.class, artist.getId());
 			
 			if (a0 == null) {
@@ -78,32 +86,19 @@ public class MasterContentHandler extends DiscogsContentHandler {
 			}
 			
 			break;
-			
-		case "[year, master, masters]":
-			((Master) discogs).setPublished(Integer.parseInt(getChars()));
+		case "[masters, master, artists, artist, name]":
+			artistNames.add(getChars());
 			
 			break;
-			
-		case "[join, artist, artists, master, masters]":
+		case "[masters, master, artists, artist, join]":
 			joins.add(getChars());
 			
 			break;
-
-		case "[data_quality, master, masters]":
-			discogs.setDataQuality(getChars());
+		case "[masters, master, artists, artist, anv]":
+			artistNames.set(artistNames.size() - 1, getChars());
 			
 			break;
-
-		case "[artists, master, masters]":
-			discogs.setDisplayArtist(getDisplayArtist(artistNames, joins));
-			
-			break;
-			
-		case "[title, master, masters]":
-			discogs.setTitle(getChars());
-			
-			break;
-		case "[master, masters]":
+		case "[masters, master]":
 			if (((Master) discogs).getId() % threshold == 0) {
 				LOG.info("Save {}", discogs);
 			}
