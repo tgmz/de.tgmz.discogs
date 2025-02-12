@@ -109,6 +109,7 @@ public class DiscogsTest {
 		
 		assertNotNull(t);
 		assertEquals("6", t.getPosition());
+		assertEquals(6, t.getTrackNumber());
 		assertEquals("6:12", t.getDuration());
 		assertTrue(t.getArtists().isEmpty());
 		

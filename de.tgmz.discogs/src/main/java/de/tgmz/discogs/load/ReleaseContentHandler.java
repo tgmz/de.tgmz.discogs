@@ -27,6 +27,8 @@ import de.tgmz.discogs.domain.Track;
 public class ReleaseContentHandler extends DiscogsContentHandler {
 	private List<String> displayArtists;
 	private List<String> displayJoins;
+	private int trackNumber;
+	protected boolean ignore;
 
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
@@ -66,10 +68,13 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			break;
 		case "[tracklist, release, releases]":
 			((Release) discogs).setTracklist(new LinkedList<>());
+			trackNumber = 1;
 			
 			break;
 		case "[track, tracklist, release, releases]":
-			((Release) discogs).getTracklist().add(new Track());
+			Track t = new Track();
+			t.setTrackNumber(trackNumber++);
+			((Release) discogs).getTracklist().add(t);
 			
 			break;
 		case "[artists, track, tracklist, release, releases]":
@@ -177,11 +182,13 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 				LOG.info("Save {}", discogs);
 			}
 			
-			discogs.setTitle(StringUtils.left(discogs.getTitle(),  MAX_LENGTH_DEFAULT));
+			if (!ignore) {
+				discogs.setTitle(StringUtils.left(discogs.getTitle(),  MAX_LENGTH_DEFAULT));
 
-			fillAtributes();
+				fillAtributes();
 				
-			save(discogs);
+				save(discogs);
+			}
 			
 			break;
 		default:

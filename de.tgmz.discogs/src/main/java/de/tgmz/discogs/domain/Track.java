@@ -30,6 +30,7 @@ public class Track implements Serializable {
 	@Id
 	@GeneratedValue
 	private long id;
+	private int trackNumber;
 	private String title;
 	private String position;
 	private String duration;
@@ -40,6 +41,10 @@ public class Track implements Serializable {
 
 	public long getId() {
 		return id;
+	}
+
+	public int getTrackNumber() {
+		return trackNumber;
 	}
 
 	public String getTitle() {
@@ -60,6 +65,10 @@ public class Track implements Serializable {
 
 	public void setId(long id) {
 		this.id = id;
+	}
+
+	public void setTrackNumber(int trackNumber) {
+		this.trackNumber = trackNumber;
 	}
 
 	public void setTitle(String name) {

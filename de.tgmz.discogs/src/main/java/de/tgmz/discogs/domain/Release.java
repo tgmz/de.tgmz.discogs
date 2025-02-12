@@ -19,6 +19,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 
 /**
@@ -36,6 +37,7 @@ public class Release extends Discogs {
 	private long id;
 	private String status;
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	@OrderBy(value = "trackNumber")
 	private List<Track> tracklist;
 	private boolean _main;
 	@ManyToOne
