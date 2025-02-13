@@ -50,6 +50,7 @@ public class DiscogsContentHandler extends DefaultHandler {
 	protected int count;
 	/** For use in filtered handlers to finetune logging */
 	protected long threshold = 10_000L;
+	protected boolean ignore;
 	private StringBuilder chars;
 
 	public DiscogsContentHandler() {
@@ -150,6 +151,10 @@ public class DiscogsContentHandler extends DefaultHandler {
 
 	public void save(Object o) {
 		LOG.debug("Save {}", o);
+		
+		if (ignore) {
+			return;
+		}
 
 		if (o instanceof Discogs d) {
 			if (d.getGenres() != null) {
@@ -194,7 +199,11 @@ public class DiscogsContentHandler extends DefaultHandler {
 		// Remove superflous blanks
 		return chars.toString().trim().replaceAll("\\s{2,}", " ");
 	}
-	protected void popStack() {
+	public String getChars(int maxLength) {
+		return StringUtils.left(getChars(), maxLength);
+	}
+	
+	private void popStack() {
 		stack.pop();
 		path = stack.reversed().toString();
 	}

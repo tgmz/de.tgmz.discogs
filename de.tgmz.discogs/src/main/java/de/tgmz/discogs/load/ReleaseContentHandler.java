@@ -30,7 +30,6 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	private List<String> displayJoins;
 	private int trackNumber;
 	private int subTrackNumber;
-	protected boolean ignore;
 
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
@@ -122,7 +121,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 
 			break;
 		case "[releases, release, title]":
-			discogs.setTitle(StringUtils.left(getChars(), MAX_LENGTH_DEFAULT));
+			discogs.setTitle(getChars(MAX_LENGTH_DEFAULT));
 			
 			break;
 		case "[releases, release, released]":
@@ -147,8 +146,10 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, artists, artist, name]":
-			displayArtists.add(getChars());
-			discogs.getArtists().getLast().setName(getChars());
+			String s = getChars(MAX_LENGTH_DEFAULT);
+			
+			displayArtists.add(s);
+			discogs.getArtists().getLast().setName(s);
 			
 			break;
 		case "[releases, release, artists, artist, anv]":
@@ -165,7 +166,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 				
 			break;
 		case "[releases, release, extraartists, artist, role]":
-			((Release) discogs).getExtraArtists().getLast().setRole(StringUtils.left(getChars(), MAX_LENGTH_DEFAULT));
+			((Release) discogs).getExtraArtists().getLast().setRole(getChars(MAX_LENGTH_DEFAULT));
 				
 			break;
 		//tracks
@@ -178,7 +179,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, tracklist, track, title]":
-			((Release) discogs).getTracklist().getLast().setTitle(StringUtils.left(getChars(), MAX_LENGTH_DEFAULT));
+			((Release) discogs).getTracklist().getLast().setTitle(getChars(MAX_LENGTH_DEFAULT));
 				
 			break;
 		case "[releases, release, tracklist, track, artists, artist, id]":
@@ -190,7 +191,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 
 			break;
 		case "[releases, release, tracklist, track, extraartists, artist, role]":
-			((Release) discogs).getTracklist().getLast().getExtraArtists().getLast().setRole(StringUtils.left(getChars(), MAX_LENGTH_DEFAULT));
+			((Release) discogs).getTracklist().getLast().getExtraArtists().getLast().setRole(getChars(MAX_LENGTH_DEFAULT));
 			
 			break;
 		case "[releases, release, tracklist, track, sub_tracks, track, position]":
@@ -198,7 +199,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, tracklist, track, sub_tracks, track, title]":
-			((Release) discogs).getTracklist().getLast().getSubTracklist().getLast().setTitle(getChars());
+			((Release) discogs).getTracklist().getLast().getSubTracklist().getLast().setTitle(getChars(MAX_LENGTH_DEFAULT));
 			
 			break;
 		case "[releases, release]":

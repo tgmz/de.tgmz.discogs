@@ -45,7 +45,7 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 			artist.setId(Long.parseLong(getChars()));
 			break;
 		case "[artists, artist, name]":
-			String s = getChars();
+			String s = getChars(MAX_LENGTH_DEFAULT);
 			
 			Matcher m = PA.matcher(s);
 			
