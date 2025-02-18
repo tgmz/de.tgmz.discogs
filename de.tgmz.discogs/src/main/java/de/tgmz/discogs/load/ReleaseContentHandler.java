@@ -30,7 +30,19 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	private List<String> displayJoins;
 	private int trackNumber;
 	private int subTrackNumber;
+	private long maxId;
 
+	@Override
+	public void startDocument() throws SAXException {
+		super.startDocument();
+		
+		maxId = (long) em.createNativeQuery("SELECT COALESCE(MAX(id), 0) FROM Release").getSingleResult();
+		
+		if (LOG.isInfoEnabled()) {
+			LOG.info("Skip releases up to id {}", String.format("%,d", maxId));
+		}
+	}
+	
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		super.startElement(uri, localName, qName, attributes);
@@ -203,11 +215,15 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release]":
-			if (((Release) discogs).getId() % threshold == 0) {
-				LOG.info("Save {}", discogs);
+			Release r = (Release) discogs;
+			
+			String s0 = r.getId() > maxId ? "Save" : "Skip";
+			
+			if (r.getId() % threshold == 0) {
+				LOG.info("{} {}", s0, discogs);
 			}
 			
-			if (!ignore) {
+			if (!ignore && r.getId() > maxId) {
 				discogs.setTitle(StringUtils.left(discogs.getTitle(),  MAX_LENGTH_DEFAULT));
 
 				fillAtributes();

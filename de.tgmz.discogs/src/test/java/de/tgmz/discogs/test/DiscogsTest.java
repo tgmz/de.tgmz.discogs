@@ -14,7 +14,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -35,17 +35,21 @@ import de.tgmz.discogs.load.ArtistContentHandler;
 import de.tgmz.discogs.load.MasterContentHandler;
 import de.tgmz.discogs.load.ReleaseContentHandler;
 import de.tgmz.discogs.logging.LogUtil;
+import de.tgmz.discogs.setup.DiscogsFile;
 import jakarta.persistence.EntityManager;
 
 public class DiscogsTest {
 	private static EntityManager em;
 	@BeforeClass
-	public static void setupOnce() {
+	public static void setupOnce() throws IOException, SAXException {
 		System.setProperty("DB_URL", "jdbc:h2:mem:discogs_test_mem");
 		System.setProperty("DB_USR", "sa");
 		System.setProperty("DB_PASS", "sa");
+		System.setProperty("DISCOGS_DIR", System.getProperty("java.io.tmpdir"));
 		
 		em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager();
+		
+		load();
 	}
 	
 	@AfterClass
@@ -56,9 +60,7 @@ public class DiscogsTest {
 	}
 	
 	@Test
-	public void testViolator() throws IOException, SAXException {
-		load("Violator");
-		
+	public void testViolator() {
 		Artist a = em.find(Artist.class, 2725L);
 		checkArtist(a);
 		
@@ -69,19 +71,13 @@ public class DiscogsTest {
 		checkRelease(r, m);
 	}
 	@Test
-	public void testSubtrack() throws IOException, SAXException {
-		try (InputStream is = this.getClass().getClassLoader().getResourceAsStream("discogs_20250101_r2460568.xml")) {
-			new ReleaseContentHandler().run(is);
-		}
-		
+	public void testSubtrack() {
 		Release r = em.find(Release.class, 2460568L);
 		assertTrue(r.getTracklist().get(10).getSubTracklist().isEmpty());
 		assertEquals("Sometimes I Feel Like A Motherless Child", r.getTracklist().get(11).getSubTracklist().get(0).getTitle());
 	}
 	@Test
-	public void testLilaWolken() throws IOException, SAXException {
-		load("Lila_Wolken");
-		
+	public void testLilaWolken() {
 		assertEquals("Yasha Conen", em.find(Artist.class, 910685L).getName());
 		
 		String displayArtist = "Marteria • Yasha • Miss Platnum";
@@ -89,16 +85,16 @@ public class DiscogsTest {
 		assertEquals(displayArtist, em.find(Master.class, 482870L).getDisplayArtist());
 		assertEquals(displayArtist, em.find(Release.class, 3870362L).getDisplayArtist());
 	}
-	private void load(String title) throws IOException,SAXException {
-		try (InputStream is = this.getClass().getClassLoader().getResourceAsStream(title + File.separator + "discogs_20250101_artists_" + title + ".xml")) {
+	private static void load() throws IOException,SAXException {
+		try (InputStream is = new FileInputStream(DiscogsFile.ARTISTS.getFile())) {
 			new ArtistContentHandler().run(is);
 		}
 		
-		try (InputStream is = this.getClass().getClassLoader().getResourceAsStream(title + File.separator + "discogs_20250101_masters_" + title + ".xml")) {
+		try (InputStream is = new FileInputStream(DiscogsFile.MASTERS.getFile())) {
 			new MasterContentHandler().run(is);
 		}
 		
-		try (InputStream is = this.getClass().getClassLoader().getResourceAsStream(title + File.separator + "discogs_20250101_releases_" + title + ".xml")) {
+		try (InputStream is = new FileInputStream(DiscogsFile.RELEASES.getFile())) {
 			new ReleaseContentHandler().run(is);
 		}
 	}

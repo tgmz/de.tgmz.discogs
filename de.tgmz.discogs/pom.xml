@@ -40,9 +40,31 @@
 			</exclusions>
 		</dependency>
 		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.14.0</version>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-text</artifactId>
 			<version>1.12.0</version>
+		</dependency>
+		<dependency>
+			<groupId>me.tongfei</groupId>
+			<artifactId>progressbar</artifactId>
+			<version>0.10.1</version>
+		</dependency>
+		<!-- Replace jline-terminal:3.24.1 in progressbar because of its
+		vulnerability CVE-2023-50572 -->
+		<dependency>
+			<groupId>org.jline</groupId>
+			<artifactId>jline-terminal</artifactId>
+			<version>3.29.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>33.4.0-jre</version>
 		</dependency>
 		<dependency>
 			<groupId>com.h2database</groupId>
@@ -53,7 +75,13 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.11</version>
+			<version>4.13.2</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mock-server</groupId>
+			<artifactId>mockserver-netty</artifactId>
+			<version>5.15.0</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -72,6 +100,16 @@
 				<version>3.8.1</version>
 				<configuration>
 					<release>21</release>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.5.2</version>
+				<configuration>
+					<includes>
+						<include>**/AllTests.class</include>
+					</includes>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -150,16 +188,14 @@
 					<plugin>
 						<groupId>org.owasp</groupId>
 						<artifactId>dependency-check-maven</artifactId>
-						<version>12.0.2</version>
+						<version>12.1.0</version>
 						<configuration>
 							<assemblyAnalyzerEnabled>false</assemblyAnalyzerEnabled>
 							<centralAnalyzerEnabled>false</centralAnalyzerEnabled>
 							<!-- Make sure xinfo plugins are shipped w/o
 							vulnerabilities -->
 							<failBuildOnCVSS>0</failBuildOnCVSS>
-							<!-- Vulnerabilities in provided dependencies are
-							not our business :-) -->
-							<skipProvidedScope>true</skipProvidedScope>
+							<skipTestScope>true</skipTestScope>
 							<failOnError>true</failOnError>
 							<nvdApiKey>${nvdApiKey}</nvdApiKey>
 							<formats>
