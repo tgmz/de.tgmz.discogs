@@ -66,14 +66,14 @@ public class DiscogsTest {
 		Artist a = em.find(Artist.class, 2725L);
 		checkArtist(a);
 		
+		Label l = em.find(Label.class, 26391L);
+		checkLabel(l);
+		
 		Master m = em.find(Master.class, 18080L);
 		checkMaster(m);
 
 		Release r = em.find(Release.class, 10222L);
-		checkRelease(r, m);
-
-		Label l = em.find(Label.class, 26391L);
-		checkLabel(l);
+		checkRelease(r, m, l);
 	}
 	@Test
 	public void testSubtrack() {
@@ -121,7 +121,7 @@ public class DiscogsTest {
 		assertTrue(m.getGenres().stream().allMatch(x -> x.getName().equals("Electronic")));
 		assertTrue(m.getStyles().stream().allMatch(x -> x.getName().equals("Synth-pop")));
 	}
-	private void checkRelease(Release r, Master m) {
+	private void checkRelease(Release r, Master m, Label l) {
 		assertEquals(m, r.getMaster());
 		assertEquals("Depeche Mode", r.getDisplayArtist());
 		assertEquals("US", r.getCountry());
@@ -153,5 +153,7 @@ public class DiscogsTest {
 		assertTrue(any.isPresent());
 		assertEquals("Mixed By", any.get().getRole());
 		assertEquals("Flood", any.get().getArtist().getName());
+		
+		assertEquals("9 26081-2", r.getLabels().get(l));
 	}
 }

@@ -11,8 +11,11 @@ package de.tgmz.discogs.load;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xml.sax.Attributes;
@@ -20,6 +23,7 @@ import org.xml.sax.SAXException;
 
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.ExtraArtist;
+import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
 import de.tgmz.discogs.domain.SubTrack;
@@ -116,6 +120,23 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			SubTrack st = new SubTrack();
 			st.setTrackNumber(subTrackNumber++);
 			((Release) discogs).getTracklist().getLast().getSubTracklist().add(st);
+			
+			break;
+		case "[releases, release, labels]":
+			((Release) discogs).setLabels(new HashMap<>());
+			
+			break;
+		case "[releases, release, labels, label]":
+			String id = attributes.getValue("id");
+			
+			if (id != null) {
+				Label l = new Label(); 
+				l.setId(Long.parseLong(attributes.getValue("id")));
+			
+				String catno = attributes.getValue("catno");
+			
+				((Release) discogs).getLabels().put(l, catno);
+			}
 			
 			break;
 		default:
@@ -282,6 +303,8 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			// Failsafe: Some extra artists refer to non-existent artists
 			eal.removeIf(x -> x.getArtist() == null);
 		}
+		
+		((Release) discogs).setLabels(getLabels(((Release) discogs).getLabels()));
 	}
 	
 	private List<Artist> getArtists(List<Artist> artists) {
@@ -298,6 +321,26 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 				LOG.debug("Artist {} not found", a);
 			} else {
 				result.add(a0);
+			}
+		}
+		
+		return result;
+	}
+	
+	private Map<Label, String> getLabels(Map<Label, String> labels) {
+		if (labels == null || labels.isEmpty()) {
+			return Collections.emptyMap();
+		}
+
+		Map<Label, String> result = new HashMap<>();
+		
+		for (Entry<Label, String> e : labels.entrySet()) {
+			Label l = em.find(Label.class, e.getKey().getId());
+			
+			if (l != null) {
+				result.put(l, e.getValue());
+			} else {
+				LOG.debug("Label with id {} not found", e.getKey().getId());
 			}
 		}
 		

@@ -10,8 +10,10 @@
 package de.tgmz.discogs.domain;
 
 import java.util.List;
+import java.util.Map;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
@@ -46,6 +48,8 @@ public class Release extends Discogs {
 	private String released;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private List<ExtraArtist> extraArtists;
+	@ElementCollection(fetch = FetchType.LAZY)
+	private Map<Label, String> labels;	
 
 	public long getId() {
 		return id;
@@ -77,6 +81,10 @@ public class Release extends Discogs {
 
 	public String getReleased() {
 		return released;
+	}
+
+	public Map<Label, String> getLabels() {
+		return labels;
 	}
 
 	public void setId(long id) {
@@ -115,9 +123,12 @@ public class Release extends Discogs {
 		this.extraArtists = extraArtists;
 	}
 
+	public void setLabels(Map<Label, String> labels) {
+		this.labels = labels;
+	}
+
 	@Override
 	public String toString() {
 		return "Release [id=" + String.format("%,d", id) + ", Discogs=" + super.toString() + ", country=" + country  + ", extraArtists=" + extraArtists + ", tracklist=" + tracklist + "]";
 	}
-
 }
