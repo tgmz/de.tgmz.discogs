@@ -16,6 +16,7 @@ import java.util.TreeMap;
 
 public enum DiscogsFile {
 	ARTISTS("artists.xml")
+	, LABELS("labels.xml")
 	, MASTERS("masters.xml")
 	, RELEASES("releases.xml"),
 	;

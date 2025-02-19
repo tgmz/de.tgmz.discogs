@@ -28,10 +28,12 @@ import org.xml.sax.SAXException;
 import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.ExtraArtist;
+import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
 import de.tgmz.discogs.domain.Track;
 import de.tgmz.discogs.load.ArtistContentHandler;
+import de.tgmz.discogs.load.LabelContentHandler;
 import de.tgmz.discogs.load.MasterContentHandler;
 import de.tgmz.discogs.load.ReleaseContentHandler;
 import de.tgmz.discogs.logging.LogUtil;
@@ -69,6 +71,9 @@ public class DiscogsTest {
 
 		Release r = em.find(Release.class, 10222L);
 		checkRelease(r, m);
+
+		Label l = em.find(Label.class, 26391L);
+		checkLabel(l);
 	}
 	@Test
 	public void testSubtrack() {
@@ -90,6 +95,10 @@ public class DiscogsTest {
 			new ArtistContentHandler().run(is);
 		}
 		
+		try (InputStream is = new FileInputStream(DiscogsFile.LABELS.getFile())) {
+			new LabelContentHandler().run(is);
+		}
+		
 		try (InputStream is = new FileInputStream(DiscogsFile.MASTERS.getFile())) {
 			new MasterContentHandler().run(is);
 		}
@@ -101,6 +110,9 @@ public class DiscogsTest {
 	private void checkArtist(Artist a) {
 		assertEquals("Depeche Mode", a.getName());
 		assertTrue(a.getVariations().contains("D M"));
+	}
+	private void checkLabel(Label l) {
+		assertEquals("Mute", l.getName());
 	}
 	private void checkMaster(Master m) {
 		assertEquals("Violator", m.getTitle());

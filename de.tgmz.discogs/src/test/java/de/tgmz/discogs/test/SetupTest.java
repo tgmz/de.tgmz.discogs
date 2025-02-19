@@ -48,6 +48,7 @@ public class SetupTest {
 		mockServer = ClientAndServer.startClientAndServer(PortFactory.findFreePort());
 		
 		setupMockRequest("discogs_20250101_artists.xml.gz", "/.*artists.*");
+		setupMockRequest("discogs_20250101_labels.xml.gz", "/.*labels.*");
 		setupMockRequest("discogs_20250101_masters.xml.gz", "/.*masters.*");
 		setupMockRequest("discogs_20250101_releases.xml.gz", "/.*releases.*");
 		setupMockRequest("discogs_20250101_CHECKSUM.txt", "/.*CHECKSUM.*");
