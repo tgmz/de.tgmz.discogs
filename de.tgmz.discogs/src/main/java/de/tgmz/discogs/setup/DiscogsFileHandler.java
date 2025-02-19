@@ -24,7 +24,7 @@ import java.util.TreeMap;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.input.CountingInputStream;
+import org.apache.commons.io.input.BoundedInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,7 +84,7 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 		
 		ProgressBar pb = pbb.setTaskName(df.getZipFileName()).setInitialMax(completeFileSize / step).build();
 
-		try (CountingInputStream cis = new CountingInputStream(url.openStream());
+		try (BoundedInputStream cis = BoundedInputStream.builder().setInputStream(httpConnection.getInputStream()).get(); 
 				OutputStream fos = new FileOutputStream(gz)) {
 
 			pb.setExtraMessage("Downloading...");
@@ -97,11 +97,11 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 				}
 			}).start();
 
-			while (cis.getByteCount() < completeFileSize) {
-				pb.stepTo(Math.floorDiv(cis.getByteCount(), step));
+			while (cis.getCount() < completeFileSize) {
+				pb.stepTo(Math.floorDiv(cis.getCount(), step));
 			}
 
-			pb.stepTo(Math.floorDiv(cis.getByteCount(), step));
+			pb.stepTo(Math.floorDiv(cis.getCount(), step));
 		}
 		
 		pb.close();
