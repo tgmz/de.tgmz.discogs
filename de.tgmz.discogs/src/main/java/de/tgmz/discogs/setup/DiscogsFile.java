@@ -70,7 +70,7 @@ public enum DiscogsFile {
 					+ String.format("%02d", cal.get(Calendar.MONTH) + 1) 
 					+ "01_";
 
-			env.put(DISCOGS_ID, id);
+			env.put(DISCOGS_ID, System.getProperty(DISCOGS_ID, id));
 			
 			env.put(DISCOGS_DIR, System.getProperty(DISCOGS_DIR, System.getProperty("user.home")));
 

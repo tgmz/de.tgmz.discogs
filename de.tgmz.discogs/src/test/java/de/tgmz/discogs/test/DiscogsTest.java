@@ -48,6 +48,7 @@ public class DiscogsTest {
 		System.setProperty("DB_USR", "sa");
 		System.setProperty("DB_PASS", "sa");
 		System.setProperty("DISCOGS_DIR", System.getProperty("java.io.tmpdir"));
+		System.setProperty("DISCOGS_ID", "discogs_");
 		
 		em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager();
 		
@@ -76,12 +77,6 @@ public class DiscogsTest {
 		checkRelease(r, m, l);
 	}
 	@Test
-	public void testSubtrack() {
-		Release r = em.find(Release.class, 2460568L);
-		assertTrue(r.getTracklist().get(10).getSubTracklist().isEmpty());
-		assertEquals("Sometimes I Feel Like A Motherless Child", r.getTracklist().get(11).getSubTracklist().get(0).getTitle());
-	}
-	@Test
 	public void testLilaWolken() {
 		assertEquals("Yasha Conen", em.find(Artist.class, 910685L).getName());
 		
@@ -89,6 +84,17 @@ public class DiscogsTest {
 		
 		assertEquals(displayArtist, em.find(Master.class, 482870L).getDisplayArtist());
 		assertEquals(displayArtist, em.find(Release.class, 3870362L).getDisplayArtist());
+	}
+	@Test
+	public void testSubtrack() {
+		Release r = em.find(Release.class, 2460568L);
+		assertTrue(r.getTracklist().get(10).getSubTracklist().isEmpty());
+		assertEquals("Sometimes I Feel Like A Motherless Child", r.getTracklist().get(11).getSubTracklist().get(0).getTitle());
+	}
+	@Test
+	public void testEmptyTrack() {
+		Release r = em.find(Release.class, 20279608L);
+		assertEquals(22, r.getTracklist().size());
 	}
 	private static void load() throws IOException,SAXException {
 		try (InputStream is = new FileInputStream(DiscogsFile.ARTISTS.getFile())) {

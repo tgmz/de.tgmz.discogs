@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -49,6 +50,7 @@ public class Release extends Discogs {
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private List<ExtraArtist> extraArtists;
 	@ElementCollection(fetch = FetchType.LAZY)
+	@Column(name = "catno")
 	private Map<Label, String> labels;	
 
 	public long getId() {

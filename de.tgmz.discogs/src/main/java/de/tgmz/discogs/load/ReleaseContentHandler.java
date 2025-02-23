@@ -203,6 +203,16 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 				
 			break;
 		//tracks
+		case "[releases, release, tracklist, track]":
+			Track t = ((Release) discogs).getTracklist().getLast();
+			
+			if (t.getPosition() == null && t.getSubTracklist() == null) {
+				// Not al "real" track (e.g. headline like "Roots" and "The Roots of Sepultura") 
+				((Release) discogs).getTracklist().removeLast();
+				--trackNumber;
+			}
+			
+			break;
 		case "[releases, release, tracklist, track, position]":
 			((Release) discogs).getTracklist().getLast().setPosition(getChars());
 			

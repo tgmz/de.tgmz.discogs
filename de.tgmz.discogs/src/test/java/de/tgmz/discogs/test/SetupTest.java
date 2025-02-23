@@ -42,16 +42,18 @@ public class SetupTest {
 		System.setProperty(LOG_LEVEL_KEY, "INFO"); // Set to "DEBUG" to force noisy logging
 		
 		System.setProperty("DISCOGS_DIR", System.getProperty("java.io.tmpdir"));
-		
+		System.setProperty("DISCOGS_ID", "discogs_");
+		System.setProperty("DISCOGS_TEST", "true");
+
 		HttpsURLConnection.setDefaultSSLSocketFactory(new KeyStoreFactory(Configuration.configuration(), new MockServerLogger()).sslContext().getSocketFactory());
 
 		mockServer = ClientAndServer.startClientAndServer(PortFactory.findFreePort());
 		
-		setupMockRequest("discogs_20250101_artists.xml.gz", "/.*artists.*");
-		setupMockRequest("discogs_20250101_labels.xml.gz", "/.*labels.*");
-		setupMockRequest("discogs_20250101_masters.xml.gz", "/.*masters.*");
-		setupMockRequest("discogs_20250101_releases.xml.gz", "/.*releases.*");
-		setupMockRequest("discogs_20250101_CHECKSUM.txt", "/.*CHECKSUM.*");
+		setupMockRequest("discogs_artists.xml.gz", "/.*artists.*");
+		setupMockRequest("discogs_labels.xml.gz", "/.*labels.*");
+		setupMockRequest("discogs_masters.xml.gz", "/.*masters.*");
+		setupMockRequest("discogs_releases.xml.gz", "/.*releases.*");
+		setupMockRequest("discogs_CHECKSUM.txt", "/.*CHECKSUM.*");
 		
 		System.setProperty("DISCOGS_URL", "https://" + mockServer.remoteAddress().getHostName() + ":" + mockServer.remoteAddress().getPort() + "/");
 		

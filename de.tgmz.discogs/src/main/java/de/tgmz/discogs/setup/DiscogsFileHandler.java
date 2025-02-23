@@ -93,7 +93,12 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 				try {
 					IOUtils.copyLarge(cis, fos);
 				} catch (IOException e) {
-					LOG.error("Error downloading {}", df.getZipFileName(), e);
+					if (!Boolean.getBoolean("DISCOGS_TEST")) {	
+						LOG.error("Error downloading {}", df.getZipFileName(), e);
+					} else {
+						// Ignore this on tests where the files are to small for "copyLarge"
+						LOG.debug("Error downloading {}, ignoring", df.getZipFileName());
+					}
 				}
 			}).start();
 
@@ -181,7 +186,7 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 
 	@Override
 	public void close() {
-		LOG.info("Success!");
+		LOG.info("Finished!");
 	}
 
 	/**
