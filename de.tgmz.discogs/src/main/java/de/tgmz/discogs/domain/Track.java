@@ -32,6 +32,7 @@ public class Track implements Serializable {
 	@Id
 	@GeneratedValue
 	private long id;
+	private int sequence;
 	private int trackNumber;
 	private String title;
 	private String position;
@@ -76,6 +77,10 @@ public class Track implements Serializable {
 		return subTracklist;
 	}
 
+	public int getSequence() {
+		return sequence;
+	}
+
 	public void setId(long id) {
 		this.id = id;
 	}
@@ -108,8 +113,14 @@ public class Track implements Serializable {
 		this.subTracklist = subTracklist;
 	}
 
+	public void setSequence(int sequence) {
+		this.sequence = sequence;
+	}
+
 	@Override
 	public String toString() {
-		return "Track [position=" + position + ", title=" + title + ", duration=" + duration + ", extraArtists=" + extraArtists + "]";
+		return "Track [sequence=" + sequence + ", trackNumber=" + trackNumber + ", position=" + position + ", title="
+				+ title + ", duration=" + duration + ", artists=" + artists + ", extraArtists=" + extraArtists
+				+ ", subTracklist=" + subTracklist + "]";
 	}
 }

@@ -98,13 +98,24 @@ public class DiscogsTest {
 	@Test
 	public void testEmptyTrack() {
 		Release r = em.find(Release.class, 20279608L);
-		assertEquals(25, r.getTracklist().size());
+		
+		List<Track> tl = r.getTracklist();
+		
+		assertEquals(25, tl.size());
+		assertEquals(1, tl.get(0).getTrackNumber());
+		assertEquals(22, tl.get(24).getTrackNumber());
+		
+		assertEquals(0, tl.get(0).getSequence());
+		assertEquals(24, tl.get(24).getSequence());
 		
 		List<Track> ftl = r.getFilteredTracklist();
 		
 		assertEquals(22, ftl.size());
 		assertEquals(1, ftl.get(0).getTrackNumber());
 		assertEquals(22, ftl.get(21).getTrackNumber());
+		
+		assertEquals(1, ftl.get(0).getSequence());
+		assertEquals(24, ftl.get(21).getSequence());
 	}
 	private static void load() throws IOException,SAXException {
 		try (InputStream is = new FileInputStream(DiscogsFile.ARTISTS.getFile())) {
