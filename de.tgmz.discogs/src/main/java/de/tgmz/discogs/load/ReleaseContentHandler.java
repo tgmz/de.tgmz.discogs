@@ -22,10 +22,12 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 import de.tgmz.discogs.domain.Artist;
+import de.tgmz.discogs.domain.DataQuality;
 import de.tgmz.discogs.domain.ExtraArtist;
 import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
+import de.tgmz.discogs.domain.Status;
 import de.tgmz.discogs.domain.SubTrack;
 import de.tgmz.discogs.domain.Track;
 
@@ -56,7 +58,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			discogs = new Release();
 			
 			((Release) discogs).setId(Long.parseLong(attributes.getValue("id")));
-			((Release) discogs).setStatus(attributes.getValue("status"));
+			((Release) discogs).setStatus(Status.byName(attributes.getValue("status")));
 			
 			break;
 		case "[releases, release, master_id]":
@@ -162,7 +164,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, data_quality]":
-			discogs.setDataQuality(getChars());
+			discogs.setDataQuality(DataQuality.byName(getChars()));
 			
 			break;
 		case "[releases, release, country]":

@@ -14,6 +14,8 @@ import java.util.List;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.MappedSuperclass;
@@ -21,7 +23,8 @@ import jakarta.persistence.MappedSuperclass;
 @MappedSuperclass
 public abstract class Discogs implements Serializable {
 	private static final long serialVersionUID = -8920772069254927533L;
-	private String dataQuality;
+	@Enumerated(EnumType.STRING)
+	private DataQuality dataQuality;
 	private String title;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private List<Artist> artists;
@@ -79,7 +82,7 @@ public abstract class Discogs implements Serializable {
 	 * The data quality e.g. &apos;Correct&apos;, &apos;Needs vote&apos
 	 * @return the styles
 	 */
-	public String getDataQuality() {
+	public DataQuality getDataQuality() {
 		return dataQuality;
 	}
 
@@ -103,7 +106,7 @@ public abstract class Discogs implements Serializable {
 		this.styles = styles;
 	}
 
-	public void setDataQuality(String dataQuality) {
+	public void setDataQuality(DataQuality dataQuality) {
 		this.dataQuality = dataQuality;
 	}
 

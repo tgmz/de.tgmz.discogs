@@ -14,6 +14,8 @@ import java.util.Set;
 
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
@@ -34,6 +36,8 @@ public class Artist implements Serializable {
 	private String name;
 	@ElementCollection
 	private Set<String> variations;
+	@Enumerated(EnumType.STRING)
+	private DataQuality dataQuality;
 
 	/**
 	 * The artists id obtained from discogs <id> tag.
@@ -59,6 +63,10 @@ public class Artist implements Serializable {
 		return variations;
 	}
 
+	public DataQuality getDataQuality() {
+		return dataQuality;
+	}
+	
 	public void setId(long id) {
 		this.id = id;
 	}
@@ -71,6 +79,10 @@ public class Artist implements Serializable {
 		this.variations = variations;
 	}
 
+	public void setDataQuality(DataQuality dataQuality) {
+		this.dataQuality = dataQuality;
+	}
+	
 	@Override
 	public String toString() {
 		return "Artist [id=" + String.format("%,d", id) + ", name=" + name + ", variations=" + variations + "]";

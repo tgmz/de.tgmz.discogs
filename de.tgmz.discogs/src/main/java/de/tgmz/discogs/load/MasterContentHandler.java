@@ -18,6 +18,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 import de.tgmz.discogs.domain.Artist;
+import de.tgmz.discogs.domain.DataQuality;
 import de.tgmz.discogs.domain.Master;
 
 public class MasterContentHandler extends DiscogsContentHandler {
@@ -69,7 +70,7 @@ public class MasterContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[masters, master, data_quality]":
-			discogs.setDataQuality(getChars());
+			discogs.setDataQuality(DataQuality.byName(getChars()));
 			
 			break;
 		case "[masters, master, artists]":

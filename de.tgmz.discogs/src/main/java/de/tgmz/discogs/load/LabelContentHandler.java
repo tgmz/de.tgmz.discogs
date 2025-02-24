@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
+import de.tgmz.discogs.domain.DataQuality;
 import de.tgmz.discogs.domain.Label;
 
 public class LabelContentHandler extends DiscogsContentHandler {
@@ -40,7 +41,7 @@ public class LabelContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[labels, label, data_quality]":
-			label.setDataQuality(getChars());
+			label.setDataQuality(DataQuality.byName(getChars()));
 			
 			break;
 		case "[labels, label]":

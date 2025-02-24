@@ -12,6 +12,8 @@ package de.tgmz.discogs.domain;
 import java.io.Serializable;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
@@ -30,7 +32,8 @@ public class Label implements Serializable {
 	@Id
 	private long id;
 	private String name;
-	private String dataQuality;
+	@Enumerated(EnumType.STRING)
+	private DataQuality dataQuality;
 
 	/**
 	 * The artists id obtained from discogs <id> tag.
@@ -48,7 +51,7 @@ public class Label implements Serializable {
 		return name;
 	}
 
-	public String getDataQuality() {
+	public DataQuality getDataQuality() {
 		return dataQuality;
 	}
 
@@ -60,7 +63,7 @@ public class Label implements Serializable {
 		this.name = name;
 	}
 
-	public void setDataQuality(String dataQuality) {
+	public void setDataQuality(DataQuality dataQuality) {
 		this.dataQuality = dataQuality;
 	}
 

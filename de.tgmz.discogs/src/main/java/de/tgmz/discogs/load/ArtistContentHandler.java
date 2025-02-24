@@ -18,6 +18,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 import de.tgmz.discogs.domain.Artist;
+import de.tgmz.discogs.domain.DataQuality;
 
 public class ArtistContentHandler extends DiscogsContentHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(ArtistContentHandler.class);
@@ -43,6 +44,9 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 		switch (path) {
 		case "[artists, artist, id]":
 			artist.setId(Long.parseLong(getChars()));
+			break;
+		case "[artists, artist, data_quality]":
+			artist.setDataQuality(DataQuality.byName(getChars()));
 			break;
 		case "[artists, artist, name]":
 			String s = getChars(MAX_LENGTH_DEFAULT);

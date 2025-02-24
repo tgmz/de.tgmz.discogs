@@ -27,10 +27,12 @@ import org.xml.sax.SAXException;
 
 import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Artist;
+import de.tgmz.discogs.domain.DataQuality;
 import de.tgmz.discogs.domain.ExtraArtist;
 import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
+import de.tgmz.discogs.domain.Status;
 import de.tgmz.discogs.domain.Track;
 import de.tgmz.discogs.load.ArtistContentHandler;
 import de.tgmz.discogs.load.LabelContentHandler;
@@ -116,13 +118,15 @@ public class DiscogsTest {
 	private void checkArtist(Artist a) {
 		assertEquals("Depeche Mode", a.getName());
 		assertTrue(a.getVariations().contains("D M"));
+		assertEquals(DataQuality.NEEDS_VOTE, a.getDataQuality());
 	}
 	private void checkLabel(Label l) {
 		assertEquals("Mute", l.getName());
+		assertEquals(DataQuality.NEEDS_VOTE, l.getDataQuality());
 	}
 	private void checkMaster(Master m) {
 		assertEquals("Violator", m.getTitle());
-		assertEquals("Correct", m.getDataQuality());
+		assertEquals(DataQuality.CORRECT, m.getDataQuality());
 		assertEquals(1990, m.getPublished().intValue());
 		assertTrue(m.getGenres().stream().allMatch(x -> x.getName().equals("Electronic")));
 		assertTrue(m.getStyles().stream().allMatch(x -> x.getName().equals("Synth-pop")));
@@ -132,8 +136,8 @@ public class DiscogsTest {
 		assertEquals("Depeche Mode", r.getDisplayArtist());
 		assertEquals("US", r.getCountry());
 		assertEquals("1990-03-20", r.getReleased());
-		assertEquals("Correct", r.getDataQuality());
-		assertEquals("Accepted", r.getStatus());
+		assertEquals(DataQuality.CORRECT, r.getDataQuality());
+		assertEquals(Status.ACCEPTED, r.getStatus());
 		assertFalse(r.isMain());
 		assertEquals("World In My Eyes", r.getTracklist().getFirst().getTitle());
 		assertTrue(r.getGenres().stream().allMatch(x -> "Electronic".equals(x.getName())));
