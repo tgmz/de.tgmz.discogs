@@ -68,6 +68,10 @@ public class Release extends Discogs {
 		return tracklist;
 	}
 
+	public List<Track> getFilteredTracklist() {
+		return tracklist.stream().filter(t -> t.getPosition() != null || !t.getSubTracklist().isEmpty()).toList();
+	}
+
 	public boolean isMain() {
 		return _main;
 	}
