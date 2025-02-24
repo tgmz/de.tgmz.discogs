@@ -9,6 +9,9 @@
 **********************************************************************/
 package de.tgmz.discogs.test;
 
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -17,7 +20,6 @@ import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.Test.None;
 import org.mockserver.configuration.Configuration;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.logging.MockServerLogger;
@@ -74,8 +76,8 @@ public class SetupTest {
 		LogUtil.logElapsed();
 	}
 	
-	@Test(expected = None.class)
-	public void testEverything() throws IOException, DiscogsVerificationException {
+	@Test
+	public void testEverything() throws IOException, DiscogsVerificationException  {
 		for (DiscogsFile df : DiscogsFile.values()) {
 			DiscogsFileHandler d = new DiscogsFileHandler(df);
 
@@ -85,10 +87,26 @@ public class SetupTest {
 		
 			d.close();
 		}
+		
+		mockServer.reset();
+		setupMockRequest(new byte[0], "/.*artists.*");
+		setupMockRequest("discogs_CHECKSUM.txt", "/.*CHECKSUM.*");
+		
+		DiscogsFile a = DiscogsFile.ARTISTS;
+		assertTrue(a.getZipFile().delete());
+		
+		DiscogsFileHandler d = new DiscogsFileHandler(a);
+
+		d.download();
+		assertThrows(DiscogsVerificationException.class, d::verify);
+		d.close();
 	}
 	private static void setupMockRequest(String file, String path) throws IOException {
 		byte[] b = SetupTest.class.getClassLoader().getResourceAsStream(file).readAllBytes();
-		
+
+		setupMockRequest(b, path);
+	}
+	private static void setupMockRequest(byte[] b, String path) {
 		mockServer.when(HttpRequest.request().withMethod("GET").withPath(path)).respond(HttpResponse.response().withBody(b));
 	}
 }
