@@ -96,35 +96,35 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			Track t = new Track();
 			t.setSequence(sequence++);
 			t.setTrackNumber(trackNumber++);
-			((Release) discogs).getTracklist().add(t);
+			((Release) discogs).getUnfilteredTracklist().add(t);
 			
 			break;
 		case "[releases, release, tracklist, track, artists]":
-			((Release) discogs).getTracklist().getLast().setArtists(new LinkedList<>());
+			((Release) discogs).getUnfilteredTracklist().getLast().setArtists(new LinkedList<>());
 			
 			break;
 		case "[releases, release, tracklist, track, artists, artist]":
-			((Release) discogs).getTracklist().getLast().getArtists().add(new Artist());
+			((Release) discogs).getUnfilteredTracklist().getLast().getArtists().add(new Artist());
 			
 			break;
 		case "[releases, release, tracklist, track, extraartists]":
-			((Release) discogs).getTracklist().getLast().setExtraArtists(new LinkedList<>());
+			((Release) discogs).getUnfilteredTracklist().getLast().setExtraArtists(new LinkedList<>());
 			
 			break;
 		case "[releases, release, tracklist, track, extraartists, artist]":
-			((Release) discogs).getTracklist().getLast().getExtraArtists().add(new ExtraArtist());
-			((Release) discogs).getTracklist().getLast().getExtraArtists().getLast().setArtist(new Artist());
+			((Release) discogs).getUnfilteredTracklist().getLast().getExtraArtists().add(new ExtraArtist());
+			((Release) discogs).getUnfilteredTracklist().getLast().getExtraArtists().getLast().setArtist(new Artist());
 			
 			break;
 		case "[releases, release, tracklist, track, sub_tracks]":
-			((Release) discogs).getTracklist().getLast().setSubTracklist(new LinkedList<>());
+			((Release) discogs).getUnfilteredTracklist().getLast().setSubTracklist(new LinkedList<>());
 			subTrackNumber = 1;
 			
 			break;
 		case "[releases, release, tracklist, track, sub_tracks, track]":
 			SubTrack st = new SubTrack();
 			st.setTrackNumber(subTrackNumber++);
-			((Release) discogs).getTracklist().getLast().getSubTracklist().add(st);
+			((Release) discogs).getUnfilteredTracklist().getLast().getSubTracklist().add(st);
 			
 			break;
 		case "[releases, release, labels]":
@@ -209,7 +209,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			break;
 		//tracks
 		case "[releases, release, tracklist, track]":
-			Track t = ((Release) discogs).getTracklist().getLast();
+			Track t = ((Release) discogs).getUnfilteredTracklist().getLast();
 			
 			if (t.getPosition() == null && t.getSubTracklist() == null) {
 				// Not al "real" track (e.g. headline like "Roots" and "The Roots of Sepultura") 
@@ -218,35 +218,35 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, tracklist, track, position]":
-			((Release) discogs).getTracklist().getLast().setPosition(getChars());
+			((Release) discogs).getUnfilteredTracklist().getLast().setPosition(getChars());
 			
 			break;
 		case "[releases, release, tracklist, track, duration]":
-			((Release) discogs).getTracklist().getLast().setDuration(getChars());
+			((Release) discogs).getUnfilteredTracklist().getLast().setDuration(getChars());
 			
 			break;
 		case "[releases, release, tracklist, track, title]":
-			((Release) discogs).getTracklist().getLast().setTitle(getChars(MAX_LENGTH_DEFAULT));
+			((Release) discogs).getUnfilteredTracklist().getLast().setTitle(getChars(MAX_LENGTH_DEFAULT));
 				
 			break;
 		case "[releases, release, tracklist, track, artists, artist, id]":
-			((Release) discogs).getTracklist().getLast().getArtists().getLast().setId(Long.valueOf(getChars()));
+			((Release) discogs).getUnfilteredTracklist().getLast().getArtists().getLast().setId(Long.valueOf(getChars()));
 			
 			break;
 		case "[releases, release, tracklist, track, extraartists, artist, id]":
-			((Release) discogs).getTracklist().getLast().getExtraArtists().getLast().getArtist().setId(Long.parseLong(getChars()));
+			((Release) discogs).getUnfilteredTracklist().getLast().getExtraArtists().getLast().getArtist().setId(Long.parseLong(getChars()));
 
 			break;
 		case "[releases, release, tracklist, track, extraartists, artist, role]":
-			((Release) discogs).getTracklist().getLast().getExtraArtists().getLast().setRole(getChars(MAX_LENGTH_DEFAULT));
+			((Release) discogs).getUnfilteredTracklist().getLast().getExtraArtists().getLast().setRole(getChars(MAX_LENGTH_DEFAULT));
 			
 			break;
 		case "[releases, release, tracklist, track, sub_tracks, track, position]":
-			((Release) discogs).getTracklist().getLast().getSubTracklist().getLast().setPosition(getChars());
+			((Release) discogs).getUnfilteredTracklist().getLast().getSubTracklist().getLast().setPosition(getChars());
 			
 			break;
 		case "[releases, release, tracklist, track, sub_tracks, track, title]":
-			((Release) discogs).getTracklist().getLast().getSubTracklist().getLast().setTitle(getChars(MAX_LENGTH_DEFAULT));
+			((Release) discogs).getUnfilteredTracklist().getLast().getSubTracklist().getLast().setTitle(getChars(MAX_LENGTH_DEFAULT));
 			
 			break;
 		case "[releases, release]":
@@ -288,7 +288,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	private void fillAtributes() {
 		discogs.setArtists(getArtists(discogs.getArtists()));
 		
-		for (Track t : ((Release) discogs).getTracklist()) {
+		for (Track t : ((Release) discogs).getUnfilteredTracklist()) {
 			t.setArtists(getArtists(t.getArtists()));
 			
 			if (t.getExtraArtists() != null) {
