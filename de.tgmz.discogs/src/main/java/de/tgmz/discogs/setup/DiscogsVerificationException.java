@@ -15,8 +15,4 @@ public class DiscogsVerificationException extends Exception {
 	public DiscogsVerificationException() {
 		super();
 	}
-
-	public DiscogsVerificationException(Throwable cause) {
-		super(cause);
-	}
 }

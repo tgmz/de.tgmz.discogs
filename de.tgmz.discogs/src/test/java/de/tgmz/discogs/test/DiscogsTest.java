@@ -92,6 +92,7 @@ public class DiscogsTest {
 		Release r = em.find(Release.class, 2460568L);
 		assertTrue(r.getUnfilteredTracklist().get(10).getSubTracklist().isEmpty());
 		assertEquals("Sometimes I Feel Like A Motherless Child", r.getTracklist().get(11).getSubTracklist().get(0).getTitle());
+		assertEquals("1-12a", r.getTracklist().get(11).getSubTracklist().get(0).getPosition());
 		assertEquals(12, r.getUnfilteredTracklist().get(11).getTrackNumber());
 		assertEquals(12, r.getTracklist().get(11).getTrackNumber());
 	}
