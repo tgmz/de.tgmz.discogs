@@ -92,11 +92,13 @@ public class DiscogsTest {
 		Release r = em.find(Release.class, 2460568L);
 		assertTrue(r.getTracklist().get(10).getSubTracklist().isEmpty());
 		assertEquals("Sometimes I Feel Like A Motherless Child", r.getTracklist().get(11).getSubTracklist().get(0).getTitle());
+		assertEquals(12, r.getTracklist().get(11).getTrackNumber());
 	}
 	@Test
 	public void testEmptyTrack() {
 		Release r = em.find(Release.class, 20279608L);
 		assertEquals(22, r.getTracklist().size());
+		assertEquals(22, r.getTracklist().get(21).getTrackNumber());
 	}
 	private static void load() throws IOException,SAXException {
 		try (InputStream is = new FileInputStream(DiscogsFile.ARTISTS.getFile())) {
