@@ -34,6 +34,7 @@ import de.tgmz.discogs.domain.Track;
 public class ReleaseContentHandler extends DiscogsContentHandler {
 	private List<String> displayArtists;
 	private List<String> displayJoins;
+	private int sequence;
 	private int trackNumber;
 	private int subTrackNumber;
 	private long maxId;
@@ -87,11 +88,13 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			break;
 		case "[releases, release, tracklist]":
 			((Release) discogs).setTracklist(new LinkedList<>());
+			sequence = 0;
 			trackNumber = 1;
 			
 			break;
 		case "[releases, release, tracklist, track]":
 			Track t = new Track();
+			t.setSequence(sequence++);
 			t.setTrackNumber(trackNumber++);
 			((Release) discogs).getTracklist().add(t);
 			

@@ -43,7 +43,7 @@ public class Release extends Discogs {
 	@Enumerated(EnumType.STRING)
 	private Status status;
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-	@OrderBy(value = "trackNumber")
+	@OrderBy(value = "sequence")
 	private List<Track> tracklist;
 	private boolean _main;
 	@ManyToOne
