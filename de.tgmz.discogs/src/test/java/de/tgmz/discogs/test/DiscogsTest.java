@@ -90,16 +90,16 @@ public class DiscogsTest {
 	@Test
 	public void testSubtrack() {
 		Release r = em.find(Release.class, 2460568L);
-		assertTrue(r.getTracklist().get(10).getSubTracklist().isEmpty());
-		assertEquals("Sometimes I Feel Like A Motherless Child", r.getFilteredTracklist().get(11).getSubTracklist().get(0).getTitle());
+		assertTrue(r.getUnfilteredTracklist().get(10).getSubTracklist().isEmpty());
+		assertEquals("Sometimes I Feel Like A Motherless Child", r.getTracklist().get(11).getSubTracklist().get(0).getTitle());
+		assertEquals(12, r.getUnfilteredTracklist().get(11).getTrackNumber());
 		assertEquals(12, r.getTracklist().get(11).getTrackNumber());
-		assertEquals(12, r.getFilteredTracklist().get(11).getTrackNumber());
 	}
 	@Test
 	public void testEmptyTrack() {
 		Release r = em.find(Release.class, 20279608L);
 		
-		List<Track> tl = r.getTracklist();
+		List<Track> tl = r.getUnfilteredTracklist();
 		
 		assertEquals(25, tl.size());
 		assertEquals(1, tl.get(0).getTrackNumber());
@@ -108,7 +108,7 @@ public class DiscogsTest {
 		assertEquals(0, tl.get(0).getSequence());
 		assertEquals(24, tl.get(24).getSequence());
 		
-		List<Track> ftl = r.getFilteredTracklist();
+		List<Track> ftl = r.getTracklist();
 		
 		assertEquals(22, ftl.size());
 		assertEquals(1, ftl.get(0).getTrackNumber());
@@ -158,12 +158,12 @@ public class DiscogsTest {
 		assertEquals(DataQuality.CORRECT, r.getDataQuality());
 		assertEquals(Status.ACCEPTED, r.getStatus());
 		assertFalse(r.isMain());
-		assertEquals("World In My Eyes", r.getTracklist().getFirst().getTitle());
+		assertEquals("World In My Eyes", r.getUnfilteredTracklist().getFirst().getTitle());
 		assertTrue(r.getGenres().stream().allMatch(x -> "Electronic".equals(x.getName())));
 		assertTrue(r.getStyles().stream().allMatch(x -> "Synth-pop".equals(x.getName())));
 		assertTrue(r.getExtraArtists().stream().filter(x -> x.getArtist() != null && "Alan Gregorie".equals(x.getArtist().getName())).findFirst().isPresent());
 		
-		List<Track> tracklist = r.getTracklist();
+		List<Track> tracklist = r.getUnfilteredTracklist();
 		
 		assertEquals(9, tracklist.size());
 		

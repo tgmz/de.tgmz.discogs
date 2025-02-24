@@ -64,12 +64,12 @@ public class Release extends Discogs {
 	 * The tracks.
 	 * @return the tracks
 	 */
-	public List<Track> getTracklist() {
+	public List<Track> getUnfilteredTracklist() {
 		return tracklist;
 	}
 
-	public List<Track> getFilteredTracklist() {
-		return tracklist.stream().filter(t -> t.getPosition() != null || !t.getSubTracklist().isEmpty()).toList();
+	public List<Track> getTracklist() {
+		return tracklist.stream().filter(t -> !(t.getPosition() == null && t.getSubTracklist().isEmpty())).toList();
 	}
 
 	public boolean isMain() {
