@@ -32,7 +32,7 @@ public class Label implements Serializable {
 	@Id
 	private long id;
 	private String name;
-	@Enumerated(EnumType.STRING)
+	@Enumerated(EnumType.ORDINAL)
 	private DataQuality dataQuality;
 
 	/**

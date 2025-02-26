@@ -23,7 +23,7 @@ import jakarta.persistence.MappedSuperclass;
 @MappedSuperclass
 public abstract class Discogs implements Serializable {
 	private static final long serialVersionUID = -8920772069254927533L;
-	@Enumerated(EnumType.STRING)
+	@Enumerated(EnumType.ORDINAL)
 	private DataQuality dataQuality;
 	private String title;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
@@ -112,6 +112,6 @@ public abstract class Discogs implements Serializable {
 
 	@Override
 	public String toString() {
-		return "[title=" + title + ", displayArtist=" + displayArtist + ", artists=" + artists + "]";
+		return "[title=" + title + ", displayArtist=" + displayArtist + ", dataQuality=" + dataQuality + ", genres=" + genres + ", styles=" + styles + ", artists=" + artists + "]";
 	}
 }

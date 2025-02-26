@@ -36,7 +36,7 @@ public class Artist implements Serializable {
 	private String name;
 	@ElementCollection
 	private Set<String> variations;
-	@Enumerated(EnumType.STRING)
+	@Enumerated(EnumType.ORDINAL)
 	private DataQuality dataQuality;
 
 	/**
