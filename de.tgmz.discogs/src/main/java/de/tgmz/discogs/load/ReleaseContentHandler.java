@@ -27,7 +27,6 @@ import de.tgmz.discogs.domain.ExtraArtist;
 import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
-import de.tgmz.discogs.domain.Status;
 import de.tgmz.discogs.domain.SubTrack;
 import de.tgmz.discogs.domain.Track;
 
@@ -59,7 +58,6 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			discogs = new Release();
 			
 			((Release) discogs).setId(Long.parseLong(attributes.getValue("id")));
-			((Release) discogs).setStatus(Status.byName(attributes.getValue("status")));
 			
 			break;
 		case "[releases, release, master_id]":
