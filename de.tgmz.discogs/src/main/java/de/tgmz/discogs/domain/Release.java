@@ -16,8 +16,6 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
@@ -40,8 +38,6 @@ public class Release extends Discogs {
 	private static final long serialVersionUID = -8124211768010344837L;
 	@Id
 	private long id;
-	@Enumerated(EnumType.STRING)
-	private Status status;
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	@OrderBy(value = "sequence")
 	private List<Track> tracklist;
@@ -74,14 +70,6 @@ public class Release extends Discogs {
 
 	public boolean isMain() {
 		return _main;
-	}
-
-	public Status getStatus() {
-		return status;
-	}
-
-	public void setStatus(Status status) {
-		this.status = status;
 	}
 
 	public String getCountry() {

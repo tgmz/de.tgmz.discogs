@@ -32,7 +32,6 @@ import de.tgmz.discogs.domain.ExtraArtist;
 import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
-import de.tgmz.discogs.domain.Status;
 import de.tgmz.discogs.domain.Track;
 import de.tgmz.discogs.load.ArtistContentHandler;
 import de.tgmz.discogs.load.LabelContentHandler;
@@ -157,7 +156,6 @@ public class DiscogsTest {
 		assertEquals("US", r.getCountry());
 		assertEquals("1990-03-20", r.getReleased());
 		assertEquals(DataQuality.CORRECT, r.getDataQuality());
-		assertEquals(Status.ACCEPTED, r.getStatus());
 		assertFalse(r.isMain());
 		assertEquals("World In My Eyes", r.getUnfilteredTracklist().getFirst().getTitle());
 		assertTrue(r.getGenres().stream().allMatch(x -> "Electronic".equals(x.getName())));
