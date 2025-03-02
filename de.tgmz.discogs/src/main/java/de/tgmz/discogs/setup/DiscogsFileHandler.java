@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
@@ -27,11 +28,14 @@ import org.apache.commons.io.input.BoundedInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import com.google.common.io.ByteSource;
 
+import de.tgmz.discogs.load.DiscogsContentHandler;
+import de.tgmz.discogs.logging.LogUtil;
 import me.tongfei.progressbar.ProgressBar;
 import me.tongfei.progressbar.ProgressBarBuilder;
 import me.tongfei.progressbar.ProgressBarConsumer;
@@ -55,7 +59,24 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 				}
 			}
 		}
+		
+		for (DiscogsFile df : DiscogsFile.values()) {
+			Class<? extends DiscogsContentHandler> clz = df.getHandler();
+			
+			if (clz != null) {
+				try (InputStream is0 = new FileInputStream(df.getUnzippedFile())) {
+					clz.getDeclaredConstructor().newInstance().run(is0);
+				} catch (IOException | SAXException | ReflectiveOperationException e) {
+					LOG.error("Cannot setup database, reason", e);
+				}
+			}
+		}
+		
+		LogUtil.logElapsed();
+		
+		System.exit(0);
 	}
+	
 	public DiscogsFileHandler(DiscogsFile df) {
 		super();
 		this.df = df;
@@ -209,6 +230,8 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 				fp.seek(fp.length() - Integer.BYTES);
 				int n = fp.readInt();
 				size = Integer.toUnsignedLong(Integer.reverseBytes(n));
+				
+				LOG.info("Uncompressed size {}", size);
 			}
 		} else {
 			// We simply estimtate the size as "5.6 multiplied compressed size"

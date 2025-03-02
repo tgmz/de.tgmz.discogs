@@ -18,12 +18,18 @@ import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
 
+import de.tgmz.discogs.load.ArtistContentHandler;
+import de.tgmz.discogs.load.DiscogsContentHandler;
+import de.tgmz.discogs.load.LabelContentHandler;
+import de.tgmz.discogs.load.MasterContentHandler;
+import de.tgmz.discogs.load.ReleaseContentHandler;
+
 public enum DiscogsFile {
-	ARTISTS("artists.xml.gz")
-	, LABELS("labels.xml.gz")
-	, MASTERS("masters.xml.gz")
-	, RELEASES("releases.xml.gz")
-	, CHECKSUM("CHECKSUM.txt")
+	ARTISTS("artists.xml.gz", ArtistContentHandler.class)
+	, LABELS("labels.xml.gz", LabelContentHandler.class)
+	, MASTERS("masters.xml.gz", MasterContentHandler.class)
+	, RELEASES("releases.xml.gz", ReleaseContentHandler.class)
+	, CHECKSUM("CHECKSUM.txt", null)
 	,
 	;
 	
@@ -33,13 +39,19 @@ public enum DiscogsFile {
 	private static Map<String, String> env;
 	
 	private String key;
+	private Class<? extends DiscogsContentHandler> handler;
 
-	private DiscogsFile(String key) {
+	private DiscogsFile(String key, Class<? extends DiscogsContentHandler> clz) {
 		this.key = key;
+		this.handler = clz;
 	}
 
 	public boolean isZipped() {
 		return key.endsWith(".gz");
+	}
+
+	public Class<? extends DiscogsContentHandler> getHandler() {
+		return handler;
 	}
 
 	public String getUnzippedFileName() {

@@ -11,7 +11,6 @@ package de.tgmz.discogs.setup;
 
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
 import java.util.NoSuchElementException;
 
 import org.slf4j.Logger;
@@ -21,8 +20,10 @@ import de.tgmz.sonar.discogs.generated.ListBucketResult;
 import de.tgmz.sonar.discogs.generated.ListBucketResult.Contents;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Unmarshaller;
 
+/**
+ * Factory for creating the ListBucketResult from amazonws.
+ */
 public final class LbrFactory {
 	private static final Logger LOG = LoggerFactory.getLogger(LbrFactory.class);
 	private static final LbrFactory INSTANCE = new LbrFactory();
@@ -38,11 +39,8 @@ public final class LbrFactory {
 		
 		try {
 			JAXBContext jaxbContext = JAXBContext.newInstance(ListBucketResult.class);
-			Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
-			URL url = URI.create(uri).toURL();
-			
-			lbr = (ListBucketResult) unmarshaller.unmarshal(url);
+			lbr = (ListBucketResult) jaxbContext.createUnmarshaller().unmarshal(URI.create(uri).toURL());
 		} catch (MalformedURLException | JAXBException e) {
 			throw new DiscogsSetupException(e);
 		}
@@ -54,7 +52,7 @@ public final class LbrFactory {
 
 	public Contents getContents(String p) {
 		return lbr.getContents().stream()
-				.filter(c -> c.getKey().contains(p))	// Filter contents containing the key (e.g. "artists.xml.gz")
+				.filter(c -> c.getKey().endsWith(p))	// Filter contents ending on key (e.g. "artists.xml.gz")
 				.max((c0, c1) -> c0.getLastModified().compare(c1.getLastModified()))	// Get contents with maximum lastModified
 				.orElseThrow(NoSuchElementException::new);	// Failsafe
 	}

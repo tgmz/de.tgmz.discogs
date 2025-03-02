@@ -18,7 +18,7 @@
         <xs:element type="xs:string" name="Prefix"/>
         <xs:element type="xs:string" name="Marker"/>
         <xs:element type="xs:short" name="MaxKeys"/>
-        <xs:element type="xs:string" name="IsTruncated"/>
+        <xs:element type="xs:boolean" name="IsTruncated"/>
         <xs:element name="Contents" maxOccurs="unbounded" minOccurs="0">
           <xs:complexType>
             <xs:sequence>
