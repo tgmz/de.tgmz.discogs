@@ -23,8 +23,10 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.zip.GZIPInputStream;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.BoundedInputStream;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,12 +47,14 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 
 	public static void main(String[] args) {
 		for (DiscogsFile df : DiscogsFile.values()) {
-			try (DiscogsFileHandler dl = new DiscogsFileHandler(df)) { 
-				dl.download();
-				dl.verify();
-				dl.extract();
-			} catch (IOException | DiscogsVerificationException e) {
-				LOG.error("Error in setup", e);
+			if (df.isZipped()) {
+				try (DiscogsFileHandler dl = new DiscogsFileHandler(df)) { 
+					dl.download();
+					dl.verify();
+					dl.extract();
+				} catch (IOException | DiscogsVerificationException e) {
+					LOG.error("Error in setup", e);
+				}
 			}
 		}
 	}
@@ -74,8 +78,10 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 		}
 		
 		LOG.info("Download {} to {}", df.getFileName(), gz);
+		
+		FileUtils.createParentDirectories(gz);
 
-		URL url = URI.create(DiscogsFile.getBaseUrl() + df.getZipFileName()).toURL();
+		URL url = URI.create(df.getRemote()).toURL();
 		
 		HttpURLConnection httpConnection = (HttpURLConnection) (url.openConnection());
 		long completeFileSize = httpConnection.getContentLengthLong();
@@ -153,9 +159,9 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 		ByteSource byteSource = com.google.common.io.Files.asByteSource(df.getZipFile());
 		HashCode hc = byteSource.hash(Hashing.sha256());
 		
-		String expected = getHash(df.getZipFileName());
+		String expected = getHash(StringUtils.substringAfterLast(df.getZipFileName(), "/"));
 
-		if (!getHash(df.getZipFileName()).equals(hc.toString())) {
+		if (!expected.equals(hc.toString())) {
 			LOG.error("Expected checksum {} but got {}", expected, hc);
 			
 			throw new DiscogsVerificationException();
@@ -166,7 +172,7 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 		if (hashes == null) {
 			hashes = new TreeMap<>();
 
-			String crcs = IOUtils.toString(URI.create(DiscogsFile.getBaseUrl() + DiscogsFile.getKey() + "CHECKSUM.txt"), StandardCharsets.UTF_8);
+			String crcs = IOUtils.toString(URI.create(DiscogsFile.CHECKSUM.getRemote()), StandardCharsets.UTF_8);
 
 			crcs.lines().forEach(x -> hashes.put(x.substring(65), x.substring(0, 64)));
 		}

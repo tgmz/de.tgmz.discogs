@@ -43,8 +43,7 @@ public class SetupTest {
 		logLevel = System.getProperty(LOG_LEVEL_KEY, "INFO");
 		System.setProperty(LOG_LEVEL_KEY, "INFO"); // Set to "DEBUG" to force noisy logging
 		
-		System.setProperty("DISCOGS_DIR", System.getProperty("java.io.tmpdir"));
-		System.setProperty("DISCOGS_ID", "discogs_");
+		System.setProperty(DiscogsFile.DISCOGS_DIR, System.getProperty("java.io.tmpdir"));
 		System.setProperty("DISCOGS_TEST", "true");
 
 		HttpsURLConnection.setDefaultSSLSocketFactory(new KeyStoreFactory(Configuration.configuration(), new MockServerLogger()).sslContext().getSocketFactory());
@@ -56,8 +55,9 @@ public class SetupTest {
 		setupMockRequest("discogs_masters.xml.gz", "/.*masters.*");
 		setupMockRequest("discogs_releases.xml.gz", "/.*releases.*");
 		setupMockRequest("discogs_CHECKSUM.txt", "/.*CHECKSUM.*");
+		setupMockRequest("root.xml", "/");
 		
-		System.setProperty("DISCOGS_URL", "https://" + mockServer.remoteAddress().getHostName() + ":" + mockServer.remoteAddress().getPort() + "/");
+		System.setProperty(DiscogsFile.DISCOGS_URL, "https://" + mockServer.remoteAddress().getHostName() + ":" + mockServer.remoteAddress().getPort() + "/");
 		
 		for (DiscogsFile df : DiscogsFile.values()) {
 			FileUtils.deleteQuietly(df.getFile());
@@ -79,15 +79,18 @@ public class SetupTest {
 	@Test
 	public void testEverything() throws IOException, DiscogsVerificationException  {
 		for (DiscogsFile df : DiscogsFile.values()) {
-			DiscogsFileHandler d = new DiscogsFileHandler(df);
+			if (df.isZipped()) {
+				DiscogsFileHandler d = new DiscogsFileHandler(df);
 
-			d.download();
-			d.verify();
-			d.extract();
+				d.download();
+				d.verify();
+				d.extract();
 		
-			d.close();
+				d.close();
+			}
 		}
 		
+		// Force VerificationException
 		mockServer.reset();
 		setupMockRequest(new byte[0], "/.*artists.*");
 		setupMockRequest("discogs_CHECKSUM.txt", "/.*CHECKSUM.*");

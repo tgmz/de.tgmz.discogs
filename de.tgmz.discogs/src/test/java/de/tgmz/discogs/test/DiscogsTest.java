@@ -48,8 +48,7 @@ public class DiscogsTest {
 		System.setProperty("DB_URL", "jdbc:h2:mem:discogs_test_mem");
 		System.setProperty("DB_USR", "sa");
 		System.setProperty("DB_PASS", "sa");
-		System.setProperty("DISCOGS_DIR", System.getProperty("java.io.tmpdir"));
-		System.setProperty("DISCOGS_ID", "discogs_");
+		System.setProperty(DiscogsFile.DISCOGS_DIR, System.getProperty("java.io.tmpdir"));
 		
 		em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager();
 		

@@ -10,35 +10,49 @@
 package de.tgmz.discogs.setup;
 
 import java.io.File;
-import java.util.Calendar;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.commons.lang3.StringUtils;
+
 public enum DiscogsFile {
-	ARTISTS("artists.xml")
-	, LABELS("labels.xml")
-	, MASTERS("masters.xml")
-	, RELEASES("releases.xml"),
+	ARTISTS(true, "artists.xml")
+	, LABELS(true, "labels.xml")
+	, MASTERS(true, "masters.xml")
+	, RELEASES(true, "releases.xml")
+	, CHECKSUM(false, "CHECKSUM.txt")
+	,
 	;
 	
-	private static final String DISCOGS_ID = "DISCOGS_ID";
-	private static final String DISCOGS_DIR = "DISCOGS_DIR";
-	private static final String DISCOGS_URL = "DISCOGS_URL";
+	public static final String DISCOGS_DIR = "DISCOGS_DIR";
+	public static final String DISCOGS_URL = "DISCOGS_URL";
 	
 	private static Map<String, String> env;
 	
+	private boolean zipped;
 	private String file;
 
-	private DiscogsFile(String file) {
+	private DiscogsFile(boolean zipped, String file) {
+		this.zipped = zipped;
 		this.file = file;
 	}
 
+	public boolean isZipped() {
+		return zipped;
+	}
+
 	public String getFileName() {
-		return getEnv(DISCOGS_ID) + file;
+		String s = LbrFactory.getInstance().getContents(file).getKey();
+		
+		return zipped ? StringUtils.removeEnd(s, ".gz") : s;
 	}
 
 	public File getFile() {
 		return new File(getEnv(DISCOGS_DIR), getFileName());
+	}
+
+	public String getRemote() {
+		return getEnv(DISCOGS_URL) + LbrFactory.getInstance().getContents(file).getKey();
 	}
 
 	public String getZipFileName() {
@@ -49,32 +63,13 @@ public enum DiscogsFile {
 		return new File(getEnv(DISCOGS_DIR), getZipFileName());
 	}
 
-	public static String getKey() {
-		return getEnv(DISCOGS_ID);
-	}
-
-	public static String getBaseUrl() {
-		return getEnv(DISCOGS_URL);
-	}
-	
 	private static String getEnv(String key) {
 		if (env == null) {
 			env = new TreeMap<>();
 
-			Calendar cal = Calendar.getInstance();
-			
-			String year = String.format("%4d", cal.get(Calendar.YEAR));
-			
-			String id = "discogs_" 
-					+ year
-					+ String.format("%02d", cal.get(Calendar.MONTH) + 1) 
-					+ "01_";
-
-			env.put(DISCOGS_ID, System.getProperty(DISCOGS_ID, id));
-			
 			env.put(DISCOGS_DIR, System.getProperty(DISCOGS_DIR, System.getProperty("user.home")));
 
-			env.put(DISCOGS_URL, System.getProperty(DISCOGS_URL, "https://discogs-data-dumps.s3-us-west-2.amazonaws.com/data/" + year + "/"));
+			env.put(DISCOGS_URL, System.getProperty(DISCOGS_URL, "https://discogs-data-dumps.s3-us-west-2.amazonaws.com/"));
 		}
 		
 		return env.get(key);
