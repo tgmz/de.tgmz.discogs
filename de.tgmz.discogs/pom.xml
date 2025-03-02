@@ -67,6 +67,16 @@
 			<version>33.4.0-jre</version>
 		</dependency>
 		<dependency>
+			<groupId>jakarta.xml.bind</groupId>
+			<artifactId>jakarta.xml.bind-api</artifactId>
+			<version>3.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jaxb</groupId>
+			<artifactId>jaxb-runtime</artifactId>
+			<version>3.0.1</version>
+		</dependency>
+		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<version>2.2.224</version>
@@ -111,6 +121,54 @@
 						<include>**/AllTests.class</include>
 					</includes>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jaxb2-maven-plugin</artifactId>
+				<version>3.1.0</version>
+				<executions>
+					<execution>
+						<id>xjc-discogs</id>
+						<goals>
+							<goal>xjc</goal>
+						</goals>
+						<configuration>
+							<!-- Set the package of the generated code -->
+							<packageName>de.tgmz.sonar.discogs.generated</packageName>
+
+							<!-- Define the DTD file -->
+							<sources>
+								<source>src/main/xsd</source>
+							</sources>
+							<clearOutputDir>false</clearOutputDir>
+
+							<!-- External parsing is disabled by default. "Cannot parse URI: file:/C: ..." -->
+							<externalEntityProcessing>true</externalEntityProcessing>
+							
+							<!-- Suppress org.xml.sax.SAXParseException -->
+							<quiet>true</quiet>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>3.2.0</version>
+				<executions>
+					<execution>
+						<id>add-source</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>${project.build.directory}/generated-sources/xinfo</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
