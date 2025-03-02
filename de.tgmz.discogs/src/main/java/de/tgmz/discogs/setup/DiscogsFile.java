@@ -10,6 +10,9 @@
 package de.tgmz.discogs.setup;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -29,18 +32,18 @@ public enum DiscogsFile {
 	
 	private static Map<String, String> env;
 	
-	private String file;
+	private String key;
 
-	private DiscogsFile(String file) {
-		this.file = file;
+	private DiscogsFile(String key) {
+		this.key = key;
 	}
 
 	public boolean isZipped() {
-		return file.endsWith(".gz");
+		return key.endsWith(".gz");
 	}
 
 	public String getUnzippedFileName() {
-		String s = LbrFactory.getInstance().getContents(file).getKey();
+		String s = LbrFactory.getInstance().getContents(key).getKey();
 		
 		return isZipped() ? StringUtils.removeEnd(s, ".gz") : s;
 	}
@@ -49,15 +52,15 @@ public enum DiscogsFile {
 		return new File(getEnv(DISCOGS_DIR), getUnzippedFileName());
 	}
 
-	public String getRemote() {
-		return getEnv(DISCOGS_URL) + LbrFactory.getInstance().getContents(file).getKey();
+	public URL getRemote() throws MalformedURLException {
+		return URI.create(getEnv(DISCOGS_URL) + LbrFactory.getInstance().getContents(key).getKey()).toURL();
 	}
 
 	public String getFileName() {
-		return LbrFactory.getInstance().getContents(file).getKey();
+		return LbrFactory.getInstance().getContents(key).getKey();
 	}
 
-	public File getFile() {
+	public File getKey() {
 		return new File(getEnv(DISCOGS_DIR), getFileName());
 	}
 

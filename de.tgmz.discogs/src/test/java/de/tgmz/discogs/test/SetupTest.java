@@ -61,7 +61,7 @@ public class SetupTest {
 		
 		for (DiscogsFile df : DiscogsFile.values()) {
 			FileUtils.deleteQuietly(df.getUnzippedFile());
-			FileUtils.deleteQuietly(df.getFile());
+			FileUtils.deleteQuietly(df.getKey());
 		}
 	}
 	
@@ -96,7 +96,7 @@ public class SetupTest {
 		setupMockRequest("discogs_CHECKSUM.txt", "/.*CHECKSUM.*");
 		
 		DiscogsFile a = DiscogsFile.ARTISTS;
-		assertTrue(a.getFile().delete());
+		assertTrue(a.getKey().delete());
 		
 		DiscogsFileHandler d = new DiscogsFileHandler(a);
 

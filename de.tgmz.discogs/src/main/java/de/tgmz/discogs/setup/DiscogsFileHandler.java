@@ -16,8 +16,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.TreeMap;
@@ -69,7 +67,7 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 	}
 
 	public void download() throws IOException {
-		File gz = df.getFile();
+		File gz = df.getKey();
 
 		if (gz.exists()) {
 			LOG.info("File {} already present, skipping download", gz);
@@ -81,9 +79,7 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 		
 		FileUtils.createParentDirectories(gz);
 
-		URL url = URI.create(df.getRemote()).toURL();
-		
-		HttpURLConnection httpConnection = (HttpURLConnection) (url.openConnection());
+		HttpURLConnection httpConnection = (HttpURLConnection) (df.getRemote().openConnection());
 		long completeFileSize = httpConnection.getContentLengthLong();
 
 		long step = 1_000L;
@@ -135,7 +131,7 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 
 		pb.setExtraMessage("Extracting...");
 
-		try (GZIPInputStream gis = new GZIPInputStream(new FileInputStream(df.getFile()));
+		try (GZIPInputStream gis = new GZIPInputStream(new FileInputStream(df.getKey()));
 				FileOutputStream fos = new FileOutputStream(unzipped)) {
 			long size = 0L;
 
@@ -156,7 +152,7 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 	public void verify() throws IOException,DiscogsVerificationException {
 		LOG.info("Verifying {}", df.getFileName());
 		
-		ByteSource byteSource = com.google.common.io.Files.asByteSource(df.getFile());
+		ByteSource byteSource = com.google.common.io.Files.asByteSource(df.getKey());
 		HashCode hc = byteSource.hash(Hashing.sha256());
 		
 		String expected = getHash(StringUtils.substringAfterLast(df.getFileName(), "/"));
@@ -172,7 +168,7 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 		if (hashes == null) {
 			hashes = new TreeMap<>();
 
-			String crcs = IOUtils.toString(URI.create(DiscogsFile.CHECKSUM.getRemote()), StandardCharsets.UTF_8);
+			String crcs = IOUtils.toString(DiscogsFile.CHECKSUM.getRemote(), StandardCharsets.UTF_8);
 
 			crcs.lines().forEach(x -> hashes.put(x.substring(65), x.substring(0, 64)));
 		}
@@ -201,7 +197,7 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 	 * @throws IOException
 	 */
 	private long determineUncompressedSize() throws IOException {
-		long size = df.getFile().length();
+		long size = df.getKey().length();
 		
 		// Based on experience the compression factor is about 5.6
 		float estm = 5.6f;
@@ -209,7 +205,7 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 		// Let's guess if the uncompressed file is < 4GB
 		if (size * estm < Math.pow(1024, 3) * 4) { 
 			// This piece of code only works, if the size of the _uncompressed_ file is < 4GB  
-			try (RandomAccessFile fp = new RandomAccessFile(df.getFile(), "r")) {
+			try (RandomAccessFile fp = new RandomAccessFile(df.getKey(), "r")) {
 				fp.seek(fp.length() - Integer.BYTES);
 				int n = fp.readInt();
 				size = Integer.toUnsignedLong(Integer.reverseBytes(n));

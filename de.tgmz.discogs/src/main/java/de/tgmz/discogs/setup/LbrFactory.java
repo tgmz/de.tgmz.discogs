@@ -30,8 +30,6 @@ public final class LbrFactory {
 
 	/**
 	 * Private constructor for security reasons
-	 * @throws JAXBException 
-	 * @throws MalformedURLException 
 	 */
 	private LbrFactory() {
 		String uri = System.getProperty(DiscogsFile.DISCOGS_URL, "https://discogs-data-dumps.s3-us-west-2.amazonaws.com/");
@@ -55,6 +53,9 @@ public final class LbrFactory {
 	}
 
 	public Contents getContents(String p) {
-		return lbr.getContents().stream().filter(c -> c.getKey().contains(p)).max((c0, c1) -> c0.getLastModified().compare(c1.getLastModified())).orElseThrow(NoSuchElementException::new);
+		return lbr.getContents().stream()
+				.filter(c -> c.getKey().contains(p))	// Filter contents containing the key (e.g. "artists.xml.gz")
+				.max((c0, c1) -> c0.getLastModified().compare(c1.getLastModified()))	// Get contents with maximum lastModified
+				.orElseThrow(NoSuchElementException::new);	// Failsafe
 	}
 }
