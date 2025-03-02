@@ -60,8 +60,8 @@ public class SetupTest {
 		System.setProperty(DiscogsFile.DISCOGS_URL, "https://" + mockServer.remoteAddress().getHostName() + ":" + mockServer.remoteAddress().getPort() + "/");
 		
 		for (DiscogsFile df : DiscogsFile.values()) {
+			FileUtils.deleteQuietly(df.getUnzippedFile());
 			FileUtils.deleteQuietly(df.getFile());
-			FileUtils.deleteQuietly(df.getZipFile());
 		}
 	}
 	
@@ -96,7 +96,7 @@ public class SetupTest {
 		setupMockRequest("discogs_CHECKSUM.txt", "/.*CHECKSUM.*");
 		
 		DiscogsFile a = DiscogsFile.ARTISTS;
-		assertTrue(a.getZipFile().delete());
+		assertTrue(a.getFile().delete());
 		
 		DiscogsFileHandler d = new DiscogsFileHandler(a);
 

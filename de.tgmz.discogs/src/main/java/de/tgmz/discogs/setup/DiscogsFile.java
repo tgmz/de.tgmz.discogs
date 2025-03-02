@@ -16,11 +16,11 @@ import java.util.TreeMap;
 import org.apache.commons.lang3.StringUtils;
 
 public enum DiscogsFile {
-	ARTISTS(true, "artists.xml")
-	, LABELS(true, "labels.xml")
-	, MASTERS(true, "masters.xml")
-	, RELEASES(true, "releases.xml")
-	, CHECKSUM(false, "CHECKSUM.txt")
+	ARTISTS("artists.xml.gz")
+	, LABELS("labels.xml.gz")
+	, MASTERS("masters.xml.gz")
+	, RELEASES("releases.xml.gz")
+	, CHECKSUM("CHECKSUM.txt")
 	,
 	;
 	
@@ -29,38 +29,36 @@ public enum DiscogsFile {
 	
 	private static Map<String, String> env;
 	
-	private boolean zipped;
 	private String file;
 
-	private DiscogsFile(boolean zipped, String file) {
-		this.zipped = zipped;
+	private DiscogsFile(String file) {
 		this.file = file;
 	}
 
 	public boolean isZipped() {
-		return zipped;
+		return file.endsWith(".gz");
 	}
 
-	public String getFileName() {
+	public String getUnzippedFileName() {
 		String s = LbrFactory.getInstance().getContents(file).getKey();
 		
-		return zipped ? StringUtils.removeEnd(s, ".gz") : s;
+		return isZipped() ? StringUtils.removeEnd(s, ".gz") : s;
 	}
 
-	public File getFile() {
-		return new File(getEnv(DISCOGS_DIR), getFileName());
+	public File getUnzippedFile() {
+		return new File(getEnv(DISCOGS_DIR), getUnzippedFileName());
 	}
 
 	public String getRemote() {
 		return getEnv(DISCOGS_URL) + LbrFactory.getInstance().getContents(file).getKey();
 	}
 
-	public String getZipFileName() {
-		return getFileName() + ".gz";
+	public String getFileName() {
+		return LbrFactory.getInstance().getContents(file).getKey();
 	}
 
-	public File getZipFile() {
-		return new File(getEnv(DISCOGS_DIR), getZipFileName());
+	public File getFile() {
+		return new File(getEnv(DISCOGS_DIR), getFileName());
 	}
 
 	private static String getEnv(String key) {

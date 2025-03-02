@@ -117,19 +117,19 @@ public class DiscogsTest {
 		assertEquals(24, ftl.get(21).getSequence());
 	}
 	private static void load() throws IOException,SAXException {
-		try (InputStream is = new FileInputStream(DiscogsFile.ARTISTS.getFile())) {
+		try (InputStream is = new FileInputStream(DiscogsFile.ARTISTS.getUnzippedFile())) {
 			new ArtistContentHandler().run(is);
 		}
 		
-		try (InputStream is = new FileInputStream(DiscogsFile.LABELS.getFile())) {
+		try (InputStream is = new FileInputStream(DiscogsFile.LABELS.getUnzippedFile())) {
 			new LabelContentHandler().run(is);
 		}
 		
-		try (InputStream is = new FileInputStream(DiscogsFile.MASTERS.getFile())) {
+		try (InputStream is = new FileInputStream(DiscogsFile.MASTERS.getUnzippedFile())) {
 			new MasterContentHandler().run(is);
 		}
 		
-		try (InputStream is = new FileInputStream(DiscogsFile.RELEASES.getFile())) {
+		try (InputStream is = new FileInputStream(DiscogsFile.RELEASES.getUnzippedFile())) {
 			new ReleaseContentHandler().run(is);
 		}
 	}

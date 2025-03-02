@@ -69,7 +69,7 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 	}
 
 	public void download() throws IOException {
-		File gz = df.getZipFile();
+		File gz = df.getFile();
 
 		if (gz.exists()) {
 			LOG.info("File {} already present, skipping download", gz);
@@ -77,7 +77,7 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 			return;
 		}
 		
-		LOG.info("Download {} to {}", df.getFileName(), gz);
+		LOG.info("Download {} to {}", df.getUnzippedFileName(), gz);
 		
 		FileUtils.createParentDirectories(gz);
 
@@ -88,7 +88,7 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 
 		long step = 1_000L;
 		
-		ProgressBar pb = pbb.setTaskName(df.getZipFileName()).setInitialMax(completeFileSize / step).build();
+		ProgressBar pb = pbb.setTaskName(df.getFileName()).setInitialMax(completeFileSize / step).build();
 
 		try (BoundedInputStream cis = BoundedInputStream.builder().setInputStream(httpConnection.getInputStream()).get(); 
 				OutputStream fos = new FileOutputStream(gz)) {
@@ -100,10 +100,10 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 					IOUtils.copyLarge(cis, fos);
 				} catch (IOException e) {
 					if (!Boolean.getBoolean("DISCOGS_TEST")) {	
-						LOG.error("Error downloading {}", df.getZipFileName(), e);
+						LOG.error("Error downloading {}", df.getFileName(), e);
 					} else {
 						// Ignore this on tests where the files are to small for "copyLarge"
-						LOG.debug("Error downloading {}, ignoring", df.getZipFileName());
+						LOG.debug("Error downloading {}, ignoring", df.getFileName());
 					}
 				}
 			}).start();
@@ -119,7 +119,7 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 	}
 
 	public void extract() throws IOException {
-		File unzipped = df.getFile();
+		File unzipped = df.getUnzippedFile();
 
 		if (unzipped.exists()) {
 			LOG.info("File {} already present, skipping extraction", unzipped);
@@ -127,15 +127,15 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 			return;
 		}
 
-		LOG.info("Extracting {} to {}", df.getZipFileName(), unzipped);
+		LOG.info("Extracting {} to {}", df.getFileName(), unzipped);
 
 		int block = 4 * 1024 * 1024;	// 4 MB
 
-		ProgressBar pb = pbb.setTaskName(df.getFileName()).setInitialMax(determineUncompressedSize()).build();
+		ProgressBar pb = pbb.setTaskName(df.getUnzippedFileName()).setInitialMax(determineUncompressedSize()).build();
 
 		pb.setExtraMessage("Extracting...");
 
-		try (GZIPInputStream gis = new GZIPInputStream(new FileInputStream(df.getZipFile()));
+		try (GZIPInputStream gis = new GZIPInputStream(new FileInputStream(df.getFile()));
 				FileOutputStream fos = new FileOutputStream(unzipped)) {
 			long size = 0L;
 
@@ -154,12 +154,12 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 	}
 
 	public void verify() throws IOException,DiscogsVerificationException {
-		LOG.info("Verifying {}", df.getZipFileName());
+		LOG.info("Verifying {}", df.getFileName());
 		
-		ByteSource byteSource = com.google.common.io.Files.asByteSource(df.getZipFile());
+		ByteSource byteSource = com.google.common.io.Files.asByteSource(df.getFile());
 		HashCode hc = byteSource.hash(Hashing.sha256());
 		
-		String expected = getHash(StringUtils.substringAfterLast(df.getZipFileName(), "/"));
+		String expected = getHash(StringUtils.substringAfterLast(df.getFileName(), "/"));
 
 		if (!expected.equals(hc.toString())) {
 			LOG.error("Expected checksum {} but got {}", expected, hc);
@@ -201,7 +201,7 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 	 * @throws IOException
 	 */
 	private long determineUncompressedSize() throws IOException {
-		long size = df.getZipFile().length();
+		long size = df.getFile().length();
 		
 		// Based on experience the compression factor is about 5.6
 		float estm = 5.6f;
@@ -209,7 +209,7 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 		// Let's guess if the uncompressed file is < 4GB
 		if (size * estm < Math.pow(1024, 3) * 4) { 
 			// This piece of code only works, if the size of the _uncompressed_ file is < 4GB  
-			try (RandomAccessFile fp = new RandomAccessFile(df.getZipFile(), "r")) {
+			try (RandomAccessFile fp = new RandomAccessFile(df.getFile(), "r")) {
 				fp.seek(fp.length() - Integer.BYTES);
 				int n = fp.readInt();
 				size = Integer.toUnsignedLong(Integer.reverseBytes(n));
