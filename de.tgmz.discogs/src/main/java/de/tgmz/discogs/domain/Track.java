@@ -32,6 +32,8 @@ public class Track implements Serializable {
 	@Id
 	@GeneratedValue
 	private long id;
+	// "sequence" is important for ordering in Release.class. Ordering by postion is impossible due to its inconsitent format and
+	// trackNumber is 0 on headlines which crashes ordering on albums with more than one headline.
 	private int sequence;
 	private int trackNumber;
 	private String title;
