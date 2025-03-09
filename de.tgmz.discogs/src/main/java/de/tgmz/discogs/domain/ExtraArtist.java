@@ -27,8 +27,15 @@ public class ExtraArtist implements Serializable {
 	private String role;
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private Artist artist;
+
+	public ExtraArtist() {
+	}
 	
-	
+	public ExtraArtist(String role, Artist artist) {
+		super();
+		this.role = role;
+		this.artist = artist;
+	}
 	/**
 	 * The id (generated)
 	 * @return the id

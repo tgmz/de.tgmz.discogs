@@ -284,19 +284,12 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	}
 	
 	private void fillAtributes() {
-		discogs.setArtists(getArtists(discogs.getArtists()));
+		fillArtists(discogs.getArtists());
+		fillExtraArtists(((Release) discogs).getExtraArtists());
 		
 		for (Track t : ((Release) discogs).getUnfilteredTracklist()) {
-			t.setArtists(getArtists(t.getArtists()));
-			
-			if (t.getExtraArtists() != null) {
-				for (ExtraArtist ea : t.getExtraArtists()) {
-					ea.setArtist(em.find(Artist.class, ea.getArtist().getId()));
-				}
-				
-				// Failsafe: Some extra artists refer to non-existent artists
-				t.getExtraArtists().removeIf(x -> x.getArtist() == null);
-			}
+			fillArtists(t.getArtists());
+			fillExtraArtists(t.getExtraArtists());
 		}
 
 		Master m = ((Release) discogs).getMaster();
@@ -304,39 +297,22 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 		if (m != null) {
 			((Release) discogs).setMaster(em.find(Master.class, m.getId()));
 		}
-		
-		List<ExtraArtist> eal = ((Release) discogs).getExtraArtists();
-		
-		if (eal != null) {
-			for (ExtraArtist ea : eal) {
-				ea.setArtist(em.find(Artist.class, ea.getArtist().getId()));
-			}
-			
-			// Failsafe: Some extra artists refer to non-existent artists
-			eal.removeIf(x -> x.getArtist() == null);
-		}
-		
+
 		((Release) discogs).setLabels(getLabels(((Release) discogs).getLabels()));
 	}
 	
-	private List<Artist> getArtists(List<Artist> artists) {
-		if (artists == null || artists.isEmpty()) {
-			return Collections.emptyList();
+	private void fillArtists(List<Artist> artists) {
+		if (artists != null) {
+			artists.replaceAll(a -> a = em.find(Artist.class, a.getId()));
+			artists.removeIf(a -> a == null);
 		}
-		
-		List<Artist> result = new LinkedList<>();
-		
-		for (Artist a : artists) {
-			Artist a0 = em.find(Artist.class, a.getId());
-		
-			if (a0 == null) {
-				LOG.debug("Artist {} not found", a);
-			} else {
-				result.add(a0);
-			}
+	}
+	
+	private void fillExtraArtists(List<ExtraArtist> axtraArtists) {
+		if (axtraArtists != null) {
+			axtraArtists.replaceAll(ea -> ea = new ExtraArtist(ea.getRole(), em.find(Artist.class, ea.getArtist().getId())));
+			axtraArtists.removeIf(ea -> ea.getArtist() == null);
 		}
-		
-		return result;
 	}
 	
 	private Map<Label, String> getLabels(Map<Label, String> labels) {
