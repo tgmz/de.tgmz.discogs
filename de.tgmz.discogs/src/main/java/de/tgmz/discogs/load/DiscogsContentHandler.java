@@ -36,6 +36,7 @@ import de.tgmz.discogs.domain.Discogs;
 import de.tgmz.discogs.domain.Genre;
 import de.tgmz.discogs.domain.Style;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 
 public class DiscogsContentHandler extends DefaultHandler {
 	protected static final Pattern PA = Pattern.compile("^(.*)(\\s+\\(\\d+\\))$");
@@ -52,11 +53,14 @@ public class DiscogsContentHandler extends DefaultHandler {
 	protected long threshold = 10_000L;
 	protected boolean ignore;
 	private StringBuilder chars;
+	private TypedQuery<Genre> gq;
+	private TypedQuery<Style> gs;
 
 	public DiscogsContentHandler() {
 		try {
 			SAXParserFactory spf = SAXParserFactory.newInstance();
-			spf.setNamespaceAware(true);
+			spf.setNamespaceAware(false);
+			spf.setValidating(false);
 			
 			SAXParser saxParser = spf.newSAXParser();
 
@@ -74,6 +78,9 @@ public class DiscogsContentHandler extends DefaultHandler {
 	@Override
 	public void startDocument() throws SAXException {
 		em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager();
+		
+		gq = em.createNamedQuery("Genre.getByName", Genre.class);
+		gs = em.createNamedQuery("Style.getByName", Style.class);
 		
 		stack = new LinkedList<>();
 		path = "";
@@ -123,7 +130,11 @@ public class DiscogsContentHandler extends DefaultHandler {
 
 	@Override
 	public void characters(char[] ch, int start, int length) {
-		if (!"notes".equals(stack.peek())) {
+		switch (stack.peek()) {
+		// Ignore irrelevant sections
+		case "notes", "description":
+			return;
+		default:
 			chars.append(String.valueOf(Arrays.copyOfRange(ch, start, start + length)));
 		}
 	}
@@ -158,35 +169,11 @@ public class DiscogsContentHandler extends DefaultHandler {
 
 		if (o instanceof Discogs d) {
 			if (d.getGenres() != null) {
-				List<Genre> gs = new LinkedList<>();
-			
-				for (Genre g : d.getGenres()) {
-					List<Genre> gl = em.createNamedQuery("Genre.getByName", Genre.class).setParameter(1, g.getName()).getResultList();
-				
-					if (!gl.isEmpty()) {
-						gs.add(gl.getFirst());
-					} else {
-						gs.add(g);
-					}
-				}
-				
-				d.setGenres(gs);
+				d.getGenres().forEach(g -> g = gq.setParameter(1, g.getName()).getResultStream().findAny().orElse(g));
 			}
 			
 			if (d.getStyles() != null) {
-				List<Style> ss = new LinkedList<>();
-			
-				for (Style s : d.getStyles()) {
-					List<Style> sl = em.createNamedQuery("Style.getByName", Style.class).setParameter(1, s.getName()).getResultList();
-				
-					if (!sl.isEmpty()) {
-						ss.add(sl.getFirst());
-					} else {
-						ss.add(s);
-					}
-				}
-				
-				d.setStyles(ss);
+				d.getStyles().forEach(s -> s = gs.setParameter(1, s.getName()).getResultStream().findAny().orElse(s));
 			}
 		}
 
