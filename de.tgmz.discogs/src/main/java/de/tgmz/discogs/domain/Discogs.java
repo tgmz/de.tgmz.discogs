@@ -11,6 +11,7 @@ package de.tgmz.discogs.domain;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -31,9 +32,9 @@ public abstract class Discogs implements Serializable {
 	@Column(length = 512)
 	private String displayArtist;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-	private List<Genre> genres;
+	private Set<Genre> genres;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-	private List<Style> styles;
+	private Set<Style> styles;
 
 	protected Discogs() {
 	}
@@ -66,7 +67,7 @@ public abstract class Discogs implements Serializable {
 	 * The genres e.g. &apos;Electronic&apos;
 	 * @return the genres
 	 */
-	public List<Genre> getGenres() {
+	public Set<Genre> getGenres() {
 		return genres;
 	}
 
@@ -74,7 +75,7 @@ public abstract class Discogs implements Serializable {
 	 * The styles e.g. &apos;Synth-pop&apos;
 	 * @return the styles
 	 */
-	public List<Style> getStyles() {
+	public Set<Style> getStyles() {
 		return styles;
 	}
 
@@ -98,11 +99,11 @@ public abstract class Discogs implements Serializable {
 		this.displayArtist = displayArtist;
 	}
 
-	public void setGenres(List<Genre> genres) {
+	public void setGenres(Set<Genre> genres) {
 		this.genres = genres;
 	}
 
-	public void setStyles(List<Style> styles) {
+	public void setStyles(Set<Style> styles) {
 		this.styles = styles;
 	}
 

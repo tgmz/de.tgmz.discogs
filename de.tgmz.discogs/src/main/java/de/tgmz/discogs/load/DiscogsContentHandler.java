@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -36,7 +37,6 @@ import de.tgmz.discogs.domain.Discogs;
 import de.tgmz.discogs.domain.Genre;
 import de.tgmz.discogs.domain.Style;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
 
 public class DiscogsContentHandler extends DefaultHandler {
 	protected static final Pattern PA = Pattern.compile("^(.*)(\\s+\\(\\d+\\))$");
@@ -53,8 +53,6 @@ public class DiscogsContentHandler extends DefaultHandler {
 	protected long threshold = 10_000L;
 	protected boolean ignore;
 	private StringBuilder chars;
-	private TypedQuery<Genre> gq;
-	private TypedQuery<Style> gs;
 
 	public DiscogsContentHandler() {
 		try {
@@ -79,9 +77,6 @@ public class DiscogsContentHandler extends DefaultHandler {
 	public void startDocument() throws SAXException {
 		em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager();
 		
-		gq = em.createNamedQuery("Genre.getByName", Genre.class);
-		gs = em.createNamedQuery("Style.getByName", Style.class);
-		
 		stack = new LinkedList<>();
 		path = "";
 	}
@@ -100,11 +95,11 @@ public class DiscogsContentHandler extends DefaultHandler {
 		
 		switch (qName) {
 		case "genres":
-			discogs.setGenres(new LinkedList<>());
+			discogs.setGenres(new HashSet<>());
 
 			break;
 		case "styles":
-			discogs.setStyles(new LinkedList<>());
+			discogs.setStyles(new HashSet<>());
 
 			break;
 		default:
@@ -115,11 +110,13 @@ public class DiscogsContentHandler extends DefaultHandler {
 	public void endElement(String uri, String localName, String qName) {
 		switch (qName) {
 		case "genre":
-			discogs.getGenres().add(new Genre(getChars()));
+			Genre g = em.find(Genre.class, getChars());
+			discogs.getGenres().add(g != null ? g : new Genre(getChars()));
 		
 			break;
 		case "style":
-			discogs.getStyles().add(new Style(getChars()));
+			Style s = em.find(Style.class, getChars());
+			discogs.getStyles().add(s != null ? s : new Style(getChars()));
 		
 			break;
 		default:
@@ -165,16 +162,6 @@ public class DiscogsContentHandler extends DefaultHandler {
 		
 		if (ignore) {
 			return;
-		}
-
-		if (o instanceof Discogs d) {
-			if (d.getGenres() != null) {
-				d.getGenres().forEach(g -> g = gq.setParameter(1, g.getName()).getResultStream().findAny().orElse(g));
-			}
-			
-			if (d.getStyles() != null) {
-				d.getStyles().forEach(s -> s = gs.setParameter(1, s.getName()).getResultStream().findAny().orElse(s));
-			}
 		}
 
 		DatabaseService.getInstance().inTransaction(x -> x.merge(o));

@@ -150,10 +150,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	public void endElement(String uri, String localName, String qName) {
 		switch (path) {
 		case "[releases, release, master_id]":
-			Master m = new Master();
-			m.setId(Long.parseLong(getChars()));
-			
-			((Release) discogs).setMaster(m);
+			((Release) discogs).setMaster(em.find(Master.class, Long.parseLong(getChars())));
 
 			break;
 		case "[releases, release, title]":
@@ -261,7 +258,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 
 				fillAtributes();
 				
-				save(discogs);
+				save(r);
 			}
 			
 			break;
