@@ -110,13 +110,11 @@ public class DiscogsContentHandler extends DefaultHandler {
 	public void endElement(String uri, String localName, String qName) {
 		switch (qName) {
 		case "genre":
-			Genre g = em.find(Genre.class, getChars());
-			discogs.getGenres().add(g != null ? g : new Genre(getChars()));
+			discogs.getGenres().add(new Genre(getChars()));
 		
 			break;
 		case "style":
-			Style s = em.find(Style.class, getChars());
-			discogs.getStyles().add(s != null ? s : new Style(getChars()));
+			discogs.getStyles().add(new Style(getChars()));
 		
 			break;
 		default:
@@ -164,6 +162,18 @@ public class DiscogsContentHandler extends DefaultHandler {
 			return;
 		}
 
+		if (discogs instanceof Discogs) {
+			if (discogs.getGenres() != null) {
+				discogs.getGenres().stream().forEach(g -> g = em.find(Genre.class, g.getId()));
+				discogs.getGenres().stream().filter(g -> g == null).forEach(g -> g = new Genre(g.getId()));
+			}
+		
+			if (discogs.getStyles() != null) {
+				discogs.getStyles().stream().forEach(s -> s = em.find(Style.class, s.getId()));
+				discogs.getStyles().stream().filter(s -> s == null).forEach(s -> s = new Style(s.getId()));
+			}
+		}
+		
 		DatabaseService.getInstance().inTransaction(x -> x.merge(o));
 		
 		++count;
