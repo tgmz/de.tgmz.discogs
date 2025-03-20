@@ -51,7 +51,7 @@ public class DiscogsContentHandler extends DefaultHandler {
 	protected int count;
 	/** For use in filtered handlers to finetune logging */
 	protected long threshold = 10_000L;
-	protected boolean ignore;
+	protected boolean relevant = true;
 	private StringBuilder chars;
 
 	public DiscogsContentHandler() {
@@ -158,7 +158,7 @@ public class DiscogsContentHandler extends DefaultHandler {
 	public void save(Object o) {
 		LOG.debug("Save {}", o);
 		
-		if (ignore) {
+		if (!relevant) {
 			return;
 		}
 

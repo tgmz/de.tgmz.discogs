@@ -36,7 +36,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	private int sequence;
 	private int trackNumber;
 	private int subTrackNumber;
-	private long maxId;
+	protected long maxId;
 
 	@Override
 	public void startDocument() throws SAXException {
@@ -253,7 +253,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 				LOG.info("{} {}", s0, discogs);
 			}
 			
-			if (!ignore && r.getId() > maxId) {
+			if (relevant && r.getId() > maxId) {
 				discogs.setTitle(StringUtils.left(discogs.getTitle(),  MAX_LENGTH_DEFAULT));
 
 				fillAtributes();
