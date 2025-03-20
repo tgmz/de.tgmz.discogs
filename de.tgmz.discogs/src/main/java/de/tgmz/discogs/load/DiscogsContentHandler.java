@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Deque;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -92,18 +91,6 @@ public class DiscogsContentHandler extends DefaultHandler {
 		path = stack.reversed().toString();
 		
 		chars = new StringBuilder();
-		
-		switch (qName) {
-		case "genres":
-			discogs.setGenres(new HashSet<>());
-
-			break;
-		case "styles":
-			discogs.setStyles(new HashSet<>());
-
-			break;
-		default:
-		}
 	}
 
 	@Override
@@ -162,16 +149,12 @@ public class DiscogsContentHandler extends DefaultHandler {
 			return;
 		}
 
-		if (discogs instanceof Discogs) {
-			if (discogs.getGenres() != null) {
-				discogs.getGenres().stream().forEach(g -> g = em.find(Genre.class, g.getId()));
-				discogs.getGenres().stream().filter(g -> g == null).forEach(g -> g = new Genre(g.getId()));
-			}
-		
-			if (discogs.getStyles() != null) {
-				discogs.getStyles().stream().forEach(s -> s = em.find(Style.class, s.getId()));
-				discogs.getStyles().stream().filter(s -> s == null).forEach(s -> s = new Style(s.getId()));
-			}
+		if (discogs != null) {
+			discogs.getGenres().stream().forEach(g -> g = em.find(Genre.class, g.getId()));
+			discogs.getGenres().stream().filter(g -> g == null).forEach(g -> g = new Genre(g.getId()));
+
+			discogs.getStyles().stream().forEach(s -> s = em.find(Style.class, s.getId()));
+			discogs.getStyles().stream().filter(s -> s == null).forEach(s -> s = new Style(s.getId()));
 		}
 		
 		DatabaseService.getInstance().inTransaction(x -> x.merge(o));

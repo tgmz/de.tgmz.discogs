@@ -10,6 +10,8 @@
 package de.tgmz.discogs.domain;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -37,6 +39,9 @@ public abstract class Discogs implements Serializable {
 	private Set<Style> styles;
 
 	protected Discogs() {
+		artists = new LinkedList<>();
+		genres = new HashSet<>();
+		styles = new HashSet<>();
 	}
 
 	/**
@@ -91,20 +96,8 @@ public abstract class Discogs implements Serializable {
 		this.title = title;
 	}
 
-	public void setArtists(List<Artist> artists) {
-		this.artists = artists;
-	}
-
 	public void setDisplayArtist(String displayArtist) {
 		this.displayArtist = displayArtist;
-	}
-
-	public void setGenres(Set<Genre> genres) {
-		this.genres = genres;
-	}
-
-	public void setStyles(Set<Style> styles) {
-		this.styles = styles;
 	}
 
 	public void setDataQuality(DataQuality dataQuality) {

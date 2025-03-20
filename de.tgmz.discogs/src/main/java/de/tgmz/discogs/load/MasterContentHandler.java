@@ -10,7 +10,6 @@
 package de.tgmz.discogs.load;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -38,8 +37,6 @@ public class MasterContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[masters, master, artists]":
-			discogs.setArtists(new LinkedList<>());
-			
 			artistNames = new ArrayList<>();
 			joins = new ArrayList<>();
 			

@@ -10,7 +10,6 @@
 package de.tgmz.discogs.load;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -68,15 +67,9 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			displayArtists = new ArrayList<>();
 			displayJoins = new ArrayList<>();
 			
-			discogs.setArtists(new LinkedList<>());
-			
 			break;
 		case "[releases, release, artists, artist]":
 			discogs.getArtists().add(new Artist());
-			
-			break;
-		case "[releases, release, extraartists]":
-			((Release) discogs).setExtraArtists(new LinkedList<>());
 			
 			break;
 		case "[releases, release, extraartists, artist]":
@@ -85,7 +78,6 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 		
 			break;
 		case "[releases, release, tracklist]":
-			((Release) discogs).setTracklist(new LinkedList<>());
 			sequence = 0;
 			trackNumber = 1;
 			
@@ -123,10 +115,6 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			SubTrack st = new SubTrack();
 			st.setTrackNumber(subTrackNumber++);
 			((Release) discogs).getUnfilteredTracklist().getLast().getSubTracklist().add(st);
-			
-			break;
-		case "[releases, release, labels]":
-			((Release) discogs).setLabels(new HashMap<>());
 			
 			break;
 		case "[releases, release, labels, label]":
@@ -313,10 +301,6 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	}
 	
 	private Map<Label, String> getLabels(Map<Label, String> labels) {
-		if (labels == null || labels.isEmpty()) {
-			return Collections.emptyMap();
-		}
-
 		Map<Label, String> result = new HashMap<>();
 		
 		for (Entry<Label, String> e : labels.entrySet()) {

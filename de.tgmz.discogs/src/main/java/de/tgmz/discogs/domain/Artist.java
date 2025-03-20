@@ -11,6 +11,7 @@ package de.tgmz.discogs.domain;
 
 import java.io.Serializable;
 import java.util.Set;
+import java.util.TreeSet;
 
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
@@ -39,6 +40,9 @@ public class Artist implements Serializable {
 	@Enumerated(EnumType.ORDINAL)
 	private DataQuality dataQuality;
 
+	public Artist() {
+		variations = new TreeSet<>();
+	}
 	/**
 	 * The artists id obtained from discogs <id> tag.
 	 * @return the id
@@ -73,10 +77,6 @@ public class Artist implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public void setVariations(Set<String> variations) {
-		this.variations = variations;
 	}
 
 	public void setDataQuality(DataQuality dataQuality) {

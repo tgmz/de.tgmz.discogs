@@ -12,6 +12,8 @@ package de.tgmz.discogs.domain;
 import java.io.Serializable;
 import java.util.Objects;
 
+import javax.annotation.processing.Generated;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
@@ -38,10 +40,6 @@ public class Style implements Serializable {
 		return id;
 	}
 
-	public void setId(String id) {
-		this.id = id;
-	}
-
 	@Override
 	public String toString() {
 		return "Genre [id=" + id + "]";
@@ -52,6 +50,7 @@ public class Style implements Serializable {
 		return Objects.hash(id);
 	}
 
+	@Generated(value = "Eclipse")
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

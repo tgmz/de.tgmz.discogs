@@ -9,7 +9,6 @@
 **********************************************************************/
 package de.tgmz.discogs.load;
 
-import java.util.TreeSet;
 import java.util.regex.Matcher;
 
 import org.slf4j.Logger;
@@ -28,14 +27,8 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		super.startElement(uri, localName, qName, attributes);
 
-		switch (path) {
-		case "[artists, artist]":
+		if ("[artists, artist]".equals(path)) {
 			artist = new Artist();
-			break;
-		case "[artists, artist, namevariations]":
-			artist.setVariations(new TreeSet<>());
-			break;
-		default:
 		}
 	}
 

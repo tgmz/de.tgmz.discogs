@@ -9,6 +9,8 @@
 **********************************************************************/
 package de.tgmz.discogs.domain;
 
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -52,6 +54,13 @@ public class Release extends Discogs {
 	@Column(name = "catno")
 	private Map<Label, String> labels;	
 
+	public Release() {
+		super();
+		
+		tracklist = new LinkedList<>();
+		extraArtists = new LinkedList<>();
+		labels = new HashMap<>();
+	}
 	public long getId() {
 		return id;
 	}
@@ -88,10 +97,6 @@ public class Release extends Discogs {
 		this.id = id;
 	}
 
-	public void setTracklist(List<Track> tracklist) {
-		this.tracklist = tracklist;
-	}
-
 	public Master getMaster() {
 		return master;
 	}
@@ -116,10 +121,10 @@ public class Release extends Discogs {
 		return extraArtists;
 	}
 
-	public void setExtraArtists(List<ExtraArtist> extraArtists) {
-		this.extraArtists = extraArtists;
-	}
-
+	/**
+	 * Setter for labels. We need a setter here because the SAX handler manipulates the keyset.
+	 * @param labels
+	 */
 	public void setLabels(Map<Label, String> labels) {
 		this.labels = labels;
 	}

@@ -29,9 +29,11 @@ import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.DataQuality;
 import de.tgmz.discogs.domain.ExtraArtist;
+import de.tgmz.discogs.domain.Genre;
 import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
+import de.tgmz.discogs.domain.Style;
 import de.tgmz.discogs.domain.Track;
 import de.tgmz.discogs.load.ArtistContentHandler;
 import de.tgmz.discogs.load.LabelContentHandler;
@@ -157,8 +159,15 @@ public class DiscogsTest {
 		assertEquals(DataQuality.CORRECT, r.getDataQuality());
 		assertFalse(r.isMain());
 		assertEquals("World In My Eyes", r.getUnfilteredTracklist().getFirst().getTitle());
-		assertTrue(r.getGenres().stream().allMatch(x -> "Electronic".equals(x.getId())));
-		assertTrue(r.getStyles().stream().allMatch(x -> "Synth-pop".equals(x.getId())));
+		
+		Genre g = new Genre("Electronic"); 
+		
+		assertTrue(r.getGenres().stream().allMatch(x -> x.equals(g)));
+		
+		Style s = new Style("Synth-pop");
+		
+		assertTrue(r.getStyles().stream().allMatch(x -> x.equals(s)));
+		
 		assertTrue(r.getExtraArtists().stream().filter(x -> x.getArtist() != null && "Alan Gregorie".equals(x.getArtist().getName())).findFirst().isPresent());
 		
 		List<Track> tracklist = r.getUnfilteredTracklist();
