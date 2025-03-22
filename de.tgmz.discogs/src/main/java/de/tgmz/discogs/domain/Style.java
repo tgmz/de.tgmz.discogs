@@ -10,9 +10,6 @@
 package de.tgmz.discogs.domain;
 
 import java.io.Serializable;
-import java.util.Objects;
-
-import javax.annotation.processing.Generated;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -42,24 +39,6 @@ public class Style implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Genre [id=" + id + "]";
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(id);
-	}
-
-	@Generated(value = "Eclipse")
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Style other = (Style) obj;
-		return Objects.equals(id, other.id);
+		return "Style [id=" + id + "]";
 	}
 }

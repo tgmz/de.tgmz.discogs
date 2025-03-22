@@ -45,6 +45,8 @@ import jakarta.persistence.EntityManager;
 
 public class DiscogsTest {
 	private static EntityManager em;
+	private static final long IGNORED = 115L;
+	
 	@BeforeClass
 	public static void setupOnce() throws IOException, SAXException {
 		System.setProperty("DB_URL", "jdbc:h2:mem:discogs_test_mem");
@@ -118,6 +120,12 @@ public class DiscogsTest {
 		assertEquals(1, ftl.get(0).getSequence());
 		assertEquals(24, ftl.get(21).getSequence());
 	}
+	@Test
+	public void testGenreStyle() {
+		assertTrue(em.createQuery("FROM Genre", Genre.class).getResultStream().anyMatch(x -> "Rock".equals(x.getId())));
+		
+		assertTrue(em.createQuery("FROM Style", Style.class).getResultStream().anyMatch(x -> "Synth-pop".equals(x.getId())));
+	}
 	private static void load() throws IOException,SAXException {
 		try (InputStream is = new FileInputStream(DiscogsFile.ARTISTS.getUnzippedFile())) {
 			new ArtistContentHandler().run(is);
@@ -128,7 +136,7 @@ public class DiscogsTest {
 		}
 		
 		try (InputStream is = new FileInputStream(DiscogsFile.MASTERS.getUnzippedFile())) {
-			new MasterContentHandler().run(is);
+			new MasterContentHandler(List.of(x -> x instanceof Master m && m.getId() != IGNORED)).run(is);
 		}
 		
 		try (InputStream is = new FileInputStream(DiscogsFile.RELEASES.getUnzippedFile())) {
@@ -159,15 +167,8 @@ public class DiscogsTest {
 		assertEquals(DataQuality.CORRECT, r.getDataQuality());
 		assertFalse(r.isMain());
 		assertEquals("World In My Eyes", r.getUnfilteredTracklist().getFirst().getTitle());
-		
-		Genre g = new Genre("Electronic"); 
-		
-		assertTrue(r.getGenres().stream().allMatch(x -> x.equals(g)));
-		
-		Style s = new Style("Synth-pop");
-		
-		assertTrue(r.getStyles().stream().allMatch(x -> x.equals(s)));
-		
+		assertTrue(r.getGenres().stream().allMatch(x -> "Electronic".equals(x.getId())));
+		assertTrue(r.getStyles().stream().allMatch(x -> "Synth-pop".equals(x.getId())));
 		assertTrue(r.getExtraArtists().stream().filter(x -> x.getArtist() != null && "Alan Gregorie".equals(x.getArtist().getName())).findFirst().isPresent());
 		
 		List<Track> tracklist = r.getUnfilteredTracklist();

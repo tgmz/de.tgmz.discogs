@@ -11,6 +11,7 @@ package de.tgmz.discogs.load;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xml.sax.Attributes;
@@ -18,12 +19,21 @@ import org.xml.sax.SAXException;
 
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.DataQuality;
+import de.tgmz.discogs.domain.Discogs;
 import de.tgmz.discogs.domain.Master;
 
-public class MasterContentHandler extends DiscogsContentHandler {
+public class MasterContentHandler extends FilteredContentHandler {
 	private Artist artist;
 	private List<String> artistNames;
 	private List<String> joins;
+
+	public MasterContentHandler() {
+		super();
+	}
+	
+	public MasterContentHandler(List<Predicate<Discogs>> filter) {
+		super(filter);
+	}
 
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {

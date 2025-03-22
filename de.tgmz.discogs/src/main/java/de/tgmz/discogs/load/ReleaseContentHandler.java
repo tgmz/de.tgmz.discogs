@@ -15,6 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xml.sax.Attributes;
@@ -22,6 +23,7 @@ import org.xml.sax.SAXException;
 
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.DataQuality;
+import de.tgmz.discogs.domain.Discogs;
 import de.tgmz.discogs.domain.ExtraArtist;
 import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Master;
@@ -29,13 +31,21 @@ import de.tgmz.discogs.domain.Release;
 import de.tgmz.discogs.domain.SubTrack;
 import de.tgmz.discogs.domain.Track;
 
-public class ReleaseContentHandler extends DiscogsContentHandler {
+public class ReleaseContentHandler extends FilteredContentHandler {
 	private List<String> displayArtists;
 	private List<String> displayJoins;
 	private int sequence;
 	private int trackNumber;
 	private int subTrackNumber;
 	protected long maxId;
+
+	public ReleaseContentHandler() {
+		super();
+	}
+	
+	public ReleaseContentHandler(List<Predicate<Discogs>> filter) {
+		super(filter);
+	}
 
 	@Override
 	public void startDocument() throws SAXException {
@@ -241,12 +251,16 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 				LOG.info("{} {}", s0, discogs);
 			}
 			
-			if (relevant && r.getId() > maxId) {
+			if (r.getId() > maxId && filter.stream().anyMatch(x -> x.test(r))) {
 				discogs.setTitle(StringUtils.left(discogs.getTitle(),  MAX_LENGTH_DEFAULT));
 
 				fillAtributes();
 				
 				save(r);
+			} else {
+				LOG.debug("Ignore {}", r);
+				
+				++ignored;
 			}
 			
 			break;

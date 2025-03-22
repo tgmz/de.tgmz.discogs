@@ -14,8 +14,6 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -32,9 +30,6 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
 import de.tgmz.discogs.database.DatabaseService;
-import de.tgmz.discogs.domain.Discogs;
-import de.tgmz.discogs.domain.Genre;
-import de.tgmz.discogs.domain.Style;
 import jakarta.persistence.EntityManager;
 
 public class DiscogsContentHandler extends DefaultHandler {
@@ -46,11 +41,9 @@ public class DiscogsContentHandler extends DefaultHandler {
 	protected String path;
 	protected EntityManager em;
 	protected XMLReader xmlReader;
-	protected Discogs discogs;
 	protected int count;
 	/** For use in filtered handlers to finetune logging */
 	protected long threshold = 10_000L;
-	protected boolean relevant = true;
 	private StringBuilder chars;
 
 	public DiscogsContentHandler() {
@@ -95,18 +88,6 @@ public class DiscogsContentHandler extends DefaultHandler {
 
 	@Override
 	public void endElement(String uri, String localName, String qName) {
-		switch (qName) {
-		case "genre":
-			discogs.getGenres().add(new Genre(getChars()));
-		
-			break;
-		case "style":
-			discogs.getStyles().add(new Style(getChars()));
-		
-			break;
-		default:
-		}
-		
 		popStack();
 	}
 
@@ -120,42 +101,9 @@ public class DiscogsContentHandler extends DefaultHandler {
 			chars.append(String.valueOf(Arrays.copyOfRange(ch, start, start + length)));
 		}
 	}
-	
-	protected String getDisplayArtist(List<String> artists, List<String> joins) {
-		StringBuilder sb = new StringBuilder();
-		
-		for (int i = 0; i < artists.size(); ++i) {
-			String s0 = artists.get(i);
-			String s1 = i < joins.size() ? joins.get(i) : ",";
-			
-			Matcher m = PA.matcher(s0);
-			
-			if (m.matches() && m.groupCount() > 1) {
-				s0 = m.group(1);
-			}
-			
-			sb.append(s0 + (",".equals(s1) ? ", " : " " + s1 +" "));
-		}
-		
-		String display = StringUtils.removeEnd(sb.toString(), ", ").trim().replace(" , ", ", ");
-		
-		return StringUtils.left(display, MAX_LENGTH_DISPLAY);
-	}
 
 	public void save(Object o) {
 		LOG.debug("Save {}", o);
-		
-		if (!relevant) {
-			return;
-		}
-
-		if (discogs != null) {
-			discogs.getGenres().stream().forEach(g -> g = em.find(Genre.class, g.getId()));
-			discogs.getGenres().stream().filter(g -> g == null).forEach(g -> g = new Genre(g.getId()));
-
-			discogs.getStyles().stream().forEach(s -> s = em.find(Style.class, s.getId()));
-			discogs.getStyles().stream().filter(s -> s == null).forEach(s -> s = new Style(s.getId()));
-		}
 		
 		DatabaseService.getInstance().inTransaction(x -> x.merge(o));
 		
@@ -166,6 +114,7 @@ public class DiscogsContentHandler extends DefaultHandler {
 		// Remove superflous blanks
 		return chars.toString().trim().replaceAll("\\s{2,}", " ");
 	}
+	
 	public String getChars(int maxLength) {
 		return StringUtils.left(getChars(), maxLength);
 	}
