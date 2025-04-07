@@ -183,6 +183,8 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 			
 			throw new DiscogsVerificationException();
 		}
+		
+		LOG.error("Verification successful");
 	}
 
 	private static String getHash(String s) throws IOException {

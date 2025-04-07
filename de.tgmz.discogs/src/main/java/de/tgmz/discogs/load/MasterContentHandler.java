@@ -15,7 +15,6 @@ import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.DataQuality;
@@ -30,8 +29,8 @@ public class MasterContentHandler extends FilteredContentHandler {
 	public MasterContentHandler() {
 		super();
 	}
-	
-	public MasterContentHandler(List<Predicate<Discogs>> filter) {
+
+	public MasterContentHandler(Predicate<Discogs> filter) {
 		super(filter);
 	}
 
@@ -111,8 +110,6 @@ public class MasterContentHandler extends FilteredContentHandler {
 				LOG.info("Save {}", discogs);
 			}
 			
-			discogs.setTitle(StringUtils.left(discogs.getTitle(),  MAX_LENGTH_DEFAULT));
-			
 			save(discogs);
 			
 			break;
@@ -121,20 +118,9 @@ public class MasterContentHandler extends FilteredContentHandler {
 		
 		super.endElement(uri, localName, qName);
 	}
-	@Override
-	public void endDocument() throws SAXException {
-		if (LOG.isInfoEnabled()) {
-			LOG.info("{} masters inserted/updated", String.format("%,d", count));
-		}
-		
-		super.endDocument();
-	}
 	
-	/**
-	 * For use in filtered handlers
-	 * @return the master
-	 */
-	protected Master getMaster() {
-		return (Master) discogs;
+	@Override
+	protected void fillAttributes(Discogs d) {
+		d.setTitle(StringUtils.left(discogs.getTitle(), MAX_LENGTH_DEFAULT));
 	}
 }

@@ -40,7 +40,7 @@ public class Release extends Discogs {
 	private static final long serialVersionUID = -8124211768010344837L;
 	@Id
 	private long id;
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@OrderBy(value = "sequence")
 	private List<Track> tracklist;
 	private boolean _main;
@@ -48,7 +48,7 @@ public class Release extends Discogs {
 	private Master master;
 	private String country;
 	private String released;
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private List<ExtraArtist> extraArtists;
 	@ElementCollection(fetch = FetchType.LAZY)
 	@Column(name = "catno")
@@ -128,7 +128,7 @@ public class Release extends Discogs {
 	public void setLabels(Map<Label, String> labels) {
 		this.labels = labels;
 	}
-
+	
 	@Override
 	public String toString() {
 		return "Release [id=" + String.format("%,d", id) + ", Discogs=" + super.toString() + ", country=" + country  + ", extraArtists=" + extraArtists + ", tracklist=" + tracklist + "]";

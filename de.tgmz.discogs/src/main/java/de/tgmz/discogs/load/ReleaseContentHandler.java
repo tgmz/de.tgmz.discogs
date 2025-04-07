@@ -19,7 +19,6 @@ import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.DataQuality;
@@ -37,27 +36,15 @@ public class ReleaseContentHandler extends FilteredContentHandler {
 	private int sequence;
 	private int trackNumber;
 	private int subTrackNumber;
-	protected long maxId;
 
 	public ReleaseContentHandler() {
 		super();
 	}
-	
-	public ReleaseContentHandler(List<Predicate<Discogs>> filter) {
+
+	public ReleaseContentHandler(Predicate<Discogs> filter) {
 		super(filter);
 	}
 
-	@Override
-	public void startDocument() throws SAXException {
-		super.startDocument();
-		
-		maxId = (long) em.createNativeQuery("SELECT COALESCE(MAX(id), 0) FROM Release").getSingleResult();
-		
-		if (LOG.isInfoEnabled()) {
-			LOG.info("Skip releases up to id {}", String.format("%,d", maxId));
-		}
-	}
-	
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		super.startElement(uri, localName, qName, attributes);
@@ -245,23 +232,11 @@ public class ReleaseContentHandler extends FilteredContentHandler {
 		case "[releases, release]":
 			Release r = (Release) discogs;
 			
-			String s0 = r.getId() > maxId ? "Save" : "Skip";
-			
-			if (r.getId() % threshold == 0) {
-				LOG.info("{} {}", s0, discogs);
+			if (r.getId() % threshold == 0 && LOG.isInfoEnabled()) {
+				LOG.info("{}/({}). {}", String.format("%,d", saved), String.format("%,d", ignored), discogs);
 			}
 			
-			if (r.getId() > maxId && filter.stream().anyMatch(x -> x.test(r))) {
-				discogs.setTitle(StringUtils.left(discogs.getTitle(),  MAX_LENGTH_DEFAULT));
-
-				fillAtributes();
-				
-				save(r);
-			} else {
-				LOG.debug("Ignore {}", r);
-				
-				++ignored;
-			}
+			save(r);
 			
 			break;
 		default:
@@ -269,35 +244,28 @@ public class ReleaseContentHandler extends FilteredContentHandler {
 		
 		super.endElement(uri, localName, qName);
 	}
+	
 	@Override
-	public void endDocument() throws SAXException {
-		if (LOG.isInfoEnabled()) {
-			LOG.info("{} releases inserted/updated", String.format("%,d", count));
-		}
-		
-		super.endDocument();
-	}
-	
-	public Release getRelease() {
-		return (Release) discogs;
-	}
-	
-	private void fillAtributes() {
-		fillArtists(discogs.getArtists());
-		fillExtraArtists(((Release) discogs).getExtraArtists());
-		
-		for (Track t : ((Release) discogs).getUnfilteredTracklist()) {
-			fillArtists(t.getArtists());
-			fillExtraArtists(t.getExtraArtists());
-		}
+	protected void fillAttributes(Discogs d) {
+		d.setTitle(StringUtils.left(discogs.getTitle(),  MAX_LENGTH_DEFAULT));
 
-		Master m = ((Release) discogs).getMaster();
-		
-		if (m != null) {
-			((Release) discogs).setMaster(em.find(Master.class, m.getId()));
-		}
+		if (d instanceof Release r) {
+			fillArtists(r.getArtists());
+			fillExtraArtists(r.getExtraArtists());
+			
+			for (Track t : r.getUnfilteredTracklist()) {
+				fillArtists(t.getArtists());
+				fillExtraArtists(t.getExtraArtists());
+			}
 
-		((Release) discogs).setLabels(getLabels(((Release) discogs).getLabels()));
+			Master m = r.getMaster();
+			
+			if (m != null) {
+				r.setMaster(em.find(Master.class, m.getId()));
+			}
+
+			r.setLabels(getLabels(r.getLabels()));
+		}
 	}
 	
 	private void fillArtists(List<Artist> artists) {

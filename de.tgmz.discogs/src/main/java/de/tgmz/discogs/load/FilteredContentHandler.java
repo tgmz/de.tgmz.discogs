@@ -25,35 +25,34 @@ import de.tgmz.discogs.domain.Discogs;
 import de.tgmz.discogs.domain.Genre;
 import de.tgmz.discogs.domain.Style;
 
-public class FilteredContentHandler extends DiscogsContentHandler {
+public abstract class FilteredContentHandler extends DiscogsContentHandler {
 	protected static final Logger LOG = LoggerFactory.getLogger(FilteredContentHandler.class);
-	protected List<Predicate<Discogs>> filter;
 	protected Discogs discogs;
+	protected int saved;
 	protected int ignored;
+	private Predicate<Discogs> filter;
 	private Set<String> genres;
 	private Set<String> styles;
 
-	public FilteredContentHandler() {
-		this (List.of(x -> true));
+	protected FilteredContentHandler() {
+		this (x -> true);
 	}
 	
-	public FilteredContentHandler(List<Predicate<Discogs>> filter) {
+	protected FilteredContentHandler(Predicate<Discogs> filter) {
 		this.filter = filter;
 	}
 
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		switch (qName) {
-		case "genre":
+		case "master", "release":
 			genres = new TreeSet<>();
-		
-			break;
-		case "style":
 			styles = new TreeSet<>();
 		
 			break;
 		default:
 		}
+		
 		super.startElement(uri, localName, qName, attributes);
 	}
 	
@@ -79,6 +78,7 @@ public class FilteredContentHandler extends DiscogsContentHandler {
 		super.endDocument();
 	
 		if (LOG.isInfoEnabled()) {
+			LOG.info("{} saved  ", String.format("%,d", saved));
 			LOG.info("{} ignored", String.format("%,d", ignored));
 		}
 	}
@@ -106,7 +106,7 @@ public class FilteredContentHandler extends DiscogsContentHandler {
 	
 	@Override
 	public void save(Object o) {
-		if (filter.stream().anyMatch(x -> x.test(discogs))) {
+		if (filter.test(discogs)) {
 			for (String x : genres) {
 				Genre g = em.find(Genre.class, x);
 				
@@ -127,11 +127,22 @@ public class FilteredContentHandler extends DiscogsContentHandler {
 				}
 			}
 			
+			fillAttributes(discogs);
+			
 			super.save(o);
+			
+			++saved;
 		} else {
 			LOG.debug("Ignore {}", o);
 			
 			++ignored;
 		}
 	}
+	
+	/**
+	 * By implementing this method derived classes may avoid time-intensive computations of attributes as this
+	 * method is called <i>after</i> applying the filter(s). 
+	 * @param d
+	 */
+	protected abstract void fillAttributes(Discogs d);
 }

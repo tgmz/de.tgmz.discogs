@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -28,6 +29,7 @@ import org.xml.sax.SAXException;
 import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.DataQuality;
+import de.tgmz.discogs.domain.Discogs;
 import de.tgmz.discogs.domain.ExtraArtist;
 import de.tgmz.discogs.domain.Genre;
 import de.tgmz.discogs.domain.Label;
@@ -41,6 +43,10 @@ import de.tgmz.discogs.load.MasterContentHandler;
 import de.tgmz.discogs.load.ReleaseContentHandler;
 import de.tgmz.discogs.logging.LogUtil;
 import de.tgmz.discogs.setup.DiscogsFile;
+import de.tgmz.mp3.discogs.load.predicate.CacheFilter;
+import de.tgmz.mp3.discogs.load.predicate.DataQualityFilter;
+import de.tgmz.mp3.discogs.load.predicate.IgnoreReleasesUpToFilter;
+import de.tgmz.mp3.discogs.load.predicate.MainFilter;
 import jakarta.persistence.EntityManager;
 
 public class DiscogsTest {
@@ -136,11 +142,21 @@ public class DiscogsTest {
 		}
 		
 		try (InputStream is = new FileInputStream(DiscogsFile.MASTERS.getUnzippedFile())) {
-			new MasterContentHandler(List.of(x -> x instanceof Master m && m.getId() != IGNORED)).run(is);
+			new MasterContentHandler(x -> x instanceof Master m && m.getId() != IGNORED).run(is);
 		}
 		
+		Predicate<Discogs> p0 = new MainFilter();
+		Predicate<Discogs> p1 = new DataQualityFilter(DataQuality.values());
+		Predicate<Discogs> p2 = new IgnoreReleasesUpToFilter();
+		
+		Predicate<Discogs> p = p0.and(p1).and(p2);
+		
+		Predicate<Discogs> p3 = new CacheFilter();
+		
+		p = p.or(p3);
+		
 		try (InputStream is = new FileInputStream(DiscogsFile.RELEASES.getUnzippedFile())) {
-			new ReleaseContentHandler().run(is);
+			new ReleaseContentHandler(p).run(is);
 		}
 	}
 	private void checkArtist(Artist a) {
