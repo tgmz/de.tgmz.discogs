@@ -33,8 +33,9 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(indexes = {
+		@Index(columnList = "displayArtist,title", name = "displayArtist_title_idx"), 
+		@Index(columnList = "displayArtist", name = "displayArtist_idx"), 
 		@Index(columnList = "title", name = "title_idx"), 
-		@Index(columnList = "displayArtist", name = "displayArtist_idx"),
 	})
 public class Release extends Discogs {
 	private static final long serialVersionUID = -8124211768010344837L;
