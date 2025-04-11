@@ -10,6 +10,7 @@
 package de.tgmz.discogs.domain;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -75,5 +76,22 @@ public class ExtraArtist implements Serializable {
 	@Override
 	public String toString() {
 		return "ExtraArtist [id=" + id + ", role=" + role + ", artist=" + artist + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(artist, role);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ExtraArtist other = (ExtraArtist) obj;
+		return Objects.equals(role, other.role) && this.artist.getId() == other.getArtist().getId();
 	}
 }

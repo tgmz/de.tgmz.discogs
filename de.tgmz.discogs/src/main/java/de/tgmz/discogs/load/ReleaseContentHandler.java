@@ -247,25 +247,25 @@ public class ReleaseContentHandler extends FilteredContentHandler {
 	
 	@Override
 	protected void fillAttributes(Discogs d) {
-		d.setTitle(StringUtils.left(discogs.getTitle(),  MAX_LENGTH_DEFAULT));
+		Release r = (Release) d;
+		
+		r.setTitle(StringUtils.left(discogs.getTitle(), MAX_LENGTH_DEFAULT));
 
-		if (d instanceof Release r) {
-			fillArtists(r.getArtists());
-			fillExtraArtists(r.getExtraArtists());
+		fillArtists(r.getArtists());
+		fillExtraArtists(r.getExtraArtists());
 			
-			for (Track t : r.getUnfilteredTracklist()) {
-				fillArtists(t.getArtists());
-				fillExtraArtists(t.getExtraArtists());
-			}
-
-			Master m = r.getMaster();
-			
-			if (m != null) {
-				r.setMaster(em.find(Master.class, m.getId()));
-			}
-
-			r.setLabels(getLabels(r.getLabels()));
+		for (Track t : r.getUnfilteredTracklist()) {
+			fillArtists(t.getArtists());
+			fillExtraArtists(t.getExtraArtists());
 		}
+
+		Master m = r.getMaster();
+			
+		if (m != null) {
+			r.setMaster(em.find(Master.class, m.getId()));
+		}
+
+		r.setLabels(getLabels(r.getLabels()));
 	}
 	
 	private void fillArtists(List<Artist> artists) {
@@ -275,10 +275,10 @@ public class ReleaseContentHandler extends FilteredContentHandler {
 		}
 	}
 	
-	private void fillExtraArtists(List<ExtraArtist> axtraArtists) {
-		if (axtraArtists != null) {
-			axtraArtists.replaceAll(ea -> ea = new ExtraArtist(ea.getRole(), em.find(Artist.class, ea.getArtist().getId())));
-			axtraArtists.removeIf(ea -> ea.getArtist() == null);
+	private void fillExtraArtists(List<ExtraArtist> extraArtists) {
+		if (extraArtists != null) {
+			extraArtists.replaceAll(ea -> ea = new ExtraArtist(ea.getRole(), em.find(Artist.class, ea.getArtist().getId())));
+			extraArtists.removeIf(ea -> ea.getArtist() == null);
 		}
 	}
 	
