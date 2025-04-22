@@ -20,6 +20,10 @@ import java.util.function.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.xml.sax.Attributes;
 
+import com.github.benmanes.caffeine.cache.CacheLoader;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
+
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.DataQuality;
 import de.tgmz.discogs.domain.Discogs;
@@ -31,6 +35,7 @@ import de.tgmz.discogs.domain.SubTrack;
 import de.tgmz.discogs.domain.Track;
 
 public class ReleaseContentHandler extends FilteredContentHandler {
+	private LoadingCache<Long, Artist> artistsCache;
 	private List<String> displayArtists;
 	private List<String> displayJoins;
 	private int sequence;
@@ -38,11 +43,18 @@ public class ReleaseContentHandler extends FilteredContentHandler {
 	private int subTrackNumber;
 
 	public ReleaseContentHandler() {
-		super();
+		this(x -> true);
 	}
 
 	public ReleaseContentHandler(Predicate<Discogs> filter) {
 		super(filter);
+		
+		artistsCache = Caffeine.newBuilder().build(new CacheLoader<Long, Artist>() {
+			@Override
+			public Artist load(Long key) throws Exception {
+				return em.find(Artist.class, key);
+			}
+		});
 	}
 
 	@Override
@@ -233,7 +245,7 @@ public class ReleaseContentHandler extends FilteredContentHandler {
 			Release r = (Release) discogs;
 			
 			if (r.getId() % threshold == 0 && LOG.isInfoEnabled()) {
-				LOG.info("{}/({}). {}", String.format("%,d", saved), String.format("%,d", ignored), discogs);
+				LOG.info("{}/{} ({}). {}", String.format("%,d", saved), String.format("%,d", ignored), String.format("%f%%", (float) saved / (ignored + saved) * 100), discogs);
 			}
 			
 			save(r);
@@ -270,14 +282,14 @@ public class ReleaseContentHandler extends FilteredContentHandler {
 	
 	private void fillArtists(List<Artist> artists) {
 		if (artists != null) {
-			artists.replaceAll(a -> a = em.find(Artist.class, a.getId()));
+			artists.replaceAll(a -> a = artistsCache.get(a.getId()));
 			artists.removeIf(a -> a == null);
 		}
 	}
 	
 	private void fillExtraArtists(List<ExtraArtist> extraArtists) {
 		if (extraArtists != null) {
-			extraArtists.replaceAll(ea -> ea = new ExtraArtist(ea.getRole(), em.find(Artist.class, ea.getArtist().getId())));
+			extraArtists.replaceAll(ea -> ea = new ExtraArtist(ea.getRole(), artistsCache.get(ea.getArtist().getId())));
 			extraArtists.removeIf(ea -> ea.getArtist() == null);
 		}
 	}

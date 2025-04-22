@@ -16,22 +16,34 @@ import java.util.function.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.xml.sax.Attributes;
 
+import com.github.benmanes.caffeine.cache.CacheLoader;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
+
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.DataQuality;
 import de.tgmz.discogs.domain.Discogs;
 import de.tgmz.discogs.domain.Master;
 
 public class MasterContentHandler extends FilteredContentHandler {
-	private Artist artist;
+	private long artistId;
 	private List<String> artistNames;
 	private List<String> joins;
+	private LoadingCache<Long, Artist> artistsCache;
 
 	public MasterContentHandler() {
-		super();
+		this(x -> true);
 	}
 
 	public MasterContentHandler(Predicate<Discogs> filter) {
 		super(filter);
+		
+		artistsCache = Caffeine.newBuilder().build(new CacheLoader<Long, Artist>() {
+			@Override
+			public Artist load(Long key) throws Exception {
+				return em.find(Artist.class, key);
+			}
+		});
 	}
 
 	@Override
@@ -50,10 +62,6 @@ public class MasterContentHandler extends FilteredContentHandler {
 			joins = new ArrayList<>();
 			
 			break;
-		case "[masters, master, artists, artist]":
-			artist = new Artist();
-			
-			break;
 		default:
 		}
 	}
@@ -62,9 +70,7 @@ public class MasterContentHandler extends FilteredContentHandler {
 	public void endElement(String uri, String localName, String qName) {
 		switch (path) {
 		case "[masters, master, artists, artist, id]":
-			long id = Long.parseLong(getChars());
-			
-			artist.setId(id);
+			artistId = Long.parseLong(getChars());
 			
 			break;
 		case "[masters, master, title]":
@@ -84,10 +90,10 @@ public class MasterContentHandler extends FilteredContentHandler {
 			
 			break;
 		case "[masters, master, artists, artist]":
-			Artist a0 = em.find(Artist.class, artist.getId());
+			Artist a0 = artistsCache.get(artistId);
 			
 			if (a0 == null) {
-				LOG.debug("Artist {} not found", artist.getId());
+				LOG.debug("Artist {} not found", artistId);
 			} else {
 				discogs.getArtists().add(a0);
 			}

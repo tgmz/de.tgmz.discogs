@@ -62,6 +62,11 @@
 			<version>3.29.0</version>
 		</dependency>
 		<dependency>
+			<groupId>com.github.ben-manes.caffeine</groupId>
+			<artifactId>caffeine</artifactId>
+			<version>3.2.0</version>
+		</dependency>
+		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>33.4.0-jre</version>
@@ -142,9 +147,10 @@
 							</sources>
 							<clearOutputDir>false</clearOutputDir>
 
-							<!-- External parsing is disabled by default. "Cannot parse URI: file:/C: ..." -->
+							<!-- External parsing is disabled by default.
+							"Cannot parse URI: file:/C: ..." -->
 							<externalEntityProcessing>true</externalEntityProcessing>
-							
+
 							<!-- Suppress org.xml.sax.SAXParseException -->
 							<quiet>true</quiet>
 						</configuration>
@@ -164,7 +170,8 @@
 						</goals>
 						<configuration>
 							<sources>
-								<source>${project.build.directory}/generated-sources/xinfo</source>
+								<source>
+									${project.build.directory}/generated-sources/xinfo</source>
 							</sources>
 						</configuration>
 					</execution>

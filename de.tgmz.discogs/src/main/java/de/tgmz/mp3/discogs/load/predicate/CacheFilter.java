@@ -15,9 +15,9 @@ import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.CacheLoader;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 
 import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Discogs;
@@ -28,7 +28,7 @@ public class CacheFilter implements Predicate<Discogs> {
 	private LoadingCache<String, String> cache;
 	
 	public CacheFilter() {
-		cache = CacheBuilder.newBuilder().build(new CacheLoader<String, String>() {
+		cache = Caffeine.newBuilder().build(new CacheLoader<String, String>() {
 			@Override
 			public String load(String key) throws Exception {
 				return key.toLowerCase();
