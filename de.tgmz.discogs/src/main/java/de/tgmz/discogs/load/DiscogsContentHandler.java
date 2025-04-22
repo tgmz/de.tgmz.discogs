@@ -33,7 +33,7 @@ import de.tgmz.discogs.database.DatabaseService;
 import jakarta.persistence.EntityManager;
 
 public class DiscogsContentHandler extends DefaultHandler {
-	protected static final Pattern PA = Pattern.compile("^(.*)(\\s+\\(\\d+\\))$");
+	protected static final Pattern PA = Pattern.compile("^(.*)(\\s?\\(\\d+\\))$");
 	protected static final Logger LOG = LoggerFactory.getLogger(DiscogsContentHandler.class);
 	protected static final int MAX_LENGTH_DEFAULT = 254;
 	protected static final int MAX_LENGTH_DISPLAY = 510;

@@ -9,6 +9,8 @@
 **********************************************************************/
 package de.tgmz.discogs.load;
 
+import java.util.regex.Matcher;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -37,7 +39,15 @@ public class LabelContentHandler extends DiscogsContentHandler {
 			label.setId(Long.parseLong(getChars()));
 			break;
 		case "[labels, label, name]":
-			label.setName(getChars(MAX_LENGTH_DEFAULT).trim());
+			String s = getChars(MAX_LENGTH_DEFAULT);
+			
+			Matcher m = PA.matcher(s);
+			
+			if (m.matches() && m.groupCount() > 1) {
+				s = m.group(1);
+			}
+			
+			label.setName(s.trim());
 			
 			break;
 		case "[labels, label, data_quality]":
