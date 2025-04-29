@@ -36,6 +36,7 @@ import de.tgmz.discogs.domain.Track;
 
 public class ReleaseContentHandler extends FilteredContentHandler {
 	private LoadingCache<Long, Artist> artistsCache;
+	private LoadingCache<Long, Label> labelCache;
 	private List<String> displayArtists;
 	private List<String> displayJoins;
 	private int sequence;
@@ -53,6 +54,13 @@ public class ReleaseContentHandler extends FilteredContentHandler {
 			@Override
 			public Artist load(Long key) throws Exception {
 				return em.find(Artist.class, key);
+			}
+		});
+		
+		labelCache = Caffeine.newBuilder().build(new CacheLoader<Long, Label>() {
+			@Override
+			public Label load(Long key) throws Exception {
+				return em.find(Label.class, key);
 			}
 		});
 	}
@@ -298,7 +306,7 @@ public class ReleaseContentHandler extends FilteredContentHandler {
 		Map<Label, String> result = new HashMap<>();
 		
 		for (Entry<Label, String> e : labels.entrySet()) {
-			Label l = em.find(Label.class, e.getKey().getId());
+			Label l = labelCache.get(e.getKey().getId());
 			
 			if (l != null) {
 				result.put(l, e.getValue());
