@@ -73,7 +73,7 @@ public class ReleaseContentHandler extends FilteredContentHandler {
 		case "[releases, release]":
 			discogs = new Release();
 			
-			((Release) discogs).setId(Long.parseLong(attributes.getValue("id")));
+			discogs.setId(Long.parseLong(attributes.getValue("id")));
 			
 			break;
 		case "[releases, release, master_id]":
@@ -250,13 +250,7 @@ public class ReleaseContentHandler extends FilteredContentHandler {
 			
 			break;
 		case "[releases, release]":
-			Release r = (Release) discogs;
-			
-			if (r.getId() % threshold == 0 && LOG.isInfoEnabled()) {
-				LOG.info("{}/{} ({}). {}", String.format("%,d", saved), String.format("%,d", ignored), String.format("%f%%", (float) saved / (ignored + saved) * 100), discogs);
-			}
-			
-			save(r);
+			save(discogs);
 			
 			break;
 		default:

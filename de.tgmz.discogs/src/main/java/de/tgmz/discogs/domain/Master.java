@@ -30,8 +30,14 @@ public class Master extends Discogs {
 	private long id;
 	private Integer published;
 
+	@Override
 	public long getId() {
 		return id;
+	}
+
+	@Override
+	public void setId(long id) {
+		this.id = id;
 	}
 
 	/**
@@ -41,10 +47,6 @@ public class Master extends Discogs {
 	 */
 	public Integer getPublished() {
 		return published;
-	}
-
-	public void setId(long id) {
-		this.id = id;
 	}
 
 	public void setPublished(Integer published) {

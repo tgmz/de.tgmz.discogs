@@ -62,6 +62,8 @@ public class Release extends Discogs {
 		extraArtists = new LinkedList<>();
 		labels = new HashMap<>();
 	}
+	
+	@Override
 	public long getId() {
 		return id;
 	}
@@ -94,6 +96,7 @@ public class Release extends Discogs {
 		return labels;
 	}
 
+	@Override
 	public void setId(long id) {
 		this.id = id;
 	}

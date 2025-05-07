@@ -44,6 +44,9 @@ public abstract class Discogs implements Serializable {
 		styles = new HashSet<>();
 	}
 
+	public abstract long getId();
+	public abstract void setId(long id);
+	
 	/**
 	 * The masters title obtained from discogs &lt;title&gt; tag.
 	 * @return the title

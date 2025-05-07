@@ -142,7 +142,7 @@ public class DiscogsTest {
 		}
 		
 		try (InputStream is = new FileInputStream(DiscogsFile.MASTERS.getUnzippedFile())) {
-			new MasterContentHandler(x -> x instanceof Master m && m.getId() != IGNORED).run(is);
+			new MasterContentHandler(x -> x.getId() != IGNORED).run(is);
 		}
 		
 		Predicate<Discogs> p0 = new MainFilter();
@@ -206,6 +206,7 @@ public class DiscogsTest {
 		assertTrue(any.isPresent());
 		assertEquals("Mixed By", any.get().getRole());
 		assertEquals("Flood", any.get().getArtist().getName());
+		assertEquals(any.get(), new ExtraArtist("Mixed By", any.get().getArtist()));
 		
 		assertEquals("9 26081-2", r.getLabels().get(l));
 	}

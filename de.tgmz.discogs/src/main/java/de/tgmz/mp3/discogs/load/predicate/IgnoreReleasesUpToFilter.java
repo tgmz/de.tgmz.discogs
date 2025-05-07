@@ -13,7 +13,6 @@ import java.util.function.Predicate;
 
 import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Discogs;
-import de.tgmz.discogs.domain.Release;
 import jakarta.persistence.EntityManager;
 
 public class IgnoreReleasesUpToFilter implements Predicate<Discogs> {
@@ -31,6 +30,6 @@ public class IgnoreReleasesUpToFilter implements Predicate<Discogs> {
 	
 	@Override
 	public boolean test(Discogs d) {
-		return (d instanceof Release r && r.getId() > maxId);
+		return d.getId() > maxId;
 	}
 }

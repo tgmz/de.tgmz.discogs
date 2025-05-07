@@ -106,26 +106,12 @@ public abstract class FilteredContentHandler extends DiscogsContentHandler {
 	
 	@Override
 	public void save(Object o) {
+		if (discogs.getId() % threshold == 0 && LOG.isInfoEnabled()) {
+			LOG.info("{}/{} ({}). {}", String.format("%,d", saved), String.format("%,d", ignored), String.format("%f%%", (float) saved / (ignored + saved) * 100), discogs);
+		}
+		
 		if (filter.test(discogs)) {
-			for (String x : genres) {
-				Genre g = em.find(Genre.class, x);
-				
-				if (g != null) {
-					discogs.getGenres().add(g);
-				} else {
-					discogs.getGenres().add(new Genre(x));
-				}
-			}
-
-			for (String x : styles) {
-				Style s = em.find(Style.class, x);
-				
-				if (s != null) {
-					discogs.getStyles().add(s);
-				} else {
-					discogs.getStyles().add(new Style(x));
-				}
-			}
+			fillGenresAndStyles();
 			
 			fillAttributes(discogs);
 			
@@ -136,6 +122,28 @@ public abstract class FilteredContentHandler extends DiscogsContentHandler {
 			LOG.debug("Ignore {}", o);
 			
 			++ignored;
+		}
+	}
+
+	private void fillGenresAndStyles() {
+		for (String x : genres) {
+			Genre g = em.find(Genre.class, x);
+			
+			if (g != null) {
+				discogs.getGenres().add(g);
+			} else {
+				discogs.getGenres().add(new Genre(x));
+			}
+		}
+
+		for (String x : styles) {
+			Style s = em.find(Style.class, x);
+			
+			if (s != null) {
+				discogs.getStyles().add(s);
+			} else {
+				discogs.getStyles().add(new Style(x));
+			}
 		}
 	}
 	

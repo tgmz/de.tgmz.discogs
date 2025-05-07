@@ -54,7 +54,7 @@ public class MasterContentHandler extends FilteredContentHandler {
 		case "[masters, master]":
 			discogs = new Master();
 			
-			((Master) discogs).setId(Long.parseLong(attributes.getValue("id")));
+			discogs.setId(Long.parseLong(attributes.getValue("id")));
 			
 			break;
 		case "[masters, master, artists]":
@@ -112,10 +112,6 @@ public class MasterContentHandler extends FilteredContentHandler {
 			
 			break;
 		case "[masters, master]":
-			if (((Master) discogs).getId() % threshold == 0) {
-				LOG.info("Save {}", discogs);
-			}
-			
 			save(discogs);
 			
 			break;
