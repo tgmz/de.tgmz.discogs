@@ -10,6 +10,7 @@
 package de.tgmz.discogs.domain;
 
 import java.io.Serializable;
+import java.util.LinkedList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -47,6 +48,12 @@ public class Track implements Serializable {
 	@OrderBy(value = "trackNumber")
 	private List<SubTrack> subTracklist;
 
+	public Track() {
+		subTracklist = new LinkedList<>();
+		artists = new LinkedList<>();
+		extraArtists = new LinkedList<>();
+	}
+	
 	public long getId() {
 		return id;
 	}
@@ -109,10 +116,6 @@ public class Track implements Serializable {
 
 	public void setArtists(List<Artist> artists) {
 		this.artists = artists;
-	}
-
-	public void setSubTracklist(List<SubTrack> subTracklist) {
-		this.subTracklist = subTracklist;
 	}
 
 	public void setSequence(int sequence) {

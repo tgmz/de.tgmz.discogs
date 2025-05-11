@@ -124,7 +124,6 @@ public class ReleaseContentHandler extends FilteredContentHandler {
 			
 			break;
 		case "[releases, release, tracklist, track, sub_tracks]":
-			((Release) discogs).getUnfilteredTracklist().getLast().setSubTracklist(new LinkedList<>());
 			subTrackNumber = 1;
 			
 			break;
