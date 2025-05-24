@@ -20,6 +20,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.Test.None;
 import org.mockserver.configuration.Configuration;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.logging.MockServerLogger;
@@ -43,6 +44,9 @@ public class SetupTest {
 		logLevel = System.getProperty(LOG_LEVEL_KEY, "INFO");
 		System.setProperty(LOG_LEVEL_KEY, "INFO"); // Set to "DEBUG" to force noisy logging
 		
+		System.setProperty("DB_URL", "jdbc:h2:mem:discogs_test_mem");
+		System.setProperty("DB_USR", "sa");
+		System.setProperty("DB_PASS", "sa");
 		System.setProperty(DiscogsFile.DISCOGS_DIR, System.getProperty("java.io.tmpdir"));
 		System.setProperty("DISCOGS_TEST", "true");
 
@@ -77,7 +81,7 @@ public class SetupTest {
 	}
 	
 	@Test
-	public void testEverything() throws IOException, DiscogsVerificationException  {
+	public void testEverything() throws IOException, DiscogsVerificationException {
 		for (DiscogsFile df : DiscogsFile.values()) {
 			if (df.isZipped()) {
 				DiscogsFileHandler d = new DiscogsFileHandler(df);
@@ -104,6 +108,13 @@ public class SetupTest {
 		assertThrows(DiscogsVerificationException.class, d::verify);
 		d.close();
 	}
+	
+	@Test(expected = None.class)
+	public void testMain() {
+		DiscogsFileHandler.main(null);
+	}
+
+	
 	private static void setupMockRequest(String file, String path) throws IOException {
 		byte[] b = SetupTest.class.getClassLoader().getResourceAsStream(file).readAllBytes();
 

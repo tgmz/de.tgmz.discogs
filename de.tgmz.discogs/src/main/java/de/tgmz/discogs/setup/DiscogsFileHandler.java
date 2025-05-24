@@ -20,6 +20,7 @@ import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.function.Predicate;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.io.FileUtils;
@@ -34,8 +35,15 @@ import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import com.google.common.io.ByteSource;
 
-import de.tgmz.discogs.load.DiscogsContentHandler;
+import de.tgmz.discogs.domain.DataQuality;
+import de.tgmz.discogs.domain.Discogs;
+import de.tgmz.discogs.load.ArtistContentHandler;
+import de.tgmz.discogs.load.LabelContentHandler;
+import de.tgmz.discogs.load.MasterContentHandler;
+import de.tgmz.discogs.load.ReleaseContentHandler;
 import de.tgmz.discogs.logging.LogUtil;
+import de.tgmz.mp3.discogs.load.predicate.DataQualityFilter;
+import de.tgmz.mp3.discogs.load.predicate.MainFilter;
 import me.tongfei.progressbar.ProgressBar;
 import me.tongfei.progressbar.ProgressBarBuilder;
 import me.tongfei.progressbar.ProgressBarConsumer;
@@ -60,21 +68,24 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 			}
 		}
 		
-		for (DiscogsFile df : DiscogsFile.values()) {
-			Class<? extends DiscogsContentHandler> clz = df.getHandler();
+		try (InputStream is0 = new FileInputStream(DiscogsFile.ARTISTS.getUnzippedFile());
+				InputStream is1 = new FileInputStream(DiscogsFile.LABELS.getUnzippedFile());
+				InputStream is2 = new FileInputStream(DiscogsFile.MASTERS.getUnzippedFile());
+				InputStream is3 = new FileInputStream(DiscogsFile.RELEASES.getUnzippedFile())) {
+			new ArtistContentHandler().run(is0);
+			new LabelContentHandler().run(is1);
+			new MasterContentHandler().run(is2);
 			
-			if (clz != null) {
-				try (InputStream is0 = new FileInputStream(df.getUnzippedFile())) {
-					clz.getDeclaredConstructor().newInstance().run(is0);
-				} catch (IOException | SAXException | ReflectiveOperationException e) {
-					LOG.error("Cannot setup database, reason", e);
-				}
-			}
+			//Only import main releases of highest quality
+			Predicate<Discogs> p0 = new DataQualityFilter(DataQuality.COMPLETE_AND_CORRECT);
+			Predicate<Discogs> p1 = new MainFilter();
+			
+			new ReleaseContentHandler(p0.and(p1)).run(is3);
+		} catch (IOException | SAXException e) {
+			LOG.error("Cannot setup database, reason", e);
 		}
 		
 		LogUtil.logElapsed();
-		
-		System.exit(0);
 	}
 	
 	public DiscogsFileHandler(DiscogsFile df) {
@@ -184,7 +195,7 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 			throw new DiscogsVerificationException();
 		}
 		
-		LOG.error("Verification successful");
+		LOG.info("Verification successful");
 	}
 
 	private static String getHash(String s) throws IOException {
