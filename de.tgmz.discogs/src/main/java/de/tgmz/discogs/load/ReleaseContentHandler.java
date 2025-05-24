@@ -218,7 +218,7 @@ public class ReleaseContentHandler extends FilteredContentHandler {
 		case "[releases, release, tracklist, track]":
 			Track t = ((Release) discogs).getUnfilteredTracklist().getLast();
 			
-			if (t.getPosition() == null && t.getSubTracklist() == null) {
+			if (t.getPosition() == null && t.getSubTracklist().isEmpty()) {
 				// Not al "real" track (e.g. headline like "Roots" and "The Roots of Sepultura") 
 				--trackNumber;
 			}
