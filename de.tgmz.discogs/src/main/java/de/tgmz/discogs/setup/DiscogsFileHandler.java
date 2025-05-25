@@ -20,7 +20,6 @@ import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.function.Predicate;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.io.FileUtils;
@@ -35,15 +34,11 @@ import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import com.google.common.io.ByteSource;
 
-import de.tgmz.discogs.domain.DataQuality;
-import de.tgmz.discogs.domain.Discogs;
 import de.tgmz.discogs.load.ArtistContentHandler;
 import de.tgmz.discogs.load.LabelContentHandler;
 import de.tgmz.discogs.load.MasterContentHandler;
 import de.tgmz.discogs.load.ReleaseContentHandler;
 import de.tgmz.discogs.logging.LogUtil;
-import de.tgmz.mp3.discogs.load.predicate.DataQualityFilter;
-import de.tgmz.mp3.discogs.load.predicate.MainFilter;
 import me.tongfei.progressbar.ProgressBar;
 import me.tongfei.progressbar.ProgressBarBuilder;
 import me.tongfei.progressbar.ProgressBarConsumer;
@@ -75,12 +70,7 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 			new ArtistContentHandler().run(is0);
 			new LabelContentHandler().run(is1);
 			new MasterContentHandler().run(is2);
-			
-			//Only import main releases of highest quality
-			Predicate<Discogs> p0 = new DataQualityFilter(DataQuality.COMPLETE_AND_CORRECT);
-			Predicate<Discogs> p1 = new MainFilter();
-			
-			new ReleaseContentHandler(p0.and(p1)).run(is3);
+			new ReleaseContentHandler().run(is3);
 		} catch (IOException | SAXException e) {
 			LOG.error("Cannot setup database, reason", e);
 		}
@@ -107,7 +97,7 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 			return;
 		}
 		
-		LOG.info("Download {} to {}", df.getUnzippedFileName(), gz);
+		LOG.info("Download {} to {}", df.getRemote(), gz);
 		
 		FileUtils.createParentDirectories(gz);
 

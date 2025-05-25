@@ -177,6 +177,22 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>3.5.0</version>
+				<configuration>
+					<mainClass>de.tgmz.discogs.setup.DiscogsFileHandler</mainClass>
+					<classpathScope>test</classpathScope>
+					<cleanupDaemonThreads>false</cleanupDaemonThreads>
+					<systemProperties>
+						<property>
+							<key>log4j.configuration</key>
+							<value>file:${basedir}/src/main/resources/log4j.xml</value>
+						</property>
+					</systemProperties>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 	<profiles>
