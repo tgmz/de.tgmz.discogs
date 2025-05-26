@@ -20,6 +20,7 @@ import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.function.Predicate;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.io.FileUtils;
@@ -34,6 +35,7 @@ import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import com.google.common.io.ByteSource;
 
+import de.tgmz.discogs.domain.Discogs;
 import de.tgmz.discogs.load.ArtistContentHandler;
 import de.tgmz.discogs.load.LabelContentHandler;
 import de.tgmz.discogs.load.MasterContentHandler;
@@ -50,7 +52,7 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 	private DiscogsFile df;
 	private ProgressBarBuilder pbb;
 
-	public static void main(String[] args) {
+	public static void main(String... args) {
 		for (DiscogsFile df : DiscogsFile.values()) {
 			if (df.isZipped()) {
 				try (DiscogsFileHandler dl = new DiscogsFileHandler(df)) { 
@@ -62,6 +64,8 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 				}
 			}
 		}
+
+		Predicate<Discogs> p = getPredicate(args);
 		
 		try (InputStream is0 = new FileInputStream(DiscogsFile.ARTISTS.getUnzippedFile());
 				InputStream is1 = new FileInputStream(DiscogsFile.LABELS.getUnzippedFile());
@@ -69,13 +73,16 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 				InputStream is3 = new FileInputStream(DiscogsFile.RELEASES.getUnzippedFile())) {
 			new ArtistContentHandler().run(is0);
 			new LabelContentHandler().run(is1);
-			new MasterContentHandler().run(is2);
-			new ReleaseContentHandler().run(is3);
+			new MasterContentHandler(p).run(is2);
+			new ReleaseContentHandler(p).run(is3);
 		} catch (IOException | SAXException e) {
 			LOG.error("Cannot setup database, reason", e);
 		}
 		
 		LogUtil.logElapsed();
+		
+		// Without this weird ClassNotFoundExceptions occur at exec-maven-plugin:load
+		System.exit(0);
 	}
 	
 	public DiscogsFileHandler(DiscogsFile df) {
@@ -244,5 +251,22 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 		}
 		
 		return size;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private static Predicate<Discogs> getPredicate(String... clz) {
+		Predicate<Discogs> p = x -> true;
+		
+		if (clz != null) {
+			try {
+				for (String s : clz) {
+					p = p.and((Predicate<Discogs>) Class.forName(s).getDeclaredConstructor().newInstance());
+				}
+			} catch (ReflectiveOperationException e) {
+				LOG.error("Error in predicate setup", e);
+			}
+		}
+		
+		return p;
 	}
 }

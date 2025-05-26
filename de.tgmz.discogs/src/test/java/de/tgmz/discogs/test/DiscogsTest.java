@@ -56,7 +56,7 @@ public class DiscogsTest {
 	@BeforeClass
 	public static void setupOnce() throws IOException, SAXException {
 		System.setProperty("DB_URL", "jdbc:h2:mem:discogs_test_mem");
-		System.setProperty("DB_USR", "sa");
+		System.setProperty("DB_USER", "sa");
 		System.setProperty("DB_PASS", "sa");
 		System.setProperty(DiscogsFile.DISCOGS_DIR, System.getProperty("java.io.tmpdir"));
 		

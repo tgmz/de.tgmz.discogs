@@ -32,7 +32,7 @@
 		<properties>
 			<!-- Database connection settings -->
 			<property name="javax.persistence.jdbc.url" value="${DB_URL}" />
-			<property name="javax.persistence.jdbc.user" value="${DB_USR}" />
+			<property name="javax.persistence.jdbc.user" value="${DB_USER}" />
 			<property name="javax.persistence.jdbc.password" value="${DB_PASS}" />
 			
 			<!-- Automatically export the schema -->

@@ -33,6 +33,7 @@ import de.tgmz.discogs.logging.LogUtil;
 import de.tgmz.discogs.setup.DiscogsFile;
 import de.tgmz.discogs.setup.DiscogsFileHandler;
 import de.tgmz.discogs.setup.DiscogsVerificationException;
+import de.tgmz.mp3.discogs.load.predicate.CacheFilter;
 
 public class SetupTest {
 	private static final String LOG_LEVEL_KEY = "org.slf4j.simpleLogger.defaultLogLevel";
@@ -45,7 +46,7 @@ public class SetupTest {
 		System.setProperty(LOG_LEVEL_KEY, "INFO"); // Set to "DEBUG" to force noisy logging
 		
 		System.setProperty("DB_URL", "jdbc:h2:mem:discogs_test_mem");
-		System.setProperty("DB_USR", "sa");
+		System.setProperty("DB_USER", "sa");
 		System.setProperty("DB_PASS", "sa");
 		System.setProperty(DiscogsFile.DISCOGS_DIR, System.getProperty("java.io.tmpdir"));
 		System.setProperty("DISCOGS_TEST", "true");
@@ -111,7 +112,7 @@ public class SetupTest {
 	
 	@Test(expected = None.class)
 	public void testMain() {
-		DiscogsFileHandler.main(null);
+		DiscogsFileHandler.main(CacheFilter.class.getCanonicalName());
 	}
 
 	

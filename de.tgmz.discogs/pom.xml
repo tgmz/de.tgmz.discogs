@@ -197,13 +197,28 @@
 				<configuration>
 					<mainClass>de.tgmz.discogs.setup.DiscogsFileHandler</mainClass>
 					<classpathScope>test</classpathScope>
-					<cleanupDaemonThreads>false</cleanupDaemonThreads>
 					<systemProperties>
 						<property>
 							<key>log4j.configuration</key>
-							<value>file:${basedir}/src/main/resources/log4j.xml</value>
+							<value>file:${project.basedir}/src/main/resources/log4j.xml</value>
+						</property>
+						<property>
+							<key>DB_URL</key>
+							<value>jdbc:h2:~/Databases/discogs;MODE=DB2;DEFAULT_NULL_ORDERING=HIGH</value>
+						</property>
+						<property>
+							<key>DB_USER</key>
+							<value>sa</value>
+						</property>
+						<property>
+							<key>DB_PASS</key>
+							<value>sa</value>
 						</property>
 					</systemProperties>
+					<!-- Remove this for a full import -->
+					<arguments>
+						<argument>de.tgmz.mp3.discogs.load.predicate.DataQualityFilter</argument>
+					</arguments>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -327,7 +342,7 @@
 					<plugin>
 						<groupId>org.apache.rat</groupId>
 						<artifactId>apache-rat-plugin</artifactId>
-						<version>0.16.1</version>
+						<version>0.13</version>
 						<executions>
 							<execution>
 								<id>rat-check</id>
