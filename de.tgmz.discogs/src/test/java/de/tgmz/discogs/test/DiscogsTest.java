@@ -17,8 +17,10 @@ import static org.junit.Assert.assertTrue;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import org.junit.AfterClass;
@@ -185,7 +187,12 @@ public class DiscogsTest {
 		assertEquals("World In My Eyes", r.getUnfilteredTracklist().getFirst().getTitle());
 		assertTrue(r.getGenres().stream().allMatch(x -> "Electronic".equals(x.getId())));
 		assertTrue(r.getStyles().stream().allMatch(x -> "Synth-pop".equals(x.getId())));
-		assertTrue(r.getExtraArtists().stream().filter(x -> x.getArtist() != null && "Alan Gregorie".equals(x.getArtist().getName())).findFirst().isPresent());
+		
+		Optional<ExtraArtist> fk = r.getExtraArtists().stream().filter(x -> x.getArtist() != null && 20662 == x.getArtist().getId()).findAny();
+		assertTrue(fk.isPresent());
+		assertEquals("François Kevorkian", fk.get().getArtist().getName());
+		assertEquals("Mixed By", fk.get().getRole());
+		assertEquals(Set.of("1 to 5", "7 to 9"), fk.get().getTracks());
 		
 		List<Track> tracklist = r.getUnfilteredTracklist();
 		
@@ -201,12 +208,12 @@ public class DiscogsTest {
 		
 		List<ExtraArtist> eas = t.getExtraArtists();
 		
-		Optional<ExtraArtist> any = eas.stream().filter(x -> x.getArtist() != null && "Flood".equals(x.getArtist().getName())).findAny();
+		Optional<ExtraArtist> flood = eas.stream().filter(x -> x.getArtist() != null && 20661 == x.getArtist().getId()).findAny();
 		
-		assertTrue(any.isPresent());
-		assertEquals("Mixed By", any.get().getRole());
-		assertEquals("Flood", any.get().getArtist().getName());
-		assertEquals(any.get(), new ExtraArtist("Mixed By", any.get().getArtist()));
+		assertTrue(flood.isPresent());
+		assertEquals("Mixed By", flood.get().getRole());
+		assertEquals("Flood", flood.get().getArtist().getName());
+		assertEquals(flood.get(), new ExtraArtist("Mixed By", flood.get().getArtist(), Collections.emptySet()));
 		
 		assertEquals("9 26081-2", r.getLabels().get(l));
 	}

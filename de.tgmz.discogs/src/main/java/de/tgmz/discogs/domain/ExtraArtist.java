@@ -10,9 +10,13 @@
 package de.tgmz.discogs.domain;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -28,14 +32,18 @@ public class ExtraArtist implements Serializable {
 	private String role;
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private Artist artist;
+	@ElementCollection
+	private Set<String> tracks;
 
 	public ExtraArtist() {
+		tracks = new TreeSet<>();
 	}
 	
-	public ExtraArtist(String role, Artist artist) {
-		super();
+	public ExtraArtist(String role, Artist artist, Set<String> tracks) {
+		this();
 		this.role = role;
 		this.artist = artist;
+		this.tracks.addAll(tracks);
 	}
 	/**
 	 * The id (generated)
@@ -60,6 +68,10 @@ public class ExtraArtist implements Serializable {
 	public Artist getArtist() {
 		return artist;
 	}
+
+	public Set<String> getTracks() {
+		return tracks;
+	}
 	
 	public void setId(long id) {
 		this.id = id;
@@ -71,6 +83,17 @@ public class ExtraArtist implements Serializable {
 	
 	public void setArtist(Artist extraArtists) {
 		this.artist = extraArtists;
+	}
+
+	public void setTracks(Set<String> tracks) {
+		this.tracks.clear();
+		this.tracks.addAll(tracks);
+	}
+	
+	public void setTracks(String... tracks) {
+		this.tracks.clear();
+		
+		Arrays.stream(tracks).forEach(s -> this.tracks.add(s));
 	}
 	
 	@Override

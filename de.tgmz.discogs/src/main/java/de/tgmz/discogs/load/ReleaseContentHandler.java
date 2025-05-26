@@ -10,11 +10,14 @@
 package de.tgmz.discogs.load;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
@@ -214,6 +217,10 @@ public class ReleaseContentHandler extends FilteredContentHandler {
 			((Release) discogs).getExtraArtists().getLast().setRole(getChars(MAX_LENGTH_DEFAULT));
 				
 			break;
+		case "[releases, release, extraartists, artist, tracks]":
+			((Release) discogs).getExtraArtists().getLast().setTracks(getChars().split("\\s*,\\s*"));
+				
+			break;
 		//tracks
 		case "[releases, release, tracklist, track]":
 			Track t = ((Release) discogs).getUnfilteredTracklist().getLast();
@@ -298,7 +305,7 @@ public class ReleaseContentHandler extends FilteredContentHandler {
 	
 	private void fillExtraArtists(List<ExtraArtist> extraArtists) {
 		if (extraArtists != null) {
-			extraArtists.replaceAll(ea -> ea = new ExtraArtist(ea.getRole(), artistsCache.get(ea.getArtist().getId())));
+			extraArtists.replaceAll(ea -> ea = new ExtraArtist(ea.getRole(), artistsCache.get(ea.getArtist().getId()), ea.getTracks()));
 			extraArtists.removeIf(ea -> ea.getArtist() == null);
 		}
 	}
