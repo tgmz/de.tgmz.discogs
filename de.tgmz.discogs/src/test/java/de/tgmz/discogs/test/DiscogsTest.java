@@ -176,6 +176,12 @@ public class DiscogsTest {
 	private void checkLabel(Label l) {
 		assertEquals("Mute", l.getName());
 		assertEquals(DataQuality.NEEDS_VOTE, l.getDataQuality());
+		
+		Optional<Label> ops = l.getSubLabels().stream().filter(l0 -> l0.getId() == 12954).findAny();
+		assertTrue(ops.isPresent());
+		
+		assertEquals("Parallel Series", ops.get().getName());
+		assertEquals(DataQuality.NEEDS_VOTE, ops.get().getDataQuality());
 	}
 	private void checkMaster(Master m) {
 		assertEquals("Violator", m.getTitle());

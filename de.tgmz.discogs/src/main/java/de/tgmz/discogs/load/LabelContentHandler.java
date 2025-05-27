@@ -27,8 +27,30 @@ public class LabelContentHandler extends DiscogsContentHandler {
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		super.startElement(uri, localName, qName, attributes);
 
-		if (path.equals("[labels, label]")) {
+		switch (path) {
+		case "[labels, label]":
 			label = new Label();
+			break;
+		case "[labels, label, sublabels, label]":
+			long subLabelId = Long.parseLong(attributes.getValue("id"));
+			
+			Label subLabel;
+			
+			if (subLabelId == label.getId()) {
+				// Stange but happens e.g. label id = 219.423, name=RDM Edition
+				subLabel = label;
+			} else {
+				subLabel = em.find(Label.class, subLabelId);
+			
+				if (subLabel == null) {
+					subLabel = new Label();
+					subLabel.setId(subLabelId);
+				}
+			}
+			
+			label.getSubLabels().add(subLabel);
+			break;
+		default:
 		}
 	}
 
@@ -53,6 +75,9 @@ public class LabelContentHandler extends DiscogsContentHandler {
 		case "[labels, label, data_quality]":
 			label.setDataQuality(DataQuality.byName(getChars()));
 			
+			break;
+		case "[labels, label, sublabels, label]":
+			label.getSubLabels().getLast().setName(getChars(MAX_LENGTH_DEFAULT));
 			break;
 		case "[labels, label]":
 			if (label.getId() % 10_000 == 0) {
