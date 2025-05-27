@@ -23,12 +23,38 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(ArtistContentHandler.class);
 	private Artist artist;
 
+	public ArtistContentHandler() {
+		super();
+	}
+	
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		super.startElement(uri, localName, qName, attributes);
 
-		if ("[artists, artist]".equals(path)) {
+		switch (path) {
+		case "[artists, artist]":
 			artist = new Artist();
+			break;
+		case "[artists, artist, members, name]":
+			long memberId = Long.parseLong(attributes.getValue("id"));
+			
+			Artist member;
+			
+			if (memberId == artist.getId()) {
+				// Stange but happens e.g. artist id = 16401, name = Drunkness
+				member = artist;
+			} else {
+				member = em.find(Artist.class, memberId);
+			
+				if (member == null) {
+					member = new Artist();
+					member.setId(memberId);
+				}
+			}
+			
+			artist.getMembers().add(member);
+			break;
+		default:
 		}
 	}
 
@@ -56,6 +82,9 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 		case "[artists, artist, namevariations, name]":
 			artist.getVariations().add(getChars());
 				
+			break;
+		case "[artists, artist, members, name]":
+			artist.getMembers().getLast().setName(getChars(MAX_LENGTH_DEFAULT));
 			break;
 		case "[artists, artist]":
 			if (artist.getId() % 10_000 == 0) {

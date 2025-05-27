@@ -165,6 +165,13 @@ public class DiscogsTest {
 		assertEquals("Depeche Mode", a.getName());
 		assertTrue(a.getVariations().contains("D M"));
 		assertEquals(DataQuality.NEEDS_VOTE, a.getDataQuality());
+		
+		Optional<Artist> alanWilder = a.getMembers().stream().filter(a0 -> a0.getId() == 25411).findFirst();
+		
+		assertTrue(alanWilder.isPresent());
+		assertEquals("Alan Wilder", alanWilder.get().getName());
+		
+		assertTrue(alanWilder.get().getVariations().contains("A. Wilder"));
 	}
 	private void checkLabel(Label l) {
 		assertEquals("Mute", l.getName());
