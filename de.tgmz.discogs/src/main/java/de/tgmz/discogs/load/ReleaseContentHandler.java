@@ -191,7 +191,7 @@ public class ReleaseContentHandler extends FilteredContentHandler {
 			
 			break;
 		case "[releases, release, artists, artist, name]":
-			String s = getChars(MAX_LENGTH_DEFAULT);
+			String s = getChars(MAX_LENGTH_DEFAULT, true);
 			
 			displayArtists.add(s);
 			discogs.getArtists().getLast().setName(s);

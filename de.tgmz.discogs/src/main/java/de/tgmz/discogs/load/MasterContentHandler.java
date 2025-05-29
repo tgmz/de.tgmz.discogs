@@ -100,7 +100,7 @@ public class MasterContentHandler extends FilteredContentHandler {
 			
 			break;
 		case "[masters, master, artists, artist, name]":
-			artistNames.add(getChars(MAX_LENGTH_DEFAULT));
+			artistNames.add(getChars(MAX_LENGTH_DEFAULT, true));
 			
 			break;
 		case "[masters, master, artists, artist, join]":

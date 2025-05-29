@@ -9,8 +9,6 @@
 **********************************************************************/
 package de.tgmz.discogs.load;
 
-import java.util.regex.Matcher;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -68,15 +66,7 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 			artist.setDataQuality(DataQuality.byName(getChars()));
 			break;
 		case "[artists, artist, name]":
-			String s = getChars(MAX_LENGTH_DEFAULT);
-			
-			Matcher m = PA.matcher(s);
-			
-			if (m.matches() && m.groupCount() > 1) {
-				s = m.group(1);
-			}
-			
-			artist.setName(s.trim());
+			artist.setName(getChars(MAX_LENGTH_DEFAULT, true));
 			
 			break;
 		case "[artists, artist, namevariations, name]":
@@ -84,7 +74,7 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 				
 			break;
 		case "[artists, artist, members, name]":
-			artist.getMembers().getLast().setName(getChars(MAX_LENGTH_DEFAULT));
+			artist.getMembers().getLast().setName(getChars(MAX_LENGTH_DEFAULT, true));
 			break;
 		case "[artists, artist]":
 			if (artist.getId() % 10_000 == 0) {
