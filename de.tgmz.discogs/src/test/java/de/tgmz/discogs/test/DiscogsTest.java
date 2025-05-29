@@ -226,6 +226,7 @@ public class DiscogsTest {
 		assertTrue(flood.isPresent());
 		assertEquals("Mixed By", flood.get().getRole());
 		assertEquals("Flood", flood.get().getArtist().getName());
+		assertEquals("Mark Ellis", flood.get().getArtist().getRealName());
 		assertEquals(flood.get(), new ExtraArtist("Mixed By", flood.get().getArtist(), Collections.emptySet()));
 		
 		assertEquals("9 26081-2", r.getLabels().get(l));

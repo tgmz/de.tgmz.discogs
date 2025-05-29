@@ -69,6 +69,10 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 			artist.setName(getChars(MAX_LENGTH_DEFAULT, true));
 			
 			break;
+		case "[artists, artist, realname]":
+			artist.setRealName(getChars(MAX_LENGTH_DEFAULT));
+			
+			break;
 		case "[artists, artist, namevariations, name]":
 			artist.getVariations().add(getChars());
 				

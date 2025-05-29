@@ -40,6 +40,7 @@ public class Artist implements Serializable {
 	@Id
 	private long id;
 	private String name;
+	private String realName;
 	@ElementCollection
 	private Set<String> variations;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -67,6 +68,10 @@ public class Artist implements Serializable {
 		return name;
 	}
 
+	public String getRealName() {
+		return realName;
+	}
+	
 	/**
 	 * Variation of the artists name. Useful for finding typos etc.
 	 * @return the id
@@ -91,6 +96,10 @@ public class Artist implements Serializable {
 		this.name = name;
 	}
 
+	public void setRealName(String realName) {
+		this.realName = realName;
+	}
+
 	public void setMembers(List<Artist> members) {
 		this.members.clear();
 		this.members.addAll(members);
@@ -102,6 +111,6 @@ public class Artist implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "Artist [id=" + String.format("%,d", id) + ", name=" + name + ", variations=" + variations + "]";
+		return "Artist [id=" + String.format("%,d", id) + ", name=" + name + ", realName=" + realName + ", variations=" + variations + "]";
 	}
 }
