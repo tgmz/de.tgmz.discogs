@@ -201,11 +201,16 @@ public class DiscogsTest {
 		assertTrue(r.getGenres().stream().allMatch(x -> "Electronic".equals(x.getId())));
 		assertTrue(r.getStyles().stream().allMatch(x -> "Synth-pop".equals(x.getId())));
 		
-		Optional<ExtraArtist> fk = r.getExtraArtists().stream().filter(x -> x.getArtist() != null && 20662 == x.getArtist().getId()).findAny();
-		assertTrue(fk.isPresent());
-		assertEquals("François Kevorkian", fk.get().getArtist().getName());
-		assertEquals("Mixed By", fk.get().getRole());
-		assertEquals(Set.of("1 to 5", "7 to 9"), fk.get().getTracks());
+		assertEquals(72, r.sizeOf());
+		
+		Optional<ExtraArtist> ofk = r.getExtraArtists().stream().filter(x -> x.getArtist() != null && 20662 == x.getArtist().getId()).findAny();
+		assertTrue(ofk.isPresent());
+		ExtraArtist fk = ofk.get();
+		assertEquals("François Kevorkian", fk.getArtist().getName());
+		assertEquals("Mixed By", fk.getRole());
+		assertEquals(Set.of("1 to 5", "7 to 9"), fk.getTracks());
+		assertTrue(fk.isApplicable(r.getTracklist().get(0)));
+		assertFalse(fk.isApplicable(r.getTracklist().get(5)));
 		
 		List<Track> tracklist = r.getUnfilteredTracklist();
 		

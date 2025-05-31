@@ -11,6 +11,7 @@ package de.tgmz.discogs.domain;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
@@ -94,6 +95,37 @@ public class ExtraArtist implements Serializable {
 		this.tracks.clear();
 		
 		Arrays.stream(tracks).forEach(s -> this.tracks.add(s));
+	}
+	
+	/**
+	 * Computes if the ExatraArtist applies to a track.
+	 * @param t the track
+	 */
+	public boolean isApplicable(Track t) {
+		if (this.getTracks().isEmpty()) {	// The ExtraArtist applies to every track
+			return true;
+		}
+		
+		if (t.getPosition() == null) {		// The ExtraArtist applies to some tracks, but we cannot decide if it applies to this one
+			return false;
+		}
+		
+		if (this.getTracks().contains(t.getPosition())) {	// Obvious
+			return true;
+		}
+		
+		boolean applicable = false;
+		Iterator<String> it = this.getTracks().iterator();
+		
+		while (it.hasNext() && !applicable) {
+			String[] range = it.next().split("\\sto\\s*");	// e.g. "A1 to A3"
+			
+			if (range.length == 2) {
+				applicable = range[0].compareTo(t.getPosition()) <= 0 && range[1].compareTo(t.getPosition()) >= 0;  
+			}
+		}
+		
+		return applicable;
 	}
 	
 	@Override
