@@ -84,9 +84,6 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 		}
 		
 		LogUtil.logElapsed();
-		
-		// Without this weird ClassNotFoundExceptions occur at exec-maven-plugin:load
-		System.exit(0);
 	}
 	
 	public DiscogsFileHandler(DiscogsFile df) {
