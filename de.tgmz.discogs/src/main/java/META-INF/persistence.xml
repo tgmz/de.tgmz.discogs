@@ -31,9 +31,9 @@
 
 		<properties>
 			<!-- Database connection settings -->
-			<property name="jakarta.persistence.jdbc.url" value="${DB_URL}" />
-			<property name="jakarta.persistence.jdbc.user" value="${DB_USR}" />
-			<property name="jakarta.persistence.jdbc.password" value="${DB_PASS}" />
+			<property name="jakarta.persistence.jdbc.url" value="${jakarta.persistence.jdbc.url}" />
+			<property name="jakarta.persistence.jdbc.user" value="${jakarta.persistence.jdbc.user}" />
+			<property name="jakarta.persistence.jdbc.password" value="${jakarta.persistence.jdbc.password}" />
 			
 			<!-- Automatically export the schema -->
 			<property name="jakarta.persistence.schema-generation.database.action" value="create" />

@@ -209,15 +209,15 @@
 							<value>file:${project.basedir}/src/main/resources/log4j.xml</value>
 						</property>
 						<property>
-							<key>DB_URL</key>
+							<key>jakarta.persistence.jdbc.url</key>
 							<value>jdbc:h2:~/Databases/discogs;MODE=DB2;DEFAULT_NULL_ORDERING=HIGH</value>
 						</property>
 						<property>
-							<key>DB_USER</key>
+							<key>jakarta.persistence.jdbc.user</key>
 							<value>sa</value>
 						</property>
 						<property>
-							<key>DB_PASS</key>
+							<key>jakarta.persistence.jdbc.password</key>
 							<value>sa</value>
 						</property>
 					</systemProperties>

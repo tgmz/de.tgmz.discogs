@@ -57,9 +57,9 @@ public class DiscogsTest {
 	
 	@BeforeClass
 	public static void setupOnce() throws IOException, SAXException {
-		System.setProperty("DB_URL", "jdbc:h2:mem:discogs_test_mem");
-		System.setProperty("DB_USER", "sa");
-		System.setProperty("DB_PASS", "sa");
+		System.setProperty("jakarta.persistence.jdbc.url", "jdbc:h2:mem:discogs_test_mem");
+		System.setProperty("jakarta.persistence.jdbc.user", "sa");
+		System.setProperty("jakarta.persistence.jdbc.password", "sa");
 		System.setProperty(DiscogsFile.DISCOGS_DIR, System.getProperty("java.io.tmpdir"));
 		
 		em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager();

@@ -35,8 +35,6 @@ public class Label implements Serializable {
 	@Enumerated(EnumType.ORDINAL)
 	private DataQuality dataQuality;
 
-	public Label() {
-	}
 	/**
 	 * The artists id obtained from discogs <id> tag.
 	 * @return the id
