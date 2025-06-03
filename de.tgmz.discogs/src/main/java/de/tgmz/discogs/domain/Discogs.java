@@ -109,6 +109,6 @@ public abstract class Discogs implements Serializable {
 
 	@Override
 	public String toString() {
-		return "[title=" + title + ", displayArtist=" + displayArtist + ", dataQuality=" + dataQuality + ", genres=" + genres + ", styles=" + styles + ", artists=" + artists + "]";
+		return "[title=" + title + ", displayArtist=" + displayArtist + "]";
 	}
 }

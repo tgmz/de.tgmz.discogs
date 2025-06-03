@@ -151,6 +151,6 @@ public class Release extends Discogs {
 	
 	@Override
 	public String toString() {
-		return "Release [id=" + String.format("%,d", id) + ", Discogs=" + super.toString() + ", country=" + country  + ", extraArtists=" + extraArtists + ", tracklist=" + tracklist + "]";
+		return "Release [id=" + String.format("%,d", id) + ", Discogs=" + super.toString() + "]";
 	}
 }

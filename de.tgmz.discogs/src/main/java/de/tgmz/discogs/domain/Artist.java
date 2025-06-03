@@ -111,6 +111,6 @@ public class Artist implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "Artist [id=" + String.format("%,d", id) + ", name=" + name + ", realName=" + realName + ", variations=" + variations + "]";
+		return "Artist [id=" + String.format("%,d", id) + ", name=" + name + "]";
 	}
 }
