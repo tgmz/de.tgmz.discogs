@@ -14,6 +14,8 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -33,10 +35,10 @@ import de.tgmz.discogs.database.DatabaseService;
 import jakarta.persistence.EntityManager;
 
 public class DiscogsContentHandler extends DefaultHandler {
-	protected static final Pattern PA = Pattern.compile("^(.*)(\\s?\\(\\d+\\))$");
 	protected static final Logger LOG = LoggerFactory.getLogger(DiscogsContentHandler.class);
 	protected static final int MAX_LENGTH_DEFAULT = 254;
 	protected static final int MAX_LENGTH_DISPLAY = 510;
+	private static final Pattern PA = Pattern.compile("^(.*)(\\s?\\(\\d+\\))$");
 	private Deque<String> stack;
 	protected String path;
 	protected EntityManager em;
@@ -102,6 +104,27 @@ public class DiscogsContentHandler extends DefaultHandler {
 		}
 	}
 
+	protected String getDisplayArtist(List<String> artists, List<String> joins) {
+		StringBuilder sb = new StringBuilder();
+		
+		for (int i = 0; i < artists.size(); ++i) {
+			String s0 = artists.get(i);
+			String s1 = i < joins.size() ? joins.get(i) : ",";
+			
+			Matcher m = PA.matcher(s0);
+			
+			if (m.matches() && m.groupCount() > 1) {
+				s0 = m.group(1);
+			}
+			
+			sb.append(s0 + (",".equals(s1) ? ", " : " " + s1 +" "));
+		}
+		
+		String display = StringUtils.removeEnd(sb.toString(), ", ").trim().replace(" , ", ", ");
+		
+		return StringUtils.left(display, MAX_LENGTH_DISPLAY);
+	}
+	
 	public void save(Object o) {
 		LOG.debug("Save {}", o);
 		
@@ -110,13 +133,31 @@ public class DiscogsContentHandler extends DefaultHandler {
 		++count;
 	}
 
-	public String getChars() {
+	public String getChars(boolean removeSuffix) {
 		// Remove superflous blanks
-		return chars.toString().trim().replaceAll("\\s{2,}", " ");
+		String s = chars.toString().trim().replaceAll("\\s{2,}", " ");
+		
+		if (removeSuffix) {
+			Matcher m = PA.matcher(s);
+			
+			if (m.matches() && m.groupCount() > 1) {
+				s = m.group(1);
+			}
+		}
+		
+		return s.strip();
+	}
+	
+	public String getChars(int maxLength, boolean removeSuffix) {
+		return StringUtils.left(getChars(removeSuffix), maxLength);
 	}
 	
 	public String getChars(int maxLength) {
-		return StringUtils.left(getChars(), maxLength);
+		return getChars(maxLength, false);
+	}
+	
+	public String getChars() {
+		return getChars(MAX_LENGTH_DEFAULT, false);
 	}
 	
 	private void popStack() {

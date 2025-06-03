@@ -191,7 +191,7 @@ public class ReleaseContentHandler extends FilteredContentHandler {
 			
 			break;
 		case "[releases, release, artists, artist, name]":
-			String s = getChars(MAX_LENGTH_DEFAULT);
+			String s = getChars(MAX_LENGTH_DEFAULT, true);
 			
 			displayArtists.add(s);
 			discogs.getArtists().getLast().setName(s);
@@ -212,6 +212,10 @@ public class ReleaseContentHandler extends FilteredContentHandler {
 			break;
 		case "[releases, release, extraartists, artist, role]":
 			((Release) discogs).getExtraArtists().getLast().setRole(getChars(MAX_LENGTH_DEFAULT));
+				
+			break;
+		case "[releases, release, extraartists, artist, tracks]":
+			((Release) discogs).getExtraArtists().getLast().setTracks(getChars().split("\\s*,\\s*"));
 				
 			break;
 		//tracks
@@ -298,7 +302,7 @@ public class ReleaseContentHandler extends FilteredContentHandler {
 	
 	private void fillExtraArtists(List<ExtraArtist> extraArtists) {
 		if (extraArtists != null) {
-			extraArtists.replaceAll(ea -> ea = new ExtraArtist(ea.getRole(), artistsCache.get(ea.getArtist().getId())));
+			extraArtists.replaceAll(ea -> ea = new ExtraArtist(ea.getRole(), artistsCache.get(ea.getArtist().getId()), ea.getTracks()));
 			extraArtists.removeIf(ea -> ea.getArtist() == null);
 		}
 	}

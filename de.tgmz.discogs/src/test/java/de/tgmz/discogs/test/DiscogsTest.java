@@ -17,8 +17,10 @@ import static org.junit.Assert.assertTrue;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import org.junit.AfterClass;
@@ -163,10 +165,23 @@ public class DiscogsTest {
 		assertEquals("Depeche Mode", a.getName());
 		assertTrue(a.getVariations().contains("D M"));
 		assertEquals(DataQuality.NEEDS_VOTE, a.getDataQuality());
+		
+		Optional<Artist> alanWilder = a.getMembers().stream().filter(a0 -> a0.getId() == 25411).findFirst();
+		
+		assertTrue(alanWilder.isPresent());
+		assertEquals("Alan Wilder", alanWilder.get().getName());
+		
+		assertTrue(alanWilder.get().getVariations().contains("A. Wilder"));
 	}
 	private void checkLabel(Label l) {
 		assertEquals("Mute", l.getName());
 		assertEquals(DataQuality.NEEDS_VOTE, l.getDataQuality());
+		
+		Optional<Label> ops = l.getSubLabels().stream().filter(l0 -> l0.getId() == 12954).findAny();
+		assertTrue(ops.isPresent());
+		
+		assertEquals("Parallel Series", ops.get().getName());
+		assertEquals(DataQuality.NEEDS_VOTE, ops.get().getDataQuality());
 	}
 	private void checkMaster(Master m) {
 		assertEquals("Violator", m.getTitle());
@@ -185,7 +200,17 @@ public class DiscogsTest {
 		assertEquals("World In My Eyes", r.getUnfilteredTracklist().getFirst().getTitle());
 		assertTrue(r.getGenres().stream().allMatch(x -> "Electronic".equals(x.getId())));
 		assertTrue(r.getStyles().stream().allMatch(x -> "Synth-pop".equals(x.getId())));
-		assertTrue(r.getExtraArtists().stream().filter(x -> x.getArtist() != null && "Alan Gregorie".equals(x.getArtist().getName())).findFirst().isPresent());
+		
+		assertEquals(72, r.sizeOf());
+		
+		Optional<ExtraArtist> ofk = r.getExtraArtists().stream().filter(x -> x.getArtist() != null && 20662 == x.getArtist().getId()).findAny();
+		assertTrue(ofk.isPresent());
+		ExtraArtist fk = ofk.get();
+		assertEquals("François Kevorkian", fk.getArtist().getName());
+		assertEquals("Mixed By", fk.getRole());
+		assertEquals(Set.of("1 to 5", "7 to 9"), fk.getTracks());
+		assertTrue(fk.isApplicable(r.getTracklist().get(0)));
+		assertFalse(fk.isApplicable(r.getTracklist().get(5)));
 		
 		List<Track> tracklist = r.getUnfilteredTracklist();
 		
@@ -201,12 +226,13 @@ public class DiscogsTest {
 		
 		List<ExtraArtist> eas = t.getExtraArtists();
 		
-		Optional<ExtraArtist> any = eas.stream().filter(x -> x.getArtist() != null && "Flood".equals(x.getArtist().getName())).findAny();
+		Optional<ExtraArtist> flood = eas.stream().filter(x -> x.getArtist() != null && 20661 == x.getArtist().getId()).findAny();
 		
-		assertTrue(any.isPresent());
-		assertEquals("Mixed By", any.get().getRole());
-		assertEquals("Flood", any.get().getArtist().getName());
-		assertEquals(any.get(), new ExtraArtist("Mixed By", any.get().getArtist()));
+		assertTrue(flood.isPresent());
+		assertEquals("Mixed By", flood.get().getRole());
+		assertEquals("Flood", flood.get().getArtist().getName());
+		assertEquals("Mark Ellis", flood.get().getArtist().getRealName());
+		assertEquals(flood.get(), new ExtraArtist("Mixed By", flood.get().getArtist(), Collections.emptySet()));
 		
 		assertEquals("9 26081-2", r.getLabels().get(l));
 	}

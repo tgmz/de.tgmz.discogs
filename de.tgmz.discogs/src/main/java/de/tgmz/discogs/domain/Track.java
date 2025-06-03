@@ -122,6 +122,14 @@ public class Track implements Serializable {
 		this.sequence = sequence;
 	}
 
+	/**
+	 * Compute the amount of information this track carries
+	 * @return A measure for the amount of information this track carries
+	 */
+	public int sizeOf() {
+		return Math.max(1, subTracklist.size()) * extraArtists.size();
+	}
+	
 	@Override
 	public String toString() {
 		return "Track [sequence=" + sequence + ", trackNumber=" + trackNumber + ", position=" + position + ", title="

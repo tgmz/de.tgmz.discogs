@@ -9,8 +9,6 @@
 **********************************************************************/
 package de.tgmz.discogs.load;
 
-import java.util.regex.Matcher;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -27,8 +25,30 @@ public class LabelContentHandler extends DiscogsContentHandler {
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		super.startElement(uri, localName, qName, attributes);
 
-		if (path.equals("[labels, label]")) {
+		switch (path) {
+		case "[labels, label]":
 			label = new Label();
+			break;
+		case "[labels, label, sublabels, label]":
+			long subLabelId = Long.parseLong(attributes.getValue("id"));
+			
+			Label subLabel;
+			
+			if (subLabelId == label.getId()) {
+				// Stange but happens e.g. label id = 219.423, name=RDM Edition
+				subLabel = label;
+			} else {
+				subLabel = em.find(Label.class, subLabelId);
+			
+				if (subLabel == null) {
+					subLabel = new Label();
+					subLabel.setId(subLabelId);
+				}
+			}
+			
+			label.getSubLabels().add(subLabel);
+			break;
+		default:
 		}
 	}
 
@@ -39,20 +59,15 @@ public class LabelContentHandler extends DiscogsContentHandler {
 			label.setId(Long.parseLong(getChars()));
 			break;
 		case "[labels, label, name]":
-			String s = getChars(MAX_LENGTH_DEFAULT);
-			
-			Matcher m = PA.matcher(s);
-			
-			if (m.matches() && m.groupCount() > 1) {
-				s = m.group(1);
-			}
-			
-			label.setName(s.trim());
+			label.setName(getChars(MAX_LENGTH_DEFAULT, true));
 			
 			break;
 		case "[labels, label, data_quality]":
 			label.setDataQuality(DataQuality.byName(getChars()));
 			
+			break;
+		case "[labels, label, sublabels, label]":
+			label.getSubLabels().getLast().setName(getChars(MAX_LENGTH_DEFAULT, true));
 			break;
 		case "[labels, label]":
 			if (label.getId() % 10_000 == 0) {

@@ -9,8 +9,6 @@
 **********************************************************************/
 package de.tgmz.discogs.load;
 
-import java.util.regex.Matcher;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -23,12 +21,38 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(ArtistContentHandler.class);
 	private Artist artist;
 
+	public ArtistContentHandler() {
+		super();
+	}
+	
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		super.startElement(uri, localName, qName, attributes);
 
-		if ("[artists, artist]".equals(path)) {
+		switch (path) {
+		case "[artists, artist]":
 			artist = new Artist();
+			break;
+		case "[artists, artist, members, name]":
+			long memberId = Long.parseLong(attributes.getValue("id"));
+			
+			Artist member;
+			
+			if (memberId == artist.getId()) {
+				// Stange but happens e.g. artist id = 16401, name = Drunkness
+				member = artist;
+			} else {
+				member = em.find(Artist.class, memberId);
+			
+				if (member == null) {
+					member = new Artist();
+					member.setId(memberId);
+				}
+			}
+			
+			artist.getMembers().add(member);
+			break;
+		default:
 		}
 	}
 
@@ -42,20 +66,19 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 			artist.setDataQuality(DataQuality.byName(getChars()));
 			break;
 		case "[artists, artist, name]":
-			String s = getChars(MAX_LENGTH_DEFAULT);
+			artist.setName(getChars(MAX_LENGTH_DEFAULT, true));
 			
-			Matcher m = PA.matcher(s);
-			
-			if (m.matches() && m.groupCount() > 1) {
-				s = m.group(1);
-			}
-			
-			artist.setName(s.trim());
+			break;
+		case "[artists, artist, realname]":
+			artist.setRealName(getChars(MAX_LENGTH_DEFAULT));
 			
 			break;
 		case "[artists, artist, namevariations, name]":
 			artist.getVariations().add(getChars());
 				
+			break;
+		case "[artists, artist, members, name]":
+			artist.getMembers().getLast().setName(getChars(MAX_LENGTH_DEFAULT, true));
 			break;
 		case "[artists, artist]":
 			if (artist.getId() % 10_000 == 0) {

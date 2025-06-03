@@ -10,9 +10,14 @@
 package de.tgmz.discogs.domain;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -28,14 +33,18 @@ public class ExtraArtist implements Serializable {
 	private String role;
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private Artist artist;
+	@ElementCollection
+	private Set<String> tracks;
 
 	public ExtraArtist() {
+		tracks = new TreeSet<>();
 	}
 	
-	public ExtraArtist(String role, Artist artist) {
-		super();
+	public ExtraArtist(String role, Artist artist, Set<String> tracks) {
+		this();
 		this.role = role;
 		this.artist = artist;
+		this.tracks.addAll(tracks);
 	}
 	/**
 	 * The id (generated)
@@ -60,6 +69,10 @@ public class ExtraArtist implements Serializable {
 	public Artist getArtist() {
 		return artist;
 	}
+
+	public Set<String> getTracks() {
+		return tracks;
+	}
 	
 	public void setId(long id) {
 		this.id = id;
@@ -71,6 +84,48 @@ public class ExtraArtist implements Serializable {
 	
 	public void setArtist(Artist extraArtists) {
 		this.artist = extraArtists;
+	}
+
+	public void setTracks(Set<String> tracks) {
+		this.tracks.clear();
+		this.tracks.addAll(tracks);
+	}
+	
+	public void setTracks(String... tracks) {
+		this.tracks.clear();
+		
+		Arrays.stream(tracks).forEach(s -> this.tracks.add(s));
+	}
+	
+	/**
+	 * Computes if the ExatraArtist applies to a track.
+	 * @param t the track
+	 */
+	public boolean isApplicable(Track t) {
+		if (this.getTracks().isEmpty()) {	// The ExtraArtist applies to every track
+			return true;
+		}
+		
+		if (t.getPosition() == null) {		// The ExtraArtist applies to some tracks, but we cannot decide if it applies to this one
+			return false;
+		}
+		
+		if (this.getTracks().contains(t.getPosition())) {	// Obvious
+			return true;
+		}
+		
+		boolean applicable = false;
+		Iterator<String> it = this.getTracks().iterator();
+		
+		while (it.hasNext() && !applicable) {
+			String[] range = it.next().split("\\sto\\s*");	// e.g. "A1 to A3"
+			
+			if (range.length == 2) {
+				applicable = range[0].compareTo(t.getPosition()) <= 0 && range[1].compareTo(t.getPosition()) >= 0;  
+			}
+		}
+		
+		return applicable;
 	}
 	
 	@Override

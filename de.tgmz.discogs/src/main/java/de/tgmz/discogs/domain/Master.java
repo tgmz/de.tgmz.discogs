@@ -55,6 +55,6 @@ public class Master extends Discogs {
 
 	@Override
 	public String toString() {
-		return "Master [id=" + String.format("%,d", id) + ", Discogs=" + super.toString() + ", published=" + published + "]";
+		return "Master [id=" + String.format("%,d", id) + ", Discogs=" + super.toString() + "]";
 	}
 }

@@ -132,9 +132,25 @@ public class Release extends Discogs {
 	public void setLabels(Map<Label, String> labels) {
 		this.labels = labels;
 	}
+
+	/**
+	 * Compute the amount of information of this release
+	 * @return A measure for the amount of information this release carries
+	 */
+	public int sizeOf() {
+		int i = 0;
+		
+		for (Track t : tracklist) {
+			i += t.sizeOf();
+			
+			i += extraArtists.stream().mapToInt(ea -> ea.isApplicable(t) ? 1 : 0).sum();
+		}
+		
+		return i;
+	}
 	
 	@Override
 	public String toString() {
-		return "Release [id=" + String.format("%,d", id) + ", Discogs=" + super.toString() + ", country=" + country  + ", extraArtists=" + extraArtists + ", tracklist=" + tracklist + "]";
+		return "Release [id=" + String.format("%,d", id) + ", Discogs=" + super.toString() + "]";
 	}
 }

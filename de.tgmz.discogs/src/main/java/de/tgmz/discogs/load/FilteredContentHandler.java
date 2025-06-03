@@ -9,13 +9,10 @@
 **********************************************************************/
 package de.tgmz.discogs.load;
 
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Predicate;
-import java.util.regex.Matcher;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -83,27 +80,6 @@ public abstract class FilteredContentHandler extends DiscogsContentHandler {
 		}
 	}
 
-	protected String getDisplayArtist(List<String> artists, List<String> joins) {
-		StringBuilder sb = new StringBuilder();
-		
-		for (int i = 0; i < artists.size(); ++i) {
-			String s0 = artists.get(i);
-			String s1 = i < joins.size() ? joins.get(i) : ",";
-			
-			Matcher m = PA.matcher(s0);
-			
-			if (m.matches() && m.groupCount() > 1) {
-				s0 = m.group(1);
-			}
-			
-			sb.append(s0 + (",".equals(s1) ? ", " : " " + s1 +" "));
-		}
-		
-		String display = StringUtils.removeEnd(sb.toString(), ", ").trim().replace(" , ", ", ");
-		
-		return StringUtils.left(display, MAX_LENGTH_DISPLAY);
-	}
-	
 	@Override
 	public void save(Object o) {
 		if (discogs.getId() % threshold == 0 && LOG.isInfoEnabled()) {

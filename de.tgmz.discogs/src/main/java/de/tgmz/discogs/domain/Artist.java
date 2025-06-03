@@ -10,15 +10,20 @@
 package de.tgmz.discogs.domain;
 
 import java.io.Serializable;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
@@ -35,13 +40,17 @@ public class Artist implements Serializable {
 	@Id
 	private long id;
 	private String name;
+	private String realName;
 	@ElementCollection
 	private Set<String> variations;
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private List<Artist> members;
 	@Enumerated(EnumType.ORDINAL)
 	private DataQuality dataQuality;
 
 	public Artist() {
 		variations = new TreeSet<>();
+		members = new LinkedList<>();
 	}
 	/**
 	 * The artists id obtained from discogs <id> tag.
@@ -59,12 +68,20 @@ public class Artist implements Serializable {
 		return name;
 	}
 
+	public String getRealName() {
+		return realName;
+	}
+	
 	/**
 	 * Variation of the artists name. Useful for finding typos etc.
 	 * @return the id
 	 */
 	public Set<String> getVariations() {
 		return variations;
+	}
+
+	public List<Artist> getMembers() {
+		return members;
 	}
 
 	public DataQuality getDataQuality() {
@@ -79,12 +96,21 @@ public class Artist implements Serializable {
 		this.name = name;
 	}
 
+	public void setRealName(String realName) {
+		this.realName = realName;
+	}
+
+	public void setMembers(List<Artist> members) {
+		this.members.clear();
+		this.members.addAll(members);
+	}
+
 	public void setDataQuality(DataQuality dataQuality) {
 		this.dataQuality = dataQuality;
 	}
 	
 	@Override
 	public String toString() {
-		return "Artist [id=" + String.format("%,d", id) + ", name=" + name + ", variations=" + variations + "]";
+		return "Artist [id=" + String.format("%,d", id) + ", name=" + name + "]";
 	}
 }
