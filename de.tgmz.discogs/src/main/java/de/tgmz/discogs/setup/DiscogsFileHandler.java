@@ -55,7 +55,11 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 			if (df.isZipped()) {
 				try (DiscogsFileHandler dl = new DiscogsFileHandler(df)) { 
 					dl.download();
-					dl.verify();
+					
+					if (!Boolean.getBoolean("SKIP_VERIFICATION")) {
+						dl.verify();
+					}
+					
 					dl.extract();
 				} catch (IOException | DiscogsVerificationException e) {
 					LOG.error("Error in setup", e);
