@@ -36,6 +36,9 @@ import com.google.common.hash.Hashing;
 import com.google.common.io.ByteSource;
 
 import de.tgmz.discogs.domain.Discogs;
+import de.tgmz.discogs.load.ArtistContentHandler;
+import de.tgmz.discogs.load.LabelContentHandler;
+import de.tgmz.discogs.load.MasterContentHandler;
 import de.tgmz.discogs.load.ReleaseContentHandler;
 import de.tgmz.discogs.logging.LogUtil;
 import me.tongfei.progressbar.ProgressBar;
@@ -68,7 +71,13 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 
 		Predicate<Discogs> p = getPredicate(args);
 		
-		try (InputStream is3 = new FileInputStream(DiscogsFile.RELEASES.getUnzippedFile())) {
+		try (InputStream is0 = new FileInputStream(DiscogsFile.ARTISTS.getUnzippedFile());
+				InputStream is1 = new FileInputStream(DiscogsFile.LABELS.getUnzippedFile());
+				InputStream is2 = new FileInputStream(DiscogsFile.MASTERS.getUnzippedFile());
+				InputStream is3 = new FileInputStream(DiscogsFile.RELEASES.getUnzippedFile())) {
+			new ArtistContentHandler().run(is0);
+			new LabelContentHandler().run(is1);
+			new MasterContentHandler().run(is2);
 			new ReleaseContentHandler(p).run(is3);
 		} catch (IOException | SAXException e) {
 			LOG.error("Cannot setup database, reason", e);

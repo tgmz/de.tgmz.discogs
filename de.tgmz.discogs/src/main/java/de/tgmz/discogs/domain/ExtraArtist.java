@@ -31,7 +31,7 @@ public class ExtraArtist implements Serializable {
 	@GeneratedValue
 	private long id;
 	private String role;
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
 	private Artist artist;
 	@ElementCollection
 	private Set<String> tracks;

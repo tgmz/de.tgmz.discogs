@@ -40,11 +40,11 @@ public class Track implements Serializable {
 	private String title;
 	private String position;
 	private String duration;
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
 	private List<Artist> artists;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private List<ExtraArtist> extraArtists;
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@OrderBy(value = "trackNumber")
 	private List<SubTrack> subTracklist;
 

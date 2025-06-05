@@ -49,7 +49,7 @@ public class Release extends Discogs {
 	private Master master;
 	private String country;
 	private String released;
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private List<ExtraArtist> extraArtists;
 	@ElementCollection(fetch = FetchType.LAZY)
 	@Column(name = "catno")
