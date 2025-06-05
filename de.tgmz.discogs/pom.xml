@@ -223,7 +223,7 @@
 					</systemProperties>
 					<!-- Remove this for a full import -->
 					<arguments>
-						<argument>de.tgmz.mp3.discogs.load.predicate.DataQualityFilter</argument>
+						<argument>de.tgmz.mp3.discogs.load.predicate.IgnoreReleasesUpToFilter</argument>
 					</arguments>
 				</configuration>
 			</plugin>
