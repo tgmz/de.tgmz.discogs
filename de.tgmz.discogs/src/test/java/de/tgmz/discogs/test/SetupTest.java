@@ -111,7 +111,7 @@ public class SetupTest {
 	}
 	
 	@Test(expected = None.class)
-	public void testMain() {
+	public void testMain() throws Exception {
 		DiscogsFileHandler.main(CacheFilter.class.getCanonicalName());
 	}
 

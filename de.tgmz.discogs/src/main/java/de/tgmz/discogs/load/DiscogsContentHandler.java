@@ -45,7 +45,7 @@ public class DiscogsContentHandler extends DefaultHandler {
 	protected XMLReader xmlReader;
 	protected int count;
 	/** For use in filtered handlers to finetune logging */
-	protected long threshold = 10_000L;
+	public long threshold = 10_000L;
 	private StringBuilder chars;
 
 	public DiscogsContentHandler() {
