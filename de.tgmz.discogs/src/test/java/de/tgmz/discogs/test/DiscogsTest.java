@@ -17,10 +17,9 @@ import static org.junit.Assert.assertTrue;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Predicate;
 
 import org.junit.AfterClass;
@@ -197,14 +196,17 @@ public class DiscogsTest {
 		
 		assertEquals(72, r.sizeOf());
 		
-		Optional<ExtraArtist> ofk = r.getExtraArtists().stream().filter(x -> x.getArtist() != null && 20662 == x.getArtist().getId()).findAny();
+		Optional<Entry<ExtraArtist, String>> ofk = r.getExtraArtists().entrySet().stream().filter(e -> e.getKey().getArtist() != null && 20662 == e.getKey().getArtist().getId()).findAny();
 		assertTrue(ofk.isPresent());
-		ExtraArtist fk = ofk.get();
+		ExtraArtist fk = ofk.get().getKey();
 		assertEquals("François Kevorkian", fk.getArtist().getName());
 		assertEquals("Mixed By", fk.getRole());
-		assertEquals(Set.of("1 to 5", "7 to 9"), fk.getTracks());
-		assertTrue(fk.isApplicable(r.getTracklist().get(0)));
-		assertFalse(fk.isApplicable(r.getTracklist().get(5)));
+		
+		String tracks = "1 to 5, 7 to 9"; 
+		
+		assertEquals(tracks, ofk.get().getValue());
+		assertTrue(r.getTracklist().get(0).isApplicable(tracks));
+		assertFalse(r.getTracklist().get(5).isApplicable(tracks));
 		
 		List<Track> tracklist = r.getUnfilteredTracklist();
 		
@@ -226,7 +228,6 @@ public class DiscogsTest {
 		assertEquals("Mixed By", flood.get().getRole());
 		assertEquals("Flood", flood.get().getArtist().getName());
 		assertEquals("Mark Ellis", flood.get().getArtist().getRealName());
-		assertEquals(flood.get(), new ExtraArtist("Mixed By", flood.get().getArtist(), Collections.emptySet()));
 		
 		assertEquals("9 26081-2", r.getLabels().get(l));
 	}

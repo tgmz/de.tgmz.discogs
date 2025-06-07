@@ -10,8 +10,12 @@
 package de.tgmz.discogs.domain;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -128,6 +132,39 @@ public class Track implements Serializable {
 	 */
 	public int sizeOf() {
 		return Math.max(1, subTracklist.size()) * extraArtists.size();
+	}
+
+	/**
+	 * Computes if the ExatraArtist applies to a track.
+	 * @param t the track
+	 */
+	public boolean isApplicable(String tracks) {
+		if (StringUtils.isEmpty(tracks)) {
+			return true;
+		}
+		
+		if (this.position == null) {
+			return false;
+		}
+		
+		String[] split = tracks.split("\\s*,\\s*");
+
+		if (StringUtils.containsAny(this.position, split)) {	// Obvious
+			return true;
+		}
+		
+		boolean applicable = false;
+		Iterator<String> it = Arrays.asList(split).iterator();
+		
+		while (it.hasNext() && !applicable) {
+			String[] range = it.next().split("\\sto\\s*");	// e.g. "A1 to A3"
+			
+			if (range.length == 2) {
+				applicable = range[0].compareTo(this.position) <= 0 && range[1].compareTo(this.position) >= 0;  
+			}
+		}
+		
+		return applicable;
 	}
 	
 	@Override

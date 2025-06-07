@@ -10,21 +10,18 @@
 package de.tgmz.discogs.domain;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
 
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedQuery;
 
 @Entity
+@NamedQuery(name="ExtraArtist.findByRoleAndArtist", query="FROM ExtraArtist WHERE role = ?1 AND artist = ?2")
 public class ExtraArtist implements Serializable { 
 	private static final long serialVersionUID = 2296552658329482485L;
 	@Id
@@ -33,18 +30,15 @@ public class ExtraArtist implements Serializable {
 	private String role;
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
 	private Artist artist;
-	@ElementCollection
-	private Set<String> tracks;
 
 	public ExtraArtist() {
-		tracks = new TreeSet<>();
+		this.artist = new Artist();
 	}
 	
-	public ExtraArtist(String role, Artist artist, Set<String> tracks) {
+	public ExtraArtist(String role, Artist artist) {
 		this();
 		this.role = role;
 		this.artist = artist;
-		this.tracks.addAll(tracks);
 	}
 	/**
 	 * The id (generated)
@@ -70,10 +64,6 @@ public class ExtraArtist implements Serializable {
 		return artist;
 	}
 
-	public Set<String> getTracks() {
-		return tracks;
-	}
-	
 	public void setId(long id) {
 		this.id = id;
 	}
@@ -86,48 +76,6 @@ public class ExtraArtist implements Serializable {
 		this.artist = extraArtists;
 	}
 
-	public void setTracks(Set<String> tracks) {
-		this.tracks.clear();
-		this.tracks.addAll(tracks);
-	}
-	
-	public void setTracks(String... tracks) {
-		this.tracks.clear();
-		
-		Arrays.stream(tracks).forEach(s -> this.tracks.add(s));
-	}
-	
-	/**
-	 * Computes if the ExatraArtist applies to a track.
-	 * @param t the track
-	 */
-	public boolean isApplicable(Track t) {
-		if (this.getTracks().isEmpty()) {	// The ExtraArtist applies to every track
-			return true;
-		}
-		
-		if (t.getPosition() == null) {		// The ExtraArtist applies to some tracks, but we cannot decide if it applies to this one
-			return false;
-		}
-		
-		if (this.getTracks().contains(t.getPosition())) {	// Obvious
-			return true;
-		}
-		
-		boolean applicable = false;
-		Iterator<String> it = this.getTracks().iterator();
-		
-		while (it.hasNext() && !applicable) {
-			String[] range = it.next().split("\\sto\\s*");	// e.g. "A1 to A3"
-			
-			if (range.length == 2) {
-				applicable = range[0].compareTo(t.getPosition()) <= 0 && range[1].compareTo(t.getPosition()) >= 0;  
-			}
-		}
-		
-		return applicable;
-	}
-	
 	@Override
 	public String toString() {
 		return "ExtraArtist [id=" + id + ", role=" + role + ", artist=" + artist + "]";

@@ -21,7 +21,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
@@ -49,8 +48,10 @@ public class Release extends Discogs {
 	private Master master;
 	private String country;
 	private String released;
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-	private List<ExtraArtist> extraArtists;
+//	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	@ElementCollection(fetch = FetchType.LAZY)
+	@Column(name = "tracks")
+	private Map<ExtraArtist, String> extraArtists;
 	@ElementCollection(fetch = FetchType.LAZY)
 	@Column(name = "catno")
 	private Map<Label, String> labels;	
@@ -59,7 +60,7 @@ public class Release extends Discogs {
 		super();
 		
 		tracklist = new LinkedList<>();
-		extraArtists = new LinkedList<>();
+		extraArtists = new HashMap<>();
 		labels = new HashMap<>();
 	}
 	
@@ -121,7 +122,7 @@ public class Release extends Discogs {
 		this.master = master;
 	}
 
-	public List<ExtraArtist> getExtraArtists() {
+	public Map<ExtraArtist, String> getExtraArtists() {
 		return extraArtists;
 	}
 
@@ -143,7 +144,7 @@ public class Release extends Discogs {
 		for (Track t : tracklist) {
 			i += t.sizeOf();
 			
-			i += extraArtists.stream().mapToInt(ea -> ea.isApplicable(t) ? 1 : 0).sum();
+			i += extraArtists.entrySet().stream().mapToInt(e -> t.isApplicable(e.getValue()) ? 1 : 0).sum();
 		}
 		
 		return i;

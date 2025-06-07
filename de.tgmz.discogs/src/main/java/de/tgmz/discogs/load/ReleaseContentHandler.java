@@ -15,15 +15,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 
+import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.DataQuality;
 import de.tgmz.discogs.domain.Discogs;
@@ -33,11 +37,19 @@ import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
 import de.tgmz.discogs.domain.SubTrack;
 import de.tgmz.discogs.domain.Track;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.TypedQuery;
 
 public class ReleaseContentHandler extends FilteredContentHandler {
+	private class TempExtraArtist {
+		String role; 
+		long artistId;
+	}
 	private LoadingCache<Long, Artist> artistsCache;
 	private LoadingCache<Long, Label> labelCache;
 	private LoadingCache<Long, Master> masterCache;
+	private LoadingCache<Pair<String, Long>, ExtraArtist> extraArtistCache;
+	private TempExtraArtist tea;
 	private List<String> displayArtists;
 	private List<String> displayJoins;
 	private int sequence;
@@ -74,6 +86,34 @@ public class ReleaseContentHandler extends FilteredContentHandler {
 	}
 
 	@Override
+	public void startDocument() throws SAXException {
+		super.startDocument();
+		
+		TypedQuery<ExtraArtist> q0 = em.createNamedQuery("ExtraArtist.findByRoleAndArtist", ExtraArtist.class);
+		
+		extraArtistCache = Caffeine.newBuilder().build(new CacheLoader<Pair<String, Long>, ExtraArtist>() {
+			@Override
+			public ExtraArtist load(Pair<String, Long> key) {
+				Artist a = artistsCache.get(key.getRight());
+				
+				if (a == null) {
+					return null;
+				}
+				
+				try {
+					return q0.setParameter(1, key.getLeft()).setParameter(2, a).getSingleResult();
+				} catch (NoResultException e) {
+					ExtraArtist ea = new ExtraArtist(key.getLeft(), a);
+
+					DatabaseService.getInstance().inTransaction(x -> x.persist(ea));
+					
+					return ea;
+				}
+			}
+		}); 
+	}
+	
+	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		super.startElement(uri, localName, qName, attributes);
 		
@@ -98,8 +138,7 @@ public class ReleaseContentHandler extends FilteredContentHandler {
 			
 			break;
 		case "[releases, release, extraartists, artist]":
-			((Release) discogs).getExtraArtists().add(new ExtraArtist());
-			((Release) discogs).getExtraArtists().getLast().setArtist(new Artist());
+			tea = new TempExtraArtist();
 		
 			break;
 		case "[releases, release, tracklist]":
@@ -122,13 +161,8 @@ public class ReleaseContentHandler extends FilteredContentHandler {
 			((Release) discogs).getUnfilteredTracklist().getLast().getArtists().add(new Artist());
 			
 			break;
-		case "[releases, release, tracklist, track, extraartists]":
-			((Release) discogs).getUnfilteredTracklist().getLast().setExtraArtists(new LinkedList<>());
-			
-			break;
 		case "[releases, release, tracklist, track, extraartists, artist]":
-			((Release) discogs).getUnfilteredTracklist().getLast().getExtraArtists().add(new ExtraArtist());
-			((Release) discogs).getUnfilteredTracklist().getLast().getExtraArtists().getLast().setArtist(new Artist());
+			tea = new TempExtraArtist();
 			
 			break;
 		case "[releases, release, tracklist, track, sub_tracks]":
@@ -207,15 +241,27 @@ public class ReleaseContentHandler extends FilteredContentHandler {
 			break;
 		// extraartists
 		case "[releases, release, extraartists, artist, id]":
-			((Release) discogs).getExtraArtists().getLast().getArtist().setId(Long.parseLong(getChars()));
+			tea.artistId = Long.parseLong(getChars());
 				
 			break;
 		case "[releases, release, extraartists, artist, role]":
-			((Release) discogs).getExtraArtists().getLast().setRole(getChars(MAX_LENGTH_DEFAULT));
+			tea.role = getChars(MAX_LENGTH_DEFAULT);
 				
+			Artist a0 = new Artist();
+			a0.setId(tea.artistId);
+			
+			ExtraArtist ea0 = new ExtraArtist(tea.role, a0);
+			
+			((Release) discogs).getExtraArtists().put(ea0, "");
+			
 			break;
 		case "[releases, release, extraartists, artist, tracks]":
-			((Release) discogs).getExtraArtists().getLast().setTracks(getChars().split("\\s*,\\s*"));
+			Artist a1 = new Artist();
+			a1.setId(tea.artistId);
+			
+			ExtraArtist ea1 = new ExtraArtist(tea.role, a1);
+			
+			((Release) discogs).getExtraArtists().put(ea1, getChars());
 				
 			break;
 		//tracks
@@ -245,11 +291,18 @@ public class ReleaseContentHandler extends FilteredContentHandler {
 			
 			break;
 		case "[releases, release, tracklist, track, extraartists, artist, id]":
-			((Release) discogs).getUnfilteredTracklist().getLast().getExtraArtists().getLast().getArtist().setId(Long.parseLong(getChars()));
+			tea.artistId = Long.parseLong(getChars());
 
 			break;
 		case "[releases, release, tracklist, track, extraartists, artist, role]":
-			((Release) discogs).getUnfilteredTracklist().getLast().getExtraArtists().getLast().setRole(getChars(MAX_LENGTH_DEFAULT));
+			tea.role = getChars(MAX_LENGTH_DEFAULT);
+
+			Artist a2 = new Artist();
+			a2.setId(tea.artistId);
+			
+			ExtraArtist ea2 = new ExtraArtist(tea.role, a2);
+			
+			((Release) discogs).getUnfilteredTracklist().getLast().getExtraArtists().add(ea2);
 			
 			break;
 		case "[releases, release, tracklist, track, sub_tracks, track, position]":
@@ -277,7 +330,17 @@ public class ReleaseContentHandler extends FilteredContentHandler {
 		r.setTitle(StringUtils.left(discogs.getTitle(), MAX_LENGTH_DEFAULT));
 
 		fillArtists(r.getArtists());
-		fillExtraArtists(r.getExtraArtists());
+		
+		Map<ExtraArtist, String> temp = new HashMap<>(r.getExtraArtists());
+		r.getExtraArtists().clear();
+		
+		for (Entry<ExtraArtist, String> e : temp.entrySet()) {
+			ExtraArtist ea = extraArtistCache.get(Pair.of(e.getKey().getRole(), e.getKey().getArtist().getId()));
+			
+			if (ea != null) {
+				r.getExtraArtists().put(ea, e.getValue());
+			}
+		}
 			
 		for (Track t : r.getUnfilteredTracklist()) {
 			fillArtists(t.getArtists());
@@ -302,8 +365,8 @@ public class ReleaseContentHandler extends FilteredContentHandler {
 	
 	private void fillExtraArtists(List<ExtraArtist> extraArtists) {
 		if (extraArtists != null) {
-			extraArtists.replaceAll(ea -> ea = new ExtraArtist(ea.getRole(), artistsCache.get(ea.getArtist().getId()), ea.getTracks()));
-			extraArtists.removeIf(ea -> ea.getArtist() == null);
+			extraArtists.replaceAll(ea -> ea = extraArtistCache.get(Pair.of(ea.getRole(), ea.getArtist().getId())));
+			extraArtists.removeIf(Objects::isNull);
 		}
 	}
 	
