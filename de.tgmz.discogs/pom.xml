@@ -210,7 +210,7 @@
 						</property>
 						<property>
 							<key>jakarta.persistence.jdbc.url</key>
-							<value>jdbc:h2:~/Databases/discogs;MODE=DB2;DEFAULT_NULL_ORDERING=HIGH</value>
+							<value>jdbc:h2:~/Databases/discogs;MODE=DB2;DEFAULT_NULL_ORDERING=HIGH;AUTO_SERVER=TRUE</value>
 						</property>
 						<property>
 							<key>jakarta.persistence.jdbc.user</key>
