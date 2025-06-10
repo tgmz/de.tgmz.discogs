@@ -64,11 +64,20 @@ public final class DatabaseService {
 	}
 
 	public void inTransaction(Consumer<EntityManager> work) {
+		this.inTransaction(work, false);
+	}
+
+	public void inTransaction(Consumer<EntityManager> work, boolean flush) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		EntityTransaction transaction = entityManager.getTransaction();
 		try {
 			transaction.begin();
 			work.accept(entityManager);
+			
+			if (flush) {
+				entityManager.flush();
+			}
+			
 			transaction.commit();
 		} catch (Exception e) {
 			if (transaction.isActive()) {

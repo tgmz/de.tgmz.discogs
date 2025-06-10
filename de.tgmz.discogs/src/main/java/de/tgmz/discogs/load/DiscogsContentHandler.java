@@ -125,10 +125,10 @@ public class DiscogsContentHandler extends DefaultHandler {
 		return StringUtils.left(display, MAX_LENGTH_DISPLAY);
 	}
 	
-	public void save(Object o) {
+	public void save(Object o, boolean flush) {
 		LOG.debug("Save {}", o);
 		
-		DatabaseService.getInstance().inTransaction(x -> x.merge(o));
+		DatabaseService.getInstance().inTransaction(x -> x.merge(o), flush);
 		
 		++count;
 	}

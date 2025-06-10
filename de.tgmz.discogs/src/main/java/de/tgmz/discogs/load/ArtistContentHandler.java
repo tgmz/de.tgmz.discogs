@@ -85,7 +85,7 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 				LOG.info("Save {}", artist);
 			}
 			
-			save(artist);
+			save(artist, false);
 		
 			break;
 		default:

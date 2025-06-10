@@ -80,9 +80,10 @@ public abstract class FilteredContentHandler extends DiscogsContentHandler {
 		}
 	}
 
-	@Override
 	public void save(Object o) {
-		if (discogs.getId() % threshold == 0 && LOG.isInfoEnabled()) {
+		boolean b = discogs.getId() % threshold == 0;
+		
+		if (b && LOG.isInfoEnabled()) {
 			LOG.info("{}/{} ({}). {}", String.format("%,d", saved), String.format("%,d", ignored), String.format("%f%%", (float) saved / (ignored + saved) * 100), discogs);
 		}
 		
@@ -91,7 +92,7 @@ public abstract class FilteredContentHandler extends DiscogsContentHandler {
 			
 			fillAttributes(discogs);
 			
-			super.save(o);
+			super.save(o, b);
 			
 			++saved;
 		} else {
