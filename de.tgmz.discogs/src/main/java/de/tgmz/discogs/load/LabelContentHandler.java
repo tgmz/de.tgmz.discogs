@@ -52,7 +52,7 @@ public class LabelContentHandler extends DiscogsContentHandler {
 				LOG.info("Save {}", label);
 			}
 			
-			save(label, false);
+			save(label);
 		
 			break;
 		default:

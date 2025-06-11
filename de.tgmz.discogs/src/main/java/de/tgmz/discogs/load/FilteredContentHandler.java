@@ -9,6 +9,8 @@
 **********************************************************************/
 package de.tgmz.discogs.load;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Predicate;
@@ -21,6 +23,7 @@ import org.xml.sax.SAXException;
 import de.tgmz.discogs.domain.Discogs;
 import de.tgmz.discogs.domain.Genre;
 import de.tgmz.discogs.domain.Style;
+import de.tgmz.discogs.setup.LimitExceededException;
 
 public abstract class FilteredContentHandler extends DiscogsContentHandler {
 	protected static final Logger LOG = LoggerFactory.getLogger(FilteredContentHandler.class);
@@ -39,6 +42,15 @@ public abstract class FilteredContentHandler extends DiscogsContentHandler {
 		this.filter = filter;
 	}
 
+	@Override
+	public void run(InputStream is) throws IOException, SAXException {
+		try {
+			super.run(is);
+		} catch (LimitExceededException e) {
+			// Supress
+		}
+	}
+	
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		switch (qName) {
@@ -80,6 +92,7 @@ public abstract class FilteredContentHandler extends DiscogsContentHandler {
 		}
 	}
 
+	@Override
 	public void save(Object o) {
 		boolean b = discogs.getId() % threshold == 0;
 		
@@ -92,7 +105,7 @@ public abstract class FilteredContentHandler extends DiscogsContentHandler {
 			
 			fillAttributes(discogs);
 			
-			super.save(o, b);
+			super.save(o);
 			
 			++saved;
 		} else {
