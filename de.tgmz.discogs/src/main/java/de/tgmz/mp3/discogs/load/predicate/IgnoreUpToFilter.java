@@ -11,29 +11,25 @@ package de.tgmz.mp3.discogs.load.predicate;
 
 import java.util.function.Predicate;
 
+import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Discogs;
-import de.tgmz.discogs.domain.Release;
-import de.tgmz.discogs.setup.LimitExceededException;
+import jakarta.persistence.EntityManager;
 
-/**
- * Only save main releases.
- */
-public class RangeFilter implements Predicate<Discogs> {
-	private long min;
-	private long max;
+public class IgnoreUpToFilter implements Predicate<Discogs> {
+	private long maxId;
 	
-	public RangeFilter(long min, long max) {
-		super();
-		this.min = min;
-		this.max = max;
+	public IgnoreUpToFilter() {
+		try (EntityManager em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager()) {
+			this.maxId = (long) em.createNativeQuery("SELECT COALESCE(MAX(id), 0) FROM Release", Long.class).getSingleResult();
+		}
+	}
+	
+	public IgnoreUpToFilter(long maxId) {
+		this.maxId = maxId;
 	}
 	
 	@Override
 	public boolean test(Discogs d) {
-		if (d.getId() > max) {
-			throw new LimitExceededException();
-		}
-		
-		return d.getId() >= min;
+		return d.getId() > maxId;
 	}
 }

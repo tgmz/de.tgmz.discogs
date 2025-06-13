@@ -14,6 +14,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -25,6 +28,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 /**
  * Release entity.
@@ -37,7 +41,10 @@ import jakarta.persistence.Table;
 		@Index(columnList = "title", name = "title_idx"), 
 	})
 public class Release extends Discogs {
+	@Transient
 	private static final long serialVersionUID = -8124211768010344837L;
+	@Transient
+	private static final Logger LOG = LoggerFactory.getLogger(Release.class);
 	@Id
 	private long id;
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -143,6 +150,10 @@ public class Release extends Discogs {
 		
 		for (Track t : tracklist) {
 			i += t.sizeOf();
+			
+			int zwerg = extraArtists.entrySet().stream().mapToInt(e -> t.isApplicable(e.getValue()) ? 1 : 0).sum();
+			
+			LOG.debug("Compute size {} for {}", zwerg, t);
 			
 			i += extraArtists.entrySet().stream().mapToInt(e -> t.isApplicable(e.getValue()) ? 1 : 0).sum();
 		}

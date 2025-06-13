@@ -46,7 +46,7 @@ import de.tgmz.discogs.logging.LogUtil;
 import de.tgmz.discogs.setup.DiscogsFile;
 import de.tgmz.mp3.discogs.load.predicate.CacheFilter;
 import de.tgmz.mp3.discogs.load.predicate.DataQualityFilter;
-import de.tgmz.mp3.discogs.load.predicate.IgnoreReleasesUpToFilter;
+import de.tgmz.mp3.discogs.load.predicate.IgnoreUpToFilter;
 import de.tgmz.mp3.discogs.load.predicate.MainFilter;
 import jakarta.persistence.EntityManager;
 
@@ -148,7 +148,7 @@ public class DiscogsTest {
 		
 		Predicate<Discogs> p0 = new MainFilter();
 		Predicate<Discogs> p1 = new DataQualityFilter(DataQuality.values());
-		Predicate<Discogs> p2 = new IgnoreReleasesUpToFilter();
+		Predicate<Discogs> p2 = new IgnoreUpToFilter();
 		
 		Predicate<Discogs> p = p0.and(p1).and(p2);
 		

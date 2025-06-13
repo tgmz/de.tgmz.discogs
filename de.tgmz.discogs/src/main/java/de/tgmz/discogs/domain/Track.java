@@ -16,6 +16,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -34,6 +36,8 @@ import jakarta.persistence.Transient;
 public class Track implements Serializable {
 	@Transient
 	private static final long serialVersionUID = 5684918391708831387L;
+	@Transient
+	private static final Logger LOG = LoggerFactory.getLogger(Track.class);
 	@Id
 	@GeneratedValue
 	private long id;
@@ -131,7 +135,11 @@ public class Track implements Serializable {
 	 * @return A measure for the amount of information this track carries
 	 */
 	public int sizeOf() {
-		return Math.max(1, subTracklist.size()) * extraArtists.size();
+		int result = Math.max(1, subTracklist.size()) * extraArtists.size();
+		
+		LOG.debug("Compute size {} for {}", result, this);
+		
+		return result;
 	}
 
 	/**

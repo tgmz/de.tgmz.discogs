@@ -147,6 +147,31 @@
 				</configuration>
 			</plugin>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.5.3</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<includes>
+						<include>**/SetupIntegrationTest.class</include>
+					</includes>
+					<systemPropertyVariables>
+						<log4j.configuration>file:${project.basedir}/src/main/resources/log4j.xml</log4j.configuration>
+						<jakarta.persistence.jdbc.url>jdbc:h2:~/Databases/discogs;MODE=DB2;DEFAULT_NULL_ORDERING=HIGH;AUTO_SERVER=true</jakarta.persistence.jdbc.url>
+						<jakarta.persistence.jdbc.user>sa</jakarta.persistence.jdbc.user>
+						<jakarta.persistence.jdbc.password>sa</jakarta.persistence.jdbc.password>
+						<DISCOGS_DIR>D:/Tgmz/Documents/discogs</DISCOGS_DIR>
+						<SKIP_VERIFICATION>true</SKIP_VERIFICATION>
+					</systemPropertyVariables>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>jaxb2-maven-plugin</artifactId>
 				<version>3.3.0</version>
@@ -223,7 +248,7 @@
 					</systemProperties>
 					<!-- Remove this for a full import -->
 					<arguments>
-						<argument>de.tgmz.mp3.discogs.load.predicate.DataQualityFilter</argument>
+						<argument>de.tgmz.mp3.discogs.load.predicate.IgnoreUpToFilter</argument>
 					</arguments>
 				</configuration>
 			</plugin>

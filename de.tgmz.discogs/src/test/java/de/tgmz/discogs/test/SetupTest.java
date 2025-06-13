@@ -112,9 +112,8 @@ public class SetupTest {
 	
 	@Test(expected = None.class)
 	public void testMain() {
-		DiscogsFileHandler.main(CacheFilter.class.getCanonicalName());
+		DiscogsFileHandler.downloadAndImport(CacheFilter.class.getCanonicalName());
 	}
-
 	
 	private static void setupMockRequest(String file, String path) throws IOException {
 		byte[] b = SetupTest.class.getClassLoader().getResourceAsStream(file).readAllBytes();

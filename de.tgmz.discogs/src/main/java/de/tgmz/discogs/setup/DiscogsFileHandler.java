@@ -13,16 +13,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.Predicate;
 import java.util.zip.GZIPInputStream;
 
@@ -32,16 +29,17 @@ import org.apache.commons.io.input.BoundedInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import com.google.common.io.ByteSource;
 
 import de.tgmz.discogs.domain.Discogs;
-import de.tgmz.discogs.load.FilteredContentHandler;
+import de.tgmz.discogs.load.ArtistContentHandler;
+import de.tgmz.discogs.load.LabelContentHandler;
+import de.tgmz.discogs.load.MasterContentHandler;
 import de.tgmz.discogs.load.ReleaseContentHandler;
-import de.tgmz.discogs.logging.LogUtil;
-import de.tgmz.mp3.discogs.load.predicate.RangeFilter;
 import me.tongfei.progressbar.ProgressBar;
 import me.tongfei.progressbar.ProgressBarBuilder;
 import me.tongfei.progressbar.ProgressBarConsumer;
@@ -53,7 +51,17 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 	private DiscogsFile df;
 	private ProgressBarBuilder pbb;
 
-	public static void main(String... args) {
+	public DiscogsFileHandler(DiscogsFile df) {
+		super();
+		this.df = df;
+
+		pbb = new ProgressBarBuilder()
+				.setStyle(ProgressBarStyle.ASCII)
+				.hideEta()
+				.setConsumer(this);
+	}
+	
+	public static void downloadAndImport(String... args) {
 		for (DiscogsFile df : DiscogsFile.values()) {
 			if (df.isZipped()) {
 				try (DiscogsFileHandler dl = new DiscogsFileHandler(df)) { 
@@ -72,40 +80,17 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 
 		Predicate<Discogs> p = getPredicate(args);
 
-		try {
-			ExecutorService es = Executors.newCachedThreadPool();
-			
-			List<DiscogsLoadExecutor> l = new LinkedList<>();
-		
-			long step  = 5_000_000L;
-			long limit = 34_000_000L;
-			
-			for (long i = 0; i < limit; i += step) {
-				Predicate<Discogs> p0 = new RangeFilter(i, i + step);
-				
-				FilteredContentHandler fch = new ReleaseContentHandler(p0.and(p));
-					
-				l.add(new DiscogsLoadExecutor(fch, new FileInputStream(DiscogsFile.RELEASES.getUnzippedFile())));
-			}
-				
-			LOG.info("Load releases with {} threads", l.size());
-			
-			es.invokeAll(l);
-		} catch (IOException | InterruptedException e) {
+		try (InputStream is0 = new FileInputStream(DiscogsFile.ARTISTS.getUnzippedFile());
+				InputStream is1 = new FileInputStream(DiscogsFile.LABELS.getUnzippedFile());
+				InputStream is2 = new FileInputStream(DiscogsFile.MASTERS.getUnzippedFile());
+				InputStream is3 = new FileInputStream(DiscogsFile.RELEASES.getUnzippedFile())) {
+			new ArtistContentHandler().run(is0);
+			new LabelContentHandler().run(is1);
+			new MasterContentHandler().run(is2);
+			new ReleaseContentHandler(p).run(is3);
+		} catch (IOException | SAXException e) {
 			LOG.error("Cannot setup database, reason", e);
 		}
-		
-		LogUtil.logElapsed();
-	}
-	
-	public DiscogsFileHandler(DiscogsFile df) {
-		super();
-		this.df = df;
-
-		pbb = new ProgressBarBuilder()
-				.setStyle(ProgressBarStyle.ASCII)
-				.hideEta()
-				.setConsumer(this);
 	}
 
 	public void download() throws IOException {

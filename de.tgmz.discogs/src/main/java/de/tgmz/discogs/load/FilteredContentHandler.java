@@ -94,9 +94,7 @@ public abstract class FilteredContentHandler extends DiscogsContentHandler {
 
 	@Override
 	public void save(Object o) {
-		boolean b = discogs.getId() % threshold == 0;
-		
-		if (b && LOG.isInfoEnabled()) {
+		if (discogs.getId() % threshold == 0 && LOG.isInfoEnabled()) {
 			LOG.info("{}/{} ({}). {}", String.format("%,d", saved), String.format("%,d", ignored), String.format("%f%%", (float) saved / (ignored + saved) * 100), discogs);
 		}
 		
