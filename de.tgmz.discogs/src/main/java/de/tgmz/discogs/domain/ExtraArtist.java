@@ -17,10 +17,15 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQuery;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(indexes = {
+	@Index(columnList = "role,artist", name = "role_artist_idx"),
+})
 @NamedQuery(name="ExtraArtist.findByRoleAndArtist", query="FROM ExtraArtist WHERE role = ?1 AND artist = ?2")
 public class ExtraArtist implements Serializable { 
 	private static final long serialVersionUID = 2296552658329482485L;
