@@ -10,8 +10,12 @@
 package de.tgmz.discogs.domain;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -40,9 +44,9 @@ public class Track implements Serializable {
 	private String title;
 	private String position;
 	private String duration;
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
 	private List<Artist> artists;
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
 	private List<ExtraArtist> extraArtists;
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	@OrderBy(value = "trackNumber")
@@ -127,7 +131,44 @@ public class Track implements Serializable {
 	 * @return A measure for the amount of information this track carries
 	 */
 	public int sizeOf() {
-		return Math.max(1, subTracklist.size()) * extraArtists.size();
+		int res = Math.max(1, subTracklist.size()) * extraArtists.size();
+		
+		res += getSubTracklist().stream().map(SubTrack::sizeOf).reduce(0, Integer::sum);
+		
+		return res;
+	}
+
+	/**
+	 * Computes if the ExatraArtist applies to a track.
+	 * @param eat the ExatraArtist (unused) and the tracks it applies to
+	 */
+	public boolean isApplicable(String tracks) {
+		if (StringUtils.isEmpty(tracks)) {
+			return true;
+		}
+		
+		if (this.position == null) {
+			return false;
+		}
+		
+		String[] split = tracks.split("\\s*,\\s*");		// e.g. "A1 to A5, B2 to B9"
+
+		if (StringUtils.containsAny(this.position, split)) {	// Obvious
+			return true;
+		}
+		
+		boolean applicable = false;
+		Iterator<String> it = Arrays.asList(split).iterator();
+		
+		while (it.hasNext() && !applicable) {
+			String[] range = it.next().split("\\sto\\s*");	// e.g. "A1 to A3"
+			
+			if (range.length == 2) {
+				applicable = range[0].compareTo(this.position) <= 0 && range[1].compareTo(this.position) >= 0;  
+			}
+		}
+		
+		return applicable;
 	}
 	
 	@Override

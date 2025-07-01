@@ -15,10 +15,7 @@ import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xml.sax.Attributes;
-
-import com.github.benmanes.caffeine.cache.CacheLoader;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
+import org.xml.sax.SAXException;
 
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.DataQuality;
@@ -27,9 +24,10 @@ import de.tgmz.discogs.domain.Master;
 
 public class MasterContentHandler extends FilteredContentHandler {
 	private long artistId;
+	private String artistName;
+	private int artistCount = 0;
 	private List<String> artistNames;
 	private List<String> joins;
-	private LoadingCache<Long, Artist> artistsCache;
 
 	public MasterContentHandler() {
 		this(x -> true);
@@ -37,13 +35,6 @@ public class MasterContentHandler extends FilteredContentHandler {
 
 	public MasterContentHandler(Predicate<Discogs> filter) {
 		super(filter);
-		
-		artistsCache = Caffeine.newBuilder().build(new CacheLoader<Long, Artist>() {
-			@Override
-			public Artist load(Long key) throws Exception {
-				return em.find(Artist.class, key);
-			}
-		});
 	}
 
 	@Override
@@ -89,18 +80,28 @@ public class MasterContentHandler extends FilteredContentHandler {
 			discogs.setDisplayArtist(getDisplayArtist(artistNames, joins));
 			
 			break;
-		case "[masters, master, artists, artist]":
-			Artist a0 = artistsCache.get(artistId);
+		case "[masters, master, artists, artist, name]":
+			artistName = getChars(MAX_LENGTH_DEFAULT, true);
 			
-			if (a0 == null) {
-				LOG.debug("Artist {} not found", artistId);
-			} else {
-				discogs.getArtists().add(a0);
-			}
+			artistNames.add(artistName);
 			
 			break;
-		case "[masters, master, artists, artist, name]":
-			artistNames.add(getChars(MAX_LENGTH_DEFAULT, true));
+		case "[masters, master, artists, artist]":
+			Artist a = em.find(Artist.class, artistId);
+			
+			if (a == null) {
+				a = new Artist();
+				a.setId(artistId);
+				a.setName(artistName);
+				
+				save(a);
+				
+				++artistCount;
+				
+				LOG.debug("Added new artist {}", a);
+			}
+			
+			discogs.getArtists().add(a);
 			
 			break;
 		case "[masters, master, artists, artist, join]":
@@ -120,7 +121,15 @@ public class MasterContentHandler extends FilteredContentHandler {
 		
 		super.endElement(uri, localName, qName);
 	}
-	
+
+	@Override
+	public void endDocument() throws SAXException {
+		super.endDocument();
+		
+		if (LOG.isInfoEnabled()) {
+			LOG.info("{} artists added  ", String.format("%,d", artistCount));
+		}
+	}
 	@Override
 	protected void fillAttributes(Discogs d) {
 		d.setTitle(StringUtils.left(discogs.getTitle(), MAX_LENGTH_DEFAULT));

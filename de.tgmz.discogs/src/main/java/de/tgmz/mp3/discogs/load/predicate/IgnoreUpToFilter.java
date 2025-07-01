@@ -13,23 +13,31 @@ import java.util.function.Predicate;
 
 import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Discogs;
+import de.tgmz.discogs.domain.Master;
 import jakarta.persistence.EntityManager;
 
-public class IgnoreReleasesUpToFilter implements Predicate<Discogs> {
-	private long maxId;
+public class IgnoreUpToFilter implements Predicate<Discogs> {
+	private long rMaxId;
+	private long mMaxId;
 	
-	public IgnoreReleasesUpToFilter() {
+	public IgnoreUpToFilter() {
 		try (EntityManager em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager()) {
-			this.maxId = (long) em.createNativeQuery("SELECT COALESCE(MAX(id), 0) FROM Release", Long.class).getSingleResult();
+			this.rMaxId = (long) em.createNativeQuery("SELECT COALESCE(MAX(id), 0) FROM Release", Long.class).getSingleResult();
+			this.mMaxId = (long) em.createNativeQuery("SELECT COALESCE(MAX(id), 0) FROM Master", Long.class).getSingleResult();
 		}
 	}
 	
-	public IgnoreReleasesUpToFilter(long maxId) {
-		this.maxId = maxId;
+	public IgnoreUpToFilter(long maxId) {
+		this.rMaxId = maxId;
+		this.mMaxId = maxId;
 	}
 	
 	@Override
 	public boolean test(Discogs d) {
-		return d.getId() > maxId;
+		if (d instanceof Master) {
+			return d.getId() > mMaxId;
+		} else {
+			return d.getId() > rMaxId;
+		}
 	}
 }

@@ -43,7 +43,7 @@ public class Artist implements Serializable {
 	private String realName;
 	@ElementCollection
 	private Set<String> variations;
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private List<Artist> members;
 	@Enumerated(EnumType.ORDINAL)
 	private DataQuality dataQuality;

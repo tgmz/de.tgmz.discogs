@@ -62,9 +62,14 @@ public class DiscogsContentHandler extends DefaultHandler {
 		}
 	}
 	
-	public void run(InputStream is) throws IOException, SAXException {
+	public void run(InputStream is) {
 		xmlReader.setContentHandler(this);
-		xmlReader.parse(new InputSource(is));
+		
+		try {
+			xmlReader.parse(new InputSource(is));
+		} catch (IOException | SAXException e) {
+			LOG.error("Parsing error", e);
+		}
 	}
 
 	@Override
@@ -131,6 +136,10 @@ public class DiscogsContentHandler extends DefaultHandler {
 		DatabaseService.getInstance().inTransaction(x -> x.merge(o));
 		
 		++count;
+		
+		if (count % threshold == 0) {
+			em.clear();
+		}
 	}
 
 	public String getChars(boolean removeSuffix) {

@@ -21,11 +21,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 /**
  * Release entity.
@@ -38,6 +38,7 @@ import jakarta.persistence.Table;
 		@Index(columnList = "title", name = "title_idx"), 
 	})
 public class Release extends Discogs {
+	@Transient
 	private static final long serialVersionUID = -8124211768010344837L;
 	@Id
 	private long id;
@@ -49,8 +50,8 @@ public class Release extends Discogs {
 	private Master master;
 	private String country;
 	private String released;
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private List<ExtraArtist> extraArtists;
+	@ElementCollection(fetch = FetchType.LAZY)
+	private Map<ExtraArtist, String> extraArtists;
 	@ElementCollection(fetch = FetchType.LAZY)
 	@Column(name = "catno")
 	private Map<Label, String> labels;	
@@ -59,7 +60,7 @@ public class Release extends Discogs {
 		super();
 		
 		tracklist = new LinkedList<>();
-		extraArtists = new LinkedList<>();
+		extraArtists = new HashMap<>();
 		labels = new HashMap<>();
 	}
 	
@@ -121,18 +122,24 @@ public class Release extends Discogs {
 		this.master = master;
 	}
 
-	public List<ExtraArtist> getExtraArtists() {
+	public Map<ExtraArtist, String> getExtraArtists() {
 		return extraArtists;
 	}
 
 	/**
 	 * Setter for labels. We need a setter here because the SAX handler manipulates the keyset.
-	 * @param labels
 	 */
 	public void setLabels(Map<Label, String> labels) {
 		this.labels = labels;
 	}
 
+	/**
+	 * Setter for extraArtists. We need a setter here because the SAX handler manipulates the keyset.
+	 */
+	public void setExtraArtists(Map<ExtraArtist, String> extraArtists) {
+		this.extraArtists = extraArtists;
+	}
+	
 	/**
 	 * Compute the amount of information of this release
 	 * @return A measure for the amount of information this release carries
@@ -143,7 +150,7 @@ public class Release extends Discogs {
 		for (Track t : tracklist) {
 			i += t.sizeOf();
 			
-			i += extraArtists.stream().mapToInt(ea -> ea.isApplicable(t) ? 1 : 0).sum();
+			i += extraArtists.entrySet().stream().filter(e -> t.isApplicable(e.getValue())).count();
 		}
 		
 		return i;

@@ -26,8 +26,8 @@ public enum DiscogsFile {
 	CHECKSUM("CHECKSUM.txt"),
 	;
 	
-	public static final String DISCOGS_DIR = "DISCOGS_DIR";
-	public static final String DISCOGS_URL = "DISCOGS_URL";
+	public static final String DISCOGS_DIR = "de.tgmz.discogs.data.dir";
+	public static final String DISCOGS_URL = "de.tgmz.discogs.url";
 	
 	private static Map<String, String> env;
 	

@@ -20,6 +20,7 @@ import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.function.Predicate;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.io.FileUtils;
@@ -28,17 +29,16 @@ import org.apache.commons.io.input.BoundedInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
 
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import com.google.common.io.ByteSource;
 
+import de.tgmz.discogs.domain.Discogs;
 import de.tgmz.discogs.load.ArtistContentHandler;
 import de.tgmz.discogs.load.LabelContentHandler;
 import de.tgmz.discogs.load.MasterContentHandler;
 import de.tgmz.discogs.load.ReleaseContentHandler;
-import de.tgmz.discogs.logging.LogUtil;
 import me.tongfei.progressbar.ProgressBar;
 import me.tongfei.progressbar.ProgressBarBuilder;
 import me.tongfei.progressbar.ProgressBarConsumer;
@@ -50,13 +50,29 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 	private DiscogsFile df;
 	private ProgressBarBuilder pbb;
 
+	public DiscogsFileHandler(DiscogsFile df) {
+		super();
+		this.df = df;
+
+		pbb = new ProgressBarBuilder()
+				.setStyle(ProgressBarStyle.ASCII)
+				.hideEta()
+				.setConsumer(this);
+	}
+
 	public static void main(String[] args) {
+		downloadAndImport(args);
+		
+		System.exit(0);
+	}
+	
+	public static void downloadAndImport(String... args) {
 		for (DiscogsFile df : DiscogsFile.values()) {
 			if (df.isZipped()) {
 				try (DiscogsFileHandler dl = new DiscogsFileHandler(df)) { 
 					dl.download();
 					
-					if (!Boolean.getBoolean("SKIP_VERIFICATION")) {
+					if (!Boolean.getBoolean("de.tgmz.discogs.skipverification")) {
 						dl.verify();
 					}
 					
@@ -66,7 +82,9 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 				}
 			}
 		}
-		
+
+		Predicate<Discogs> p = getPredicate(args);
+
 		try (InputStream is0 = new FileInputStream(DiscogsFile.ARTISTS.getUnzippedFile());
 				InputStream is1 = new FileInputStream(DiscogsFile.LABELS.getUnzippedFile());
 				InputStream is2 = new FileInputStream(DiscogsFile.MASTERS.getUnzippedFile());
@@ -74,22 +92,10 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 			new ArtistContentHandler().run(is0);
 			new LabelContentHandler().run(is1);
 			new MasterContentHandler().run(is2);
-			new ReleaseContentHandler().run(is3);
-		} catch (IOException | SAXException e) {
+			new ReleaseContentHandler(p).run(is3);
+		} catch (IOException e) {
 			LOG.error("Cannot setup database, reason", e);
 		}
-		
-		LogUtil.logElapsed();
-	}
-	
-	public DiscogsFileHandler(DiscogsFile df) {
-		super();
-		this.df = df;
-
-		pbb = new ProgressBarBuilder()
-				.setStyle(ProgressBarStyle.ASCII)
-				.hideEta()
-				.setConsumer(this);
 	}
 
 	public void download() throws IOException {
@@ -248,5 +254,22 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 		}
 		
 		return size;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private static Predicate<Discogs> getPredicate(String... clz) {
+		Predicate<Discogs> p = x -> true;
+		
+		if (clz != null) {
+			try {
+				for (String s : clz) {
+					p = p.and((Predicate<Discogs>) Class.forName(s).getDeclaredConstructor().newInstance());
+				}
+			} catch (ReflectiveOperationException e) {
+				LOG.error("Error in predicate setup", e);
+			}
+		}
+		
+		return p;
 	}
 }

@@ -10,17 +10,12 @@
 package de.tgmz.discogs.domain;
 
 import java.io.Serializable;
-import java.util.LinkedList;
-import java.util.List;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
@@ -37,14 +32,9 @@ public class Label implements Serializable {
 	@Id
 	private long id;
 	private String name;
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private List<Label> subLabels;
 	@Enumerated(EnumType.ORDINAL)
 	private DataQuality dataQuality;
 
-	public Label() {
-		subLabels = new LinkedList<>();
-	}
 	/**
 	 * The artists id obtained from discogs <id> tag.
 	 * @return the id
@@ -61,10 +51,6 @@ public class Label implements Serializable {
 		return name;
 	}
 
-	public List<Label> getSubLabels() {
-		return subLabels;
-	}
-
 	public DataQuality getDataQuality() {
 		return dataQuality;
 	}
@@ -75,11 +61,6 @@ public class Label implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public void setSubLabels(List<Label> subLabels) {
-		this.subLabels.clear();
-		this.subLabels.addAll(subLabels);
 	}
 
 	public void setDataQuality(DataQuality dataQuality) {

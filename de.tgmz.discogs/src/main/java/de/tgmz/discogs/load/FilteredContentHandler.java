@@ -9,6 +9,7 @@
 **********************************************************************/
 package de.tgmz.discogs.load;
 
+import java.io.InputStream;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Predicate;
@@ -39,6 +40,15 @@ public abstract class FilteredContentHandler extends DiscogsContentHandler {
 		this.filter = filter;
 	}
 
+	@Override
+	public void run(InputStream is) {
+		try {
+			super.run(is);
+		} catch (Exception e) {
+			LOG.error("Error on id {}", discogs, e);
+		}
+	}
+	
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		switch (qName) {

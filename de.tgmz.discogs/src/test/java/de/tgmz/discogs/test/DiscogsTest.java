@@ -17,10 +17,9 @@ import static org.junit.Assert.assertTrue;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Predicate;
 
 import org.junit.AfterClass;
@@ -38,6 +37,7 @@ import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
 import de.tgmz.discogs.domain.Style;
+import de.tgmz.discogs.domain.SubTrack;
 import de.tgmz.discogs.domain.Track;
 import de.tgmz.discogs.load.ArtistContentHandler;
 import de.tgmz.discogs.load.LabelContentHandler;
@@ -45,9 +45,8 @@ import de.tgmz.discogs.load.MasterContentHandler;
 import de.tgmz.discogs.load.ReleaseContentHandler;
 import de.tgmz.discogs.logging.LogUtil;
 import de.tgmz.discogs.setup.DiscogsFile;
-import de.tgmz.mp3.discogs.load.predicate.CacheFilter;
 import de.tgmz.mp3.discogs.load.predicate.DataQualityFilter;
-import de.tgmz.mp3.discogs.load.predicate.IgnoreReleasesUpToFilter;
+import de.tgmz.mp3.discogs.load.predicate.IgnoreUpToFilter;
 import de.tgmz.mp3.discogs.load.predicate.MainFilter;
 import jakarta.persistence.EntityManager;
 
@@ -57,9 +56,9 @@ public class DiscogsTest {
 	
 	@BeforeClass
 	public static void setupOnce() throws IOException, SAXException {
-		System.setProperty("DB_URL", "jdbc:h2:mem:discogs_test_mem");
-		System.setProperty("DB_USR", "sa");
-		System.setProperty("DB_PASS", "sa");
+		System.setProperty("jakarta.persistence.jdbc.url", "jdbc:h2:mem:discogs_test_mem");
+		System.setProperty("jakarta.persistence.jdbc.user", "sa");
+		System.setProperty("jakarta.persistence.jdbc.password", "sa");
 		System.setProperty(DiscogsFile.DISCOGS_DIR, System.getProperty("java.io.tmpdir"));
 		
 		em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager();
@@ -98,6 +97,28 @@ public class DiscogsTest {
 		assertEquals(displayArtist, em.find(Release.class, 3870362L).getDisplayArtist());
 	}
 	@Test
+	public void testDecca() {
+		Release r = em.find(Release.class, 10850325L);
+		
+		assertEquals("Germany", r.getCountry());
+		
+		Track t = r.getTracklist().get(3);
+		
+		assertEquals("Die Zauberflöte", t.getTitle());
+		assertEquals(1,  t.sizeOf());
+		
+		SubTrack st = t.getSubTracklist().getFirst();
+		
+		assertEquals("Ouvertüre", st.getTitle());
+		assertEquals(1,  st.sizeOf());
+		
+		ExtraArtist ea = st.getExtraArtists().getFirst();
+		
+		assertEquals(754974, ea.getArtist().getId());
+		assertEquals("Wiener Philharmoniker", ea.getArtist().getName());
+		assertEquals("Orchestra", ea.getRole());
+	}
+	@Test
 	public void testSubtrack() {
 		Release r = em.find(Release.class, 2460568L);
 		assertTrue(r.getUnfilteredTracklist().get(10).getSubTracklist().isEmpty());
@@ -129,6 +150,23 @@ public class DiscogsTest {
 		assertEquals(24, ftl.get(21).getSequence());
 	}
 	@Test
+	public void testExtraArtist() {
+		Artist a0 = new Artist();
+		a0 .setId(1);
+		a0.setName("A");
+		
+		Artist a1 = new Artist();
+		a1 .setId(1);
+		a1.setName("B");
+		
+		
+		ExtraArtist ea0 = new ExtraArtist(a0, "Mixed By");
+		ExtraArtist ea1 = new ExtraArtist(a1, "Mixed By");
+
+		// Ensure that ExtraArtists are equal iff the artists _ids_ and roles are equal
+		assertEquals(ea0, ea1);
+	}
+	@Test
 	public void testGenreStyle() {
 		assertTrue(em.createQuery("FROM Genre", Genre.class).getResultStream().anyMatch(x -> "Rock".equals(x.getId())));
 		
@@ -147,15 +185,12 @@ public class DiscogsTest {
 			new MasterContentHandler(x -> x.getId() != IGNORED).run(is);
 		}
 		
-		Predicate<Discogs> p0 = new MainFilter();
-		Predicate<Discogs> p1 = new DataQualityFilter(DataQuality.values());
-		Predicate<Discogs> p2 = new IgnoreReleasesUpToFilter();
+		Predicate<Discogs> p0 = new IgnoreUpToFilter();
+		Predicate<Discogs> p1 = new MainFilter();
+		Predicate<Discogs> p2 = new DataQualityFilter(DataQuality.values());
+		Predicate<Discogs> p3 = new IgnoreUpToFilter(1);
 		
-		Predicate<Discogs> p = p0.and(p1).and(p2);
-		
-		Predicate<Discogs> p3 = new CacheFilter();
-		
-		p = p.or(p3);
+		Predicate<Discogs> p = p0.or(p1).or(p2).or(p3);
 		
 		try (InputStream is = new FileInputStream(DiscogsFile.RELEASES.getUnzippedFile())) {
 			new ReleaseContentHandler(p).run(is);
@@ -176,12 +211,6 @@ public class DiscogsTest {
 	private void checkLabel(Label l) {
 		assertEquals("Mute", l.getName());
 		assertEquals(DataQuality.NEEDS_VOTE, l.getDataQuality());
-		
-		Optional<Label> ops = l.getSubLabels().stream().filter(l0 -> l0.getId() == 12954).findAny();
-		assertTrue(ops.isPresent());
-		
-		assertEquals("Parallel Series", ops.get().getName());
-		assertEquals(DataQuality.NEEDS_VOTE, ops.get().getDataQuality());
 	}
 	private void checkMaster(Master m) {
 		assertEquals("Violator", m.getTitle());
@@ -203,14 +232,20 @@ public class DiscogsTest {
 		
 		assertEquals(72, r.sizeOf());
 		
-		Optional<ExtraArtist> ofk = r.getExtraArtists().stream().filter(x -> x.getArtist() != null && 20662 == x.getArtist().getId()).findAny();
-		assertTrue(ofk.isPresent());
-		ExtraArtist fk = ofk.get();
-		assertEquals("François Kevorkian", fk.getArtist().getName());
-		assertEquals("Mixed By", fk.getRole());
-		assertEquals(Set.of("1 to 5", "7 to 9"), fk.getTracks());
-		assertTrue(fk.isApplicable(r.getTracklist().get(0)));
-		assertFalse(fk.isApplicable(r.getTracklist().get(5)));
+		ExtraArtist af = r.getExtraArtists().keySet().stream().filter(ea -> 132774 == ea.getArtist().getId()).findAny().orElseThrow();
+
+		assertEquals("Andrew Fletcher", af.getArtist().getName());
+		assertEquals("Performer", af.getRole());
+		
+		Entry<ExtraArtist, String> fk = r.getExtraArtists().entrySet().stream().filter(eea -> 20662 == eea.getKey().getArtist().getId()).findAny().orElseThrow();
+		
+		assertEquals("François Kevorkian", fk.getKey().getArtist().getName());
+		assertEquals("Mixed By", fk.getKey().getRole());
+		assertEquals("1 to 5, 7 to 9", fk.getValue());
+
+		Optional<ExtraArtist> ofk = r.getTracklist().get(5).getExtraArtists().stream().filter(ea -> 20662 == ea.getArtist().getId()).findAny();
+
+		assertFalse(ofk.isPresent());
 		
 		List<Track> tracklist = r.getUnfilteredTracklist();
 		
@@ -232,7 +267,6 @@ public class DiscogsTest {
 		assertEquals("Mixed By", flood.get().getRole());
 		assertEquals("Flood", flood.get().getArtist().getName());
 		assertEquals("Mark Ellis", flood.get().getArtist().getRealName());
-		assertEquals(flood.get(), new ExtraArtist("Mixed By", flood.get().getArtist(), Collections.emptySet()));
 		
 		assertEquals("9 26081-2", r.getLabels().get(l));
 	}

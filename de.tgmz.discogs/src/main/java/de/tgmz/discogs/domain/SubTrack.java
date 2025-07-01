@@ -10,14 +10,19 @@
 package de.tgmz.discogs.domain;
 
 import java.io.Serializable;
+import java.util.LinkedList;
+import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Transient;
 
 /**
- * Track entity
+ * SubTrack entity
  */
 @Entity
 public class SubTrack implements Serializable {
@@ -29,11 +34,12 @@ public class SubTrack implements Serializable {
 	private int trackNumber;
 	private String title;
 	private String position;
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
+	private List<ExtraArtist> extraArtists;
 
-	public long getId() {
-		return id;
+	public SubTrack() {
+		extraArtists = new LinkedList<>();
 	}
-
 	public int getTrackNumber() {
 		return trackNumber;
 	}
@@ -44,6 +50,10 @@ public class SubTrack implements Serializable {
 
 	public String getPosition() {
 		return position;
+	}
+
+	public List<ExtraArtist> getExtraArtists() {
+		return extraArtists;
 	}
 
 	public void setId(long id) {
@@ -60,6 +70,14 @@ public class SubTrack implements Serializable {
 
 	public void setPosition(String position) {
 		this.position = position;
+	}
+
+	/**
+	 * Compute the amount of information this track carries
+	 * @return A measure for the amount of information this track carries
+	 */
+	public int sizeOf() {
+		return extraArtists.size();
 	}
 
 	@Override

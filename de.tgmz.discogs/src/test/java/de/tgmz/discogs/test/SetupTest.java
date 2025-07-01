@@ -12,6 +12,7 @@ package de.tgmz.discogs.test;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.io.IOException;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -33,6 +34,7 @@ import de.tgmz.discogs.logging.LogUtil;
 import de.tgmz.discogs.setup.DiscogsFile;
 import de.tgmz.discogs.setup.DiscogsFileHandler;
 import de.tgmz.discogs.setup.DiscogsVerificationException;
+import de.tgmz.mp3.discogs.load.predicate.MainFilter;
 
 public class SetupTest {
 	private static final String LOG_LEVEL_KEY = "org.slf4j.simpleLogger.defaultLogLevel";
@@ -44,9 +46,9 @@ public class SetupTest {
 		logLevel = System.getProperty(LOG_LEVEL_KEY, "INFO");
 		System.setProperty(LOG_LEVEL_KEY, "INFO"); // Set to "DEBUG" to force noisy logging
 		
-		System.setProperty("DB_URL", "jdbc:h2:mem:discogs_test_mem");
-		System.setProperty("DB_USR", "sa");
-		System.setProperty("DB_PASS", "sa");
+		System.setProperty("jakarta.persistence.jdbc.url", "jdbc:h2:mem:discogs_test_mem");
+		System.setProperty("jakarta.persistence.jdbc.user", "sa");
+		System.setProperty("jakarta.persistence.jdbc.password", "sa");
 		System.setProperty(DiscogsFile.DISCOGS_DIR, System.getProperty("java.io.tmpdir"));
 		System.setProperty("DISCOGS_TEST", "true");
 
@@ -63,10 +65,7 @@ public class SetupTest {
 		
 		System.setProperty(DiscogsFile.DISCOGS_URL, "https://" + mockServer.remoteAddress().getHostName() + ":" + mockServer.remoteAddress().getPort() + "/");
 		
-		for (DiscogsFile df : DiscogsFile.values()) {
-			FileUtils.deleteQuietly(df.getUnzippedFile());
-			FileUtils.deleteQuietly(df.getKey());
-		}
+		FileUtils.deleteDirectory(new File(System.getProperty(DiscogsFile.DISCOGS_DIR), "data"));
 	}
 	
 	@AfterClass
@@ -111,9 +110,8 @@ public class SetupTest {
 	
 	@Test(expected = None.class)
 	public void testMain() {
-		DiscogsFileHandler.main(null);
+		DiscogsFileHandler.downloadAndImport(MainFilter.class.getCanonicalName());
 	}
-
 	
 	private static void setupMockRequest(String file, String path) throws IOException {
 		byte[] b = SetupTest.class.getClassLoader().getResourceAsStream(file).readAllBytes();

@@ -26,6 +26,10 @@ public class DataQualityFilter implements Predicate<Discogs> {
 	private static final Logger LOG = LoggerFactory.getLogger(DataQualityFilter.class);
 	private List<DataQuality> dq;
 	
+	public DataQualityFilter() {
+		this (DataQuality.COMPLETE_AND_CORRECT, DataQuality.CORRECT);
+	}
+	
 	public DataQualityFilter(DataQuality... dq) {
 		this.dq = List.of(dq);
 	}
