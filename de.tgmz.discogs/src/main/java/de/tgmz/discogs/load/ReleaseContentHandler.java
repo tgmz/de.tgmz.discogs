@@ -9,6 +9,7 @@
 **********************************************************************/
 package de.tgmz.discogs.load;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -60,7 +61,7 @@ public class ReleaseContentHandler extends FilteredContentHandler {
 	public ReleaseContentHandler(Predicate<Discogs> filter) {
 		super(filter);
 	}
-
+	
 	@Override
 	public void startDocument() throws SAXException {
 		super.startDocument();

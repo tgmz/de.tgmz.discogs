@@ -18,8 +18,13 @@ import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.function.Predicate;
 import java.util.zip.GZIPInputStream;
 
@@ -39,6 +44,8 @@ import de.tgmz.discogs.load.ArtistContentHandler;
 import de.tgmz.discogs.load.LabelContentHandler;
 import de.tgmz.discogs.load.MasterContentHandler;
 import de.tgmz.discogs.load.ReleaseContentHandler;
+import de.tgmz.discogs.load.Runner;
+import de.tgmz.mp3.discogs.load.predicate.RangeFilter;
 import me.tongfei.progressbar.ProgressBar;
 import me.tongfei.progressbar.ProgressBarBuilder;
 import me.tongfei.progressbar.ProgressBarConsumer;
@@ -83,18 +90,27 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 			}
 		}
 
-		Predicate<Discogs> p = getPredicate(args);
-
-		try (InputStream is0 = new FileInputStream(DiscogsFile.ARTISTS.getUnzippedFile());
-				InputStream is1 = new FileInputStream(DiscogsFile.LABELS.getUnzippedFile());
-				InputStream is2 = new FileInputStream(DiscogsFile.MASTERS.getUnzippedFile());
-				InputStream is3 = new FileInputStream(DiscogsFile.RELEASES.getUnzippedFile())) {
-			new ArtistContentHandler().run(is0);
-			new LabelContentHandler().run(is1);
-			new MasterContentHandler().run(is2);
-			new ReleaseContentHandler(p).run(is3);
-		} catch (IOException e) {
-			LOG.error("Cannot setup database, reason", e);
+		ExecutorService es = Executors.newFixedThreadPool(2);
+		
+		List<Runner> tasks = new LinkedList<>();
+		
+		for (long l = 0; l < 34_000_000L; l += 1_000_000L) {
+			RangeFilter rf = new RangeFilter(l, l + 1_000_000L);
+			ReleaseContentHandler rch = new ReleaseContentHandler(rf);
+			
+			tasks.add(new Runner(rch, DiscogsFile.RELEASES.getUnzippedFile()));
+		}
+		
+		try {
+			List<Future<Integer>> invokeAll = es.invokeAll(tasks);
+			
+			for (Future<Integer> fi : invokeAll) {
+				LOG.info("{}", fi);
+			}
+		} catch (InterruptedException e) {
+			LOG.error("Executor invocation interrupted", e);
+			
+			Thread.currentThread().interrupt();
 		}
 	}
 
