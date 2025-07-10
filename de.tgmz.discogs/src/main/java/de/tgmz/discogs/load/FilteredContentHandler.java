@@ -9,7 +9,6 @@
 **********************************************************************/
 package de.tgmz.discogs.load;
 
-import java.io.InputStream;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Predicate;
@@ -19,12 +18,15 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
+import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Discogs;
 import de.tgmz.discogs.domain.Genre;
 import de.tgmz.discogs.domain.Style;
+import jakarta.persistence.EntityManager;
 
 public abstract class FilteredContentHandler extends DiscogsContentHandler {
 	protected static final Logger LOG = LoggerFactory.getLogger(FilteredContentHandler.class);
+	protected EntityManager em;
 	protected Discogs discogs;
 	protected int saved;
 	protected int ignored;
@@ -41,14 +43,11 @@ public abstract class FilteredContentHandler extends DiscogsContentHandler {
 	}
 
 	@Override
-	public void run(InputStream is) {
-		try {
-			super.run(is);
-		} catch (Exception e) {
-			LOG.error("Error on id {}", discogs, e);
-		}
+	public void startDocument() throws SAXException {
+		super.startDocument();
+		
+		em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager();
 	}
-	
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		switch (qName) {
@@ -83,6 +82,8 @@ public abstract class FilteredContentHandler extends DiscogsContentHandler {
 	@Override
 	public void endDocument() throws SAXException {
 		super.endDocument();
+		
+		em.close();
 	
 		if (LOG.isInfoEnabled()) {
 			LOG.info("{} saved  ", String.format("%,d", saved));

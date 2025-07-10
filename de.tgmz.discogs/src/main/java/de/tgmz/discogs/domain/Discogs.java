@@ -107,6 +107,14 @@ public abstract class Discogs implements Serializable {
 		this.dataQuality = dataQuality;
 	}
 
+	public void setGenres(Set<Genre> genres) {
+		this.genres = genres;
+	}
+
+	public void setStyles(Set<Style> styles) {
+		this.styles = styles;
+	}
+
 	@Override
 	public String toString() {
 		return "[title=" + title + ", displayArtist=" + displayArtist + "]";

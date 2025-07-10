@@ -32,7 +32,6 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
 import de.tgmz.discogs.database.DatabaseService;
-import jakarta.persistence.EntityManager;
 
 public class DiscogsContentHandler extends DefaultHandler {
 	protected static final Logger LOG = LoggerFactory.getLogger(DiscogsContentHandler.class);
@@ -41,7 +40,6 @@ public class DiscogsContentHandler extends DefaultHandler {
 	private static final Pattern PA = Pattern.compile("^(.*)(\\s?\\(\\d+\\))$");
 	private Deque<String> stack;
 	protected String path;
-	protected EntityManager em;
 	protected XMLReader xmlReader;
 	protected int count;
 	/** For use in filtered handlers to finetune logging */
@@ -74,17 +72,10 @@ public class DiscogsContentHandler extends DefaultHandler {
 
 	@Override
 	public void startDocument() throws SAXException {
-		em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager();
-		
 		stack = new LinkedList<>();
 		path = "";
 	}
 	
-	@Override
-	public void endDocument() throws SAXException {
-		em.close();
-	}
-
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		stack.push(qName);
@@ -136,10 +127,6 @@ public class DiscogsContentHandler extends DefaultHandler {
 		DatabaseService.getInstance().inTransaction(x -> x.merge(o));
 		
 		++count;
-		
-		if (count % threshold == 0) {
-			em.clear();
-		}
 	}
 
 	public String getChars(boolean removeSuffix) {

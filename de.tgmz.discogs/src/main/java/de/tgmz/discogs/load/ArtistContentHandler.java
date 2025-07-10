@@ -14,15 +14,25 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
+import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.DataQuality;
+import jakarta.persistence.EntityManager;
 
 public class ArtistContentHandler extends DiscogsContentHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(ArtistContentHandler.class);
+	private EntityManager em;
 	private Artist artist;
 
 	public ArtistContentHandler() {
 		super();
+	}
+	
+	@Override
+	public void startDocument() throws SAXException {
+		super.startDocument();
+		
+		em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager();
 	}
 	
 	@Override
@@ -95,6 +105,8 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 	}
 	@Override
 	public void endDocument() throws SAXException {
+		em.close();
+		
 		if (LOG.isInfoEnabled()) {
 			LOG.info("{} artists inserted/updated", String.format("%,d", count));
 		}

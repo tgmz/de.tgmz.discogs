@@ -25,7 +25,6 @@ import java.util.function.Predicate;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.xml.sax.SAXException;
 
 import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Artist;
@@ -55,7 +54,7 @@ public class DiscogsTest {
 	private static final long IGNORED = 115L;
 	
 	@BeforeClass
-	public static void setupOnce() throws IOException, SAXException {
+	public static void setupOnce() throws IOException {
 		System.setProperty("jakarta.persistence.jdbc.url", "jdbc:h2:mem:discogs_test_mem");
 		System.setProperty("jakarta.persistence.jdbc.user", "sa");
 		System.setProperty("jakarta.persistence.jdbc.password", "sa");
@@ -105,12 +104,12 @@ public class DiscogsTest {
 		Track t = r.getTracklist().get(3);
 		
 		assertEquals("Die Zauberflöte", t.getTitle());
-		assertEquals(1,  t.sizeOf());
+		assertEquals(3, t.sizeOf());
 		
 		SubTrack st = t.getSubTracklist().getFirst();
 		
 		assertEquals("Ouvertüre", st.getTitle());
-		assertEquals(1,  st.sizeOf());
+		assertEquals(2, st.sizeOf());
 		
 		ExtraArtist ea = st.getExtraArtists().getFirst();
 		
@@ -172,7 +171,7 @@ public class DiscogsTest {
 		
 		assertTrue(em.createQuery("FROM Style", Style.class).getResultStream().anyMatch(x -> "Synth-pop".equals(x.getId())));
 	}
-	private static void load() throws IOException,SAXException {
+	private static void load() throws IOException {
 		try (InputStream is = new FileInputStream(DiscogsFile.ARTISTS.getUnzippedFile())) {
 			new ArtistContentHandler().run(is);
 		}
@@ -230,7 +229,7 @@ public class DiscogsTest {
 		assertTrue(r.getGenres().stream().allMatch(x -> "Electronic".equals(x.getId())));
 		assertTrue(r.getStyles().stream().allMatch(x -> "Synth-pop".equals(x.getId())));
 		
-		assertEquals(72, r.sizeOf());
+		assertEquals(190, r.sizeOf());
 		
 		ExtraArtist af = r.getExtraArtists().keySet().stream().filter(ea -> 132774 == ea.getArtist().getId()).findAny().orElseThrow();
 

@@ -9,8 +9,6 @@
 **********************************************************************/
 package de.tgmz.discogs.domain;
 
-import java.io.Serializable;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
@@ -19,7 +17,7 @@ import jakarta.persistence.Transient;
  * Genre entity
  */
 @Entity
-public class Genre implements Serializable {
+public class Genre extends Nature {
 	@Transient
 	private static final long serialVersionUID = 5684918391708831387L;
 	@Id
@@ -33,12 +31,8 @@ public class Genre implements Serializable {
 		this.id = id;
 	}
 
+	@Override
 	public String getId() {
 		return id;
-	}
-
-	@Override
-	public String toString() {
-		return "Genre [id=" + id + "]";
 	}
 }
