@@ -14,27 +14,25 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
-import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.DataQuality;
-import jakarta.persistence.EntityManager;
+import de.tgmz.discogs.load.persist.ArtistPersistable;
 
 public class ArtistContentHandler extends DiscogsContentHandler {
+	@SuppressWarnings("unused")
 	private static final Logger LOG = LoggerFactory.getLogger(ArtistContentHandler.class);
-	private EntityManager em;
 	private Artist artist;
 
 	public ArtistContentHandler() {
 		super();
 	}
-	
+
 	@Override
 	public void startDocument() throws SAXException {
 		super.startDocument();
 		
-		em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager();
+		persister = new ArtistPersistable();
 	}
-	
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		super.startElement(uri, localName, qName, attributes);
@@ -52,12 +50,8 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 				// Stange but happens e.g. artist id = 16401, name = Drunkness
 				member = artist;
 			} else {
-				member = em.find(Artist.class, memberId);
-			
-				if (member == null) {
-					member = new Artist();
-					member.setId(memberId);
-				}
+				member = new Artist();
+				member.setId(memberId);
 			}
 			
 			artist.getMembers().add(member);
@@ -91,10 +85,6 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 			artist.getMembers().getLast().setName(getChars(MAX_LENGTH_DEFAULT, true));
 			break;
 		case "[artists, artist]":
-			if (artist.getId() % 10_000 == 0) {
-				LOG.info("Save {}", artist);
-			}
-			
 			save(artist);
 		
 			break;
@@ -102,15 +92,5 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 		}
 		
 		super.endElement(uri, localName, qName);
-	}
-	@Override
-	public void endDocument() throws SAXException {
-		em.close();
-		
-		if (LOG.isInfoEnabled()) {
-			LOG.info("{} artists inserted/updated", String.format("%,d", count));
-		}
-		
-		super.endDocument();
 	}
 }

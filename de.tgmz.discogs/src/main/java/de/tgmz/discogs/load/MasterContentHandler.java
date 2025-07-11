@@ -13,39 +13,52 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.DataQuality;
-import de.tgmz.discogs.domain.Discogs;
 import de.tgmz.discogs.domain.Master;
+import de.tgmz.discogs.load.factory.GenreFactory;
+import de.tgmz.discogs.load.factory.StyleFactory;
+import de.tgmz.discogs.load.persist.MasterPersistable;
 
-public class MasterContentHandler extends FilteredContentHandler {
+public class MasterContentHandler extends DiscogsContentHandler {
 	private long artistId;
 	private String artistName;
-	private int artistCount = 0;
+	private Master master;
 	private List<String> artistNames;
 	private List<String> joins;
+	private Predicate<Master> filter;
+	private GenreFactory genreFactory;
+	private StyleFactory styleFactory;
 
 	public MasterContentHandler() {
-		this(x -> true);
+		this (x -> true);
+	}
+	
+	public MasterContentHandler(Predicate<Master> filter) {
+		this.filter = filter;
+		
+		genreFactory = new GenreFactory();
+		styleFactory = new StyleFactory();
 	}
 
-	public MasterContentHandler(Predicate<Discogs> filter) {
-		super(filter);
+	@Override
+	public void startDocument() throws SAXException {
+		super.startDocument();
+		
+		persister = new MasterPersistable(filter);
 	}
-
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		super.startElement(uri, localName, qName, attributes);
 		
 		switch (path) {
 		case "[masters, master]":
-			discogs = new Master();
+			master = new Master();
 			
-			discogs.setId(Long.parseLong(attributes.getValue("id")));
+			master.setId(Long.parseLong(attributes.getValue("id")));
 			
 			break;
 		case "[masters, master, artists]":
@@ -65,19 +78,27 @@ public class MasterContentHandler extends FilteredContentHandler {
 			
 			break;
 		case "[masters, master, title]":
-			discogs.setTitle(getChars(MAX_LENGTH_DEFAULT));
+			master.setTitle(getChars(MAX_LENGTH_DEFAULT));
 			
 			break;
 		case "[masters, master, year]":
-			((Master) discogs).setPublished(Integer.parseInt(getChars()));
+			master.setPublished(Integer.parseInt(getChars()));
 			
 			break;
 		case "[masters, master, data_quality]":
-			discogs.setDataQuality(DataQuality.byName(getChars()));
+			master.setDataQuality(DataQuality.byName(getChars()));
+			
+			break;
+		case "[masters, master, genres, genre]":
+			master.getGenres().add(genreFactory.get(getChars()));
+			
+			break;
+		case "[masters, master, styles, style]":
+			master.getStyles().add(styleFactory.get(getChars()));
 			
 			break;
 		case "[masters, master, artists]":
-			discogs.setDisplayArtist(getDisplayArtist(artistNames, joins));
+			master.setDisplayArtist(getDisplayArtist(artistNames, joins));
 			
 			break;
 		case "[masters, master, artists, artist, name]":
@@ -87,21 +108,12 @@ public class MasterContentHandler extends FilteredContentHandler {
 			
 			break;
 		case "[masters, master, artists, artist]":
-			Artist a = em.find(Artist.class, artistId);
+			Artist a = new Artist();
 			
-			if (a == null) {
-				a = new Artist();
-				a.setId(artistId);
-				a.setName(artistName);
-				
-				save(a);
-				
-				++artistCount;
-				
-				LOG.debug("Added new artist {}", a);
-			}
+			a.setId(artistId);
+			a.setName(artistName);
 			
-			discogs.getArtists().add(a);
+			master.getArtists().add(a);
 			
 			break;
 		case "[masters, master, artists, artist, join]":
@@ -113,25 +125,12 @@ public class MasterContentHandler extends FilteredContentHandler {
 			
 			break;
 		case "[masters, master]":
-			save(discogs);
+			save(master);
 			
 			break;
 		default:
 		}
 		
 		super.endElement(uri, localName, qName);
-	}
-
-	@Override
-	public void endDocument() throws SAXException {
-		super.endDocument();
-		
-		if (LOG.isInfoEnabled()) {
-			LOG.info("{} artists added  ", String.format("%,d", artistCount));
-		}
-	}
-	@Override
-	protected void fillAttributes(Discogs d) {
-		d.setTitle(StringUtils.left(discogs.getTitle(), MAX_LENGTH_DEFAULT));
 	}
 }

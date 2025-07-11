@@ -215,8 +215,8 @@ public class DiscogsTest {
 		assertEquals("Violator", m.getTitle());
 		assertEquals(DataQuality.CORRECT, m.getDataQuality());
 		assertEquals(1990, m.getPublished().intValue());
-		assertTrue(m.getGenres().stream().allMatch(x -> x.getId().equals("Electronic")));
-		assertTrue(m.getStyles().stream().allMatch(x -> x.getId().equals("Synth-pop")));
+		assertTrue(m.getGenres().stream().anyMatch(x -> x.getId().equals("Electronic")));
+		assertTrue(m.getStyles().stream().anyMatch(x -> x.getId().equals("Synth-pop")));
 	}
 	private void checkRelease(Release r, Master m, Label l) {
 		assertEquals(m, r.getMaster());
@@ -226,8 +226,8 @@ public class DiscogsTest {
 		assertEquals(DataQuality.CORRECT, r.getDataQuality());
 		assertFalse(r.isMain());
 		assertEquals("World In My Eyes", r.getUnfilteredTracklist().getFirst().getTitle());
-		assertTrue(r.getGenres().stream().allMatch(x -> "Electronic".equals(x.getId())));
-		assertTrue(r.getStyles().stream().allMatch(x -> "Synth-pop".equals(x.getId())));
+		assertTrue(r.getGenres().stream().anyMatch(x -> "Electronic".equals(x.getId())));
+		assertTrue(r.getStyles().stream().anyMatch(x -> "Synth-pop".equals(x.getId())));
 		
 		assertEquals(190, r.sizeOf());
 		

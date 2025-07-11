@@ -19,18 +19,18 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
-import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.DataQuality;
 import de.tgmz.discogs.domain.Discogs;
 import de.tgmz.discogs.domain.ExtraArtist;
-import de.tgmz.discogs.domain.Genre;
 import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
-import de.tgmz.discogs.domain.Style;
 import de.tgmz.discogs.domain.SubTrack;
 import de.tgmz.discogs.domain.Track;
+import de.tgmz.discogs.load.factory.GenreFactory;
+import de.tgmz.discogs.load.factory.StyleFactory;
+import de.tgmz.discogs.load.persist.ReleasePersistable;
 
 public class ReleaseContentHandler extends DiscogsContentHandler {
 	protected static final Logger LOG = LoggerFactory.getLogger(ReleaseContentHandler.class);
@@ -41,10 +41,10 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	private int subTrackNumber;
 	private ExtraArtist rea;
 	private String tracks;
-	private int artistCount = 0;
 	private Release r;
-	private ReleasePersister persister;
 	private Predicate<Discogs> filter;
+	private GenreFactory genreFactory;
+	private StyleFactory styleFactory;
 	
 	public ReleaseContentHandler() {
 		this (x -> true);
@@ -52,14 +52,18 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	
 	public ReleaseContentHandler(Predicate<Discogs> filter) {
 		super();
+		
 		this.filter = filter;
+		
+		genreFactory = new GenreFactory();
+		styleFactory = new StyleFactory();
 	}
 	
 	@Override
 	public void startDocument() throws SAXException {
 		super.startDocument();
 		
-		persister = new ReleasePersister();
+		persister = new ReleasePersistable(filter);
 	}
 	
 	@Override
@@ -197,11 +201,11 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, genres, genre]":
-			r.getGenres().add(new Genre(getChars()));
+			r.getGenres().add(genreFactory.get(getChars()));
 			
 			break;
 		case "[releases, release, styles, style]":
-			r.getStyles().add(new Style(getChars()));
+			r.getStyles().add(styleFactory.get(getChars()));
 			
 			break;
 		// extraartists
@@ -288,28 +292,12 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release]":
-			if (r.getId() % 10_000 == 0) {
-				LOG.info("Save release {}", r);
-			}
-
-			if (filter.test(r)) {
-				persister.setRelease(r);
-			
-				DatabaseService.getInstance().inTransaction(x -> persister.save(x));
-			}
+			save(r);
 			
 			break;
 		default:
 		}
 		
 		super.endElement(uri, localName, qName);
-	}
-	@Override
-	public void endDocument() throws SAXException {
-		super.endDocument();
-		
-		if (LOG.isInfoEnabled()) {
-			LOG.info("{} artists added  ", String.format("%,d", artistCount));
-		}
 	}
 }

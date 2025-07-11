@@ -7,62 +7,46 @@
 *
 * SPDX-License-Identifier: EPL-2.0
 **********************************************************************/
-package de.tgmz.discogs.load;
+package de.tgmz.discogs.load.persist;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.Set;
+import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.benmanes.caffeine.cache.CacheLoader;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
-
 import de.tgmz.discogs.domain.Artist;
+import de.tgmz.discogs.domain.Discogs;
 import de.tgmz.discogs.domain.ExtraArtist;
-import de.tgmz.discogs.domain.Genre;
 import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
-import de.tgmz.discogs.domain.Style;
 import de.tgmz.discogs.domain.SubTrack;
 import de.tgmz.discogs.domain.Track;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 
-public class ReleasePersister {
-	private static final Logger LOG = LoggerFactory.getLogger(ReleasePersister.class);
-	private Release r;
+public class ReleasePersistable implements IPersistable<Release> {
+	private static final Logger LOG = LoggerFactory.getLogger(ReleasePersistable.class);
+	private Predicate<Discogs> filter;
 	private EntityManager em;
-	private LoadingCache<String, Genre> genreFactory;
-	private LoadingCache<String, Style> styleFactory;
 	
-	public ReleasePersister() {
-		genreFactory = Caffeine.newBuilder().build(new CacheLoader<String, Genre>() {
-			@Override
-			public Genre load(String key) {
-				return new Genre(key);
-			}
-		});
-
-		styleFactory = Caffeine.newBuilder().build(new CacheLoader<String, Style>() {
-			@Override
-			public Style load(String key) {
-				return new Style(key);
-			}
-		});
-	}
-
-	public void setRelease(Release r) {
-		this.r = r;
+	public ReleasePersistable() {
+		this(x -> true);
 	}
 	
-	public void save(EntityManager em0) {
+	public ReleasePersistable(Predicate<Discogs> filter) {
+		this.filter = filter;
+	}
+	
+	public int save(EntityManager em0, Release r) {
+		if (!filter.test(r)) {
+			return 0;
+		}
+		
 		this.em = em0;
 			
 		// Master
@@ -82,14 +66,6 @@ public class ReleasePersister {
 			
 		r.setLabels(result);
 		
-		Set<Genre> gs = HashSet.newHashSet(r.getGenres().size());
-		r.getGenres().stream().forEach(g -> gs.add(genreFactory.get(g.getId())));
-		r.setGenres(gs);
-		
-		Set<Style> ss = HashSet.newHashSet(r.getStyles().size());
-		r.getStyles().stream().forEach(s -> ss.add(styleFactory.get(s.getId())));
-		r.setStyles(ss);
-				
 		r.getArtists().replaceAll(a -> a = fillArtist(a));
 		r.getArtists().removeIf(Objects::isNull);
 
@@ -118,11 +94,9 @@ public class ReleasePersister {
 			}
 		}
 			
-		LOG.debug("Save {}", r);
-
 		em.merge(r);
 		
-		em.flush();
+		return 1;
 	}
 	
 	private ExtraArtist fillExtraArtist(ExtraArtist ea0) {

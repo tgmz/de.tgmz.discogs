@@ -32,19 +32,22 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
 import de.tgmz.discogs.database.DatabaseService;
+import de.tgmz.discogs.load.persist.IPersistable;
 
 public class DiscogsContentHandler extends DefaultHandler {
-	protected static final Logger LOG = LoggerFactory.getLogger(DiscogsContentHandler.class);
-	protected static final int MAX_LENGTH_DEFAULT = 254;
-	protected static final int MAX_LENGTH_DISPLAY = 510;
+	private static final Logger LOG = LoggerFactory.getLogger(DiscogsContentHandler.class);
 	private static final Pattern PA = Pattern.compile("^(.*)(\\s?\\(\\d+\\))$");
 	private Deque<String> stack;
-	protected String path;
-	protected XMLReader xmlReader;
-	protected int count;
-	/** For use in filtered handlers to finetune logging */
-	protected long threshold = 10_000L;
+	private XMLReader xmlReader;
+	private int saved;
+	private int count;
+	private long threshold = 10_000L;
 	private StringBuilder chars;
+	protected static final int MAX_LENGTH_DEFAULT = 254;
+	protected static final int MAX_LENGTH_DISPLAY = 510;
+	protected String path;
+	@SuppressWarnings("rawtypes")
+	protected IPersistable persister;
 
 	public DiscogsContentHandler() {
 		try {
@@ -100,6 +103,15 @@ public class DiscogsContentHandler extends DefaultHandler {
 		}
 	}
 
+	@Override
+	public void endDocument() throws SAXException {
+		super.endDocument();
+		
+		if (LOG.isInfoEnabled()) {
+			LOG.info("{} entities added, {} ignored", String.format("%,d", saved), String.format("%,d", count - saved));
+		}
+	}
+	
 	protected String getDisplayArtist(List<String> artists, List<String> joins) {
 		StringBuilder sb = new StringBuilder();
 		
@@ -121,12 +133,15 @@ public class DiscogsContentHandler extends DefaultHandler {
 		return StringUtils.left(display, MAX_LENGTH_DISPLAY);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void save(Object o) {
 		LOG.debug("Save {}", o);
 		
-		DatabaseService.getInstance().inTransaction(x -> x.merge(o));
+		DatabaseService.getInstance().inTransaction(x -> saved += persister.save(x, o));
 		
-		++count;
+		if (++count % threshold == 0 && LOG.isInfoEnabled()) {
+			LOG.info("{}/{} ({}). {}", String.format("%,d", saved), String.format("%,d", count), String.format("%f%%", (float) saved / count * 100), o);
+		}
 	}
 
 	public String getChars(boolean removeSuffix) {

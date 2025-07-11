@@ -16,11 +16,20 @@ import org.xml.sax.SAXException;
 
 import de.tgmz.discogs.domain.DataQuality;
 import de.tgmz.discogs.domain.Label;
+import de.tgmz.discogs.load.persist.LabelPersistable;
 
 public class LabelContentHandler extends DiscogsContentHandler {
+	@SuppressWarnings("unused")
 	private static final Logger LOG = LoggerFactory.getLogger(LabelContentHandler.class);
 	private Label label;
 
+	@Override
+	public void startDocument() throws SAXException {
+		super.startDocument();
+		
+		persister = new LabelPersistable();
+	}
+	
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		super.startElement(uri, localName, qName, attributes);
@@ -48,10 +57,6 @@ public class LabelContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[labels, label]":
-			if (label.getId() % 10_000 == 0) {
-				LOG.info("Save {}", label);
-			}
-			
 			save(label);
 		
 			break;
@@ -59,13 +64,5 @@ public class LabelContentHandler extends DiscogsContentHandler {
 		}
 		
 		super.endElement(uri, localName, qName);
-	}
-	@Override
-	public void endDocument() throws SAXException {
-		if (LOG.isInfoEnabled()) {
-			LOG.info("{} labels inserted/updated", String.format("%,d", count));
-		}
-		
-		super.endDocument();
 	}
 }
