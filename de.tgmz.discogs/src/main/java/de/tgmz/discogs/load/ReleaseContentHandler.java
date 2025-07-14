@@ -10,7 +10,6 @@
 package de.tgmz.discogs.load;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -39,8 +38,11 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	private int sequence;
 	private int trackNumber;
 	private int subTrackNumber;
-	private ExtraArtist rea;
-	private String tracks;
+	private Artist artist;
+	private ExtraArtist extraArtist;
+	private Track track;
+	private SubTrack subTrack;
+	private String applicableTracks;
 	private Release r;
 	private Predicate<Discogs> filter;
 	private GenreFactory genreFactory;
@@ -87,12 +89,12 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, artists, artist]":
-			r.getArtists().add(new Artist());
+			artist = new Artist();
 			
 			break;
 		case "[releases, release, extraartists, artist]":
-			rea = new ExtraArtist();
-			tracks = "";
+			extraArtist = new ExtraArtist();
+			applicableTracks = "";
 		
 			break;
 		case "[releases, release, tracklist]":
@@ -101,22 +103,17 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, tracklist, track]":
-			Track t = new Track();
-			t.setSequence(sequence++);
-			t.setTrackNumber(trackNumber++);
-			r.getUnfilteredTracklist().add(t);
-			
-			break;
-		case "[releases, release, tracklist, track, artists]":
-			r.getUnfilteredTracklist().getLast().setArtists(new LinkedList<>());
+			track = new Track();
+			track.setSequence(sequence++);
+			track.setTrackNumber(trackNumber++);
 			
 			break;
 		case "[releases, release, tracklist, track, artists, artist]":
-			r.getUnfilteredTracklist().getLast().getArtists().add(new Artist());
+			artist = new Artist();
 			
 			break;
 		case "[releases, release, tracklist, track, extraartists, artist]":
-			r.getUnfilteredTracklist().getLast().getExtraArtists().add(new ExtraArtist());
+			extraArtist = new ExtraArtist();
 			
 			break;
 		case "[releases, release, tracklist, track, sub_tracks]":
@@ -124,13 +121,12 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, tracklist, track, sub_tracks, track]":
-			SubTrack st = new SubTrack();
-			st.setTrackNumber(subTrackNumber++);
-			r.getUnfilteredTracklist().getLast().getSubTracklist().add(st);
+			subTrack = new SubTrack();
+			subTrack.setTrackNumber(subTrackNumber++);
 			
 			break;
 		case "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist]":
-			r.getUnfilteredTracklist().getLast().getSubTracklist().getLast().getExtraArtists().add(new ExtraArtist());
+			extraArtist = new ExtraArtist();
 			
 			break;
 		case "[releases, release, labels, label]":
@@ -181,15 +177,19 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			r.setDisplayArtist(getDisplayArtist(displayArtists, displayJoins));
 			
 			break;
+		case "[releases, release, artists, artist]":
+			r.getArtists().add(artist);
+			
+			break;
 		case "[releases, release, artists, artist, id]":
-			r.getArtists().getLast().setId(Long.valueOf(getChars()));
+			artist.setId(Long.valueOf(getChars()));
 			
 			break;
 		case "[releases, release, artists, artist, name]":
 			String s = getChars(MAX_LENGTH_DEFAULT, true);
 			
 			displayArtists.add(s);
-			r.getArtists().getLast().setName(s);
+			artist.setName(s);
 			
 			break;
 		case "[releases, release, artists, artist, anv]":
@@ -210,85 +210,102 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			break;
 		// extraartists
 		case "[releases, release, extraartists, artist, id]":
-			rea.getArtist().setId(Long.parseLong(getChars()));
+			extraArtist.getArtist().setId(Long.parseLong(getChars()));
 				
 			break;
 		case "[releases, release, extraartists, artist, name]":
-			rea.getArtist().setName(getChars(MAX_LENGTH_DEFAULT, true));
+			extraArtist.getArtist().setName(getChars(MAX_LENGTH_DEFAULT, true));
 			
 			break;
 		case "[releases, release, extraartists, artist, role]":
-			rea.setRole(getChars());
+			extraArtist.setRole(getChars());
 			
 			break;
 		case "[releases, release, extraartists, artist, tracks]":
-			tracks = getChars();
+			applicableTracks = getChars();
 				
 			break;
 		case "[releases, release, extraartists, artist]":
-			r.getExtraArtists().put(rea, tracks);
+			r.getExtraArtists().put(extraArtist, applicableTracks);
 				
 			break;
 		//tracks
 		case "[releases, release, tracklist, track]":
-			Track t = r.getUnfilteredTracklist().getLast();
+			r.getUnfilteredTracklist().add(track);
 			
-			if (t.getPosition() == null && t.getSubTracklist().isEmpty()) {
+			if (track.getPosition() == null && track.getSubTracklist().isEmpty()) {
 				// Not al "real" track (e.g. headline like "Roots" and "The Roots of Sepultura") 
 				--trackNumber;
 			}
 			
 			break;
 		case "[releases, release, tracklist, track, position]":
-			r.getUnfilteredTracklist().getLast().setPosition(getChars());
+			track.setPosition(getChars());
 			
 			break;
 		case "[releases, release, tracklist, track, duration]":
-			r.getUnfilteredTracklist().getLast().setDuration(getChars());
+			track.setDuration(getChars());
 			
 			break;
 		case "[releases, release, tracklist, track, title]":
-			r.getUnfilteredTracklist().getLast().setTitle(getChars(MAX_LENGTH_DEFAULT));
+			track.setTitle(getChars(MAX_LENGTH_DEFAULT));
 				
 			break;
+		case "[releases, release, tracklist, track, artists, artist]":
+			track.getArtists().add(artist);
+			
+			break;
 		case "[releases, release, tracklist, track, artists, artist, id]":
-			r.getUnfilteredTracklist().getLast().getArtists().getLast().setId(Long.valueOf(getChars()));
+			artist.setId(Long.valueOf(getChars()));
 			
 			break;
 		case "[releases, release, tracklist, track, artists, artist, name]":
-			r.getUnfilteredTracklist().getLast().getArtists().getLast().setName(getChars(MAX_LENGTH_DEFAULT, true));
+			artist.setName(getChars(MAX_LENGTH_DEFAULT, true));
+			
+			break;
+		case "[releases, release, tracklist, track, extraartists, artist]":
+			track.getExtraArtists().add(extraArtist);
 			
 			break;
 		case "[releases, release, tracklist, track, extraartists, artist, id]":
-			r.getUnfilteredTracklist().getLast().getExtraArtists().getLast().getArtist().setId(Long.parseLong(getChars()));
+			extraArtist.getArtist().setId(Long.parseLong(getChars()));
 
 			break;
 		case "[releases, release, tracklist, track, extraartists, artist, name]":
-			r.getUnfilteredTracklist().getLast().getExtraArtists().getLast().getArtist().setName(getChars(MAX_LENGTH_DEFAULT, true));
+			extraArtist.getArtist().setName(getChars(MAX_LENGTH_DEFAULT, true));
 			
 			break;
 		case "[releases, release, tracklist, track, extraartists, artist, role]":
-			r.getUnfilteredTracklist().getLast().getExtraArtists().getLast().setRole(getChars(MAX_LENGTH_DEFAULT));
+			extraArtist.setRole(getChars(MAX_LENGTH_DEFAULT));
 			
 			break;
+		case "[releases, release, tracklist, track, sub_tracks, track]":
+			track.getSubTracklist().add(subTrack);
+			
+			break;
+
 		case "[releases, release, tracklist, track, sub_tracks, track, position]":
-			r.getUnfilteredTracklist().getLast().getSubTracklist().getLast().setPosition(getChars());
+			subTrack.setPosition(getChars());
 			
 			break;
 		case "[releases, release, tracklist, track, sub_tracks, track, title]":
-			r.getUnfilteredTracklist().getLast().getSubTracklist().getLast().setTitle(getChars(MAX_LENGTH_DEFAULT));
+			subTrack.setTitle(getChars(MAX_LENGTH_DEFAULT));
+			
+			break;
+		case "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist]":
+			subTrack.getExtraArtists().add(extraArtist);
 			
 			break;
 		case "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist, id]":
-			r.getUnfilteredTracklist().getLast().getSubTracklist().getLast().getExtraArtists().getLast().getArtist().setId(Long.parseLong(getChars()));
+			extraArtist.getArtist().setId(Long.parseLong(getChars()));
 			
 			break;
 		case "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist, name]":
-			r.getUnfilteredTracklist().getLast().getSubTracklist().getLast().getExtraArtists().getLast().getArtist().setName(getChars(MAX_LENGTH_DEFAULT, true));
+			extraArtist.getArtist().setName(getChars(MAX_LENGTH_DEFAULT, true));
 			
 			break;
 		case "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist, role]":
-			r.getUnfilteredTracklist().getLast().getSubTracklist().getLast().getExtraArtists().getLast().setRole(getChars());
+			extraArtist.setRole(getChars());
 			
 			break;
 		case "[releases, release]":

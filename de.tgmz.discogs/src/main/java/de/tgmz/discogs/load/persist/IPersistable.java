@@ -11,6 +11,7 @@ package de.tgmz.discogs.load.persist;
 
 import jakarta.persistence.EntityManager;
 
+@FunctionalInterface
 public interface IPersistable<T> {
 	int save(EntityManager em, T o);
 }
