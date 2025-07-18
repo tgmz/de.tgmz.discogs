@@ -21,12 +21,12 @@ public class ArtistPersistable implements IPersistable<Artist> {
 	
 	public ArtistPersistable() {
 		this(x -> true);
-		
-		af = new  ArtistFactory();
 	}
 
 	public ArtistPersistable(Predicate<Artist> filter) {
 		this.filter = filter;
+		
+		af = new  ArtistFactory();
 	}
 
 	@Override

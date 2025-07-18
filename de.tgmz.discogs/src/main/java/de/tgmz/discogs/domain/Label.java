@@ -11,11 +11,14 @@ package de.tgmz.discogs.domain;
 
 import java.io.Serializable;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
@@ -34,9 +37,11 @@ public class Label implements Serializable {
 	private String name;
 	@Enumerated(EnumType.ORDINAL)
 	private DataQuality dataQuality;
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+	private Label parentLabel;
 
 	/**
-	 * The artists id obtained from discogs <id> tag.
+	 * The labels id obtained from discogs <id> tag.
 	 * @return the id
 	 */
 	public long getId() {
@@ -44,7 +49,7 @@ public class Label implements Serializable {
 	}
 
 	/**
-	 * The artists name obtained from discogs <name> tag.
+	 * The labels name obtained from discogs <name> tag.
 	 * @return the name
 	 */
 	public String getName() {
@@ -53,6 +58,10 @@ public class Label implements Serializable {
 
 	public DataQuality getDataQuality() {
 		return dataQuality;
+	}
+
+	public Label getParentLabel() {
+		return parentLabel;
 	}
 
 	public void setId(long id) {
@@ -65,6 +74,10 @@ public class Label implements Serializable {
 
 	public void setDataQuality(DataQuality dataQuality) {
 		this.dataQuality = dataQuality;
+	}
+
+	public void setParentLabel(Label parentLabel) {
+		this.parentLabel = parentLabel;
 	}
 
 	@Override

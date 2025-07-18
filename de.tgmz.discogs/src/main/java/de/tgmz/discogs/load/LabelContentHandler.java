@@ -38,6 +38,13 @@ public class LabelContentHandler extends DiscogsContentHandler {
 		case "[labels, label]":
 			label = new Label();
 			break;
+		case "[labels, label, parentLabel]":
+			Label pl = new Label();
+			pl.setId(Long.parseLong(attributes.getValue("id")));
+			
+			label.setParentLabel(pl);
+			
+			break;
 		default:
 		}
 	}
@@ -54,6 +61,10 @@ public class LabelContentHandler extends DiscogsContentHandler {
 			break;
 		case "[labels, label, data_quality]":
 			label.setDataQuality(DataQuality.byName(getChars()));
+			
+			break;
+		case "[labels, label, parentLabel]":
+			label.getParentLabel().setName(getChars(MAX_LENGTH_DEFAULT, true));
 			
 			break;
 		case "[labels, label]":

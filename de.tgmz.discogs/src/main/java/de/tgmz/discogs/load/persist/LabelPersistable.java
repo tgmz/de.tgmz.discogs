@@ -12,10 +12,12 @@ package de.tgmz.discogs.load.persist;
 import java.util.function.Predicate;
 
 import de.tgmz.discogs.domain.Label;
+import de.tgmz.discogs.load.factory.LabelFactory;
 import jakarta.persistence.EntityManager;
 
 public class LabelPersistable implements IPersistable<Label> {
 	private Predicate<Label> filter;
+	private LabelFactory lf;
 	
 	public LabelPersistable() {
 		this(x -> true);
@@ -23,12 +25,27 @@ public class LabelPersistable implements IPersistable<Label> {
 
 	public LabelPersistable(Predicate<Label> filter) {
 		this.filter = filter;
+		
+		lf = new LabelFactory();
 	}
 
 	@Override
 	public int save(EntityManager em, Label label) {
 		if (filter.test(label)) {
-			em.merge(label);
+			Label l = lf.get(label);
+			
+			Label pl = label.getParentLabel();
+			
+			if (pl != null) {
+				if (pl.getId() != l.getId()) {
+					l.setParentLabel(lf.get(pl));
+				} else {
+					// Crazy, but happens (label.id = 219423, name=RDM Edition)
+					l.setParentLabel(l);
+				}
+			}
+			
+			em.merge(l);
 			
 			return 1;
 		} else {

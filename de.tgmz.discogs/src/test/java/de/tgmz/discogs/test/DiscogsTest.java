@@ -210,6 +210,8 @@ public class DiscogsTest {
 	private void checkLabel(Label l) {
 		assertEquals("Mute", l.getName());
 		assertEquals(DataQuality.NEEDS_VOTE, l.getDataQuality());
+		
+		assertEquals("Mute Artists Ltd.",  l.getParentLabel().getName());
 	}
 	private void checkMaster(Master m) {
 		assertEquals("Violator", m.getTitle());
@@ -260,12 +262,11 @@ public class DiscogsTest {
 		
 		List<ExtraArtist> eas = t.getExtraArtists();
 		
-		Optional<ExtraArtist> flood = eas.stream().filter(x -> x.getArtist() != null && 20661 == x.getArtist().getId()).findAny();
+		ExtraArtist flood = eas.stream().filter(x -> x.getArtist() != null && 20661 == x.getArtist().getId()).findAny().orElseThrow();
 		
-		assertTrue(flood.isPresent());
-		assertEquals("Mixed By", flood.get().getRole());
-		assertEquals("Flood", flood.get().getArtist().getName());
-		assertEquals("Mark Ellis", flood.get().getArtist().getRealName());
+		assertEquals("Mixed By", flood.getRole());
+		assertEquals("Flood", flood.getArtist().getName());
+		assertEquals("Mark Ellis", flood.getArtist().getRealName());
 		
 		assertEquals("9 26081-2", r.getLabels().get(l));
 	}
