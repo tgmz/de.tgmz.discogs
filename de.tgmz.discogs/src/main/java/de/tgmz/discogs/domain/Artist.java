@@ -23,6 +23,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
@@ -44,13 +45,18 @@ public class Artist implements Serializable {
 	@ElementCollection
 	private Set<String> variations;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	@JoinTable(name = "artist_members")
 	private List<Artist> members;
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	@JoinTable(name = "artist_aliases")
+	private List<Artist> aliases;
 	@Enumerated(EnumType.ORDINAL)
 	private DataQuality dataQuality;
 
 	public Artist() {
 		variations = new TreeSet<>();
 		members = new LinkedList<>();
+		aliases = new LinkedList<>();
 	}
 	/**
 	 * The artists id obtained from discogs <id> tag.
@@ -88,6 +94,10 @@ public class Artist implements Serializable {
 		return dataQuality;
 	}
 	
+	public List<Artist> getAliases() {
+		return aliases;
+	}
+	
 	public void setId(long id) {
 		this.id = id;
 	}
@@ -100,15 +110,10 @@ public class Artist implements Serializable {
 		this.realName = realName;
 	}
 
-	public void setMembers(List<Artist> members) {
-		this.members.clear();
-		this.members.addAll(members);
-	}
-
 	public void setDataQuality(DataQuality dataQuality) {
 		this.dataQuality = dataQuality;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Artist [id=" + String.format("%,d", id) + ", name=" + name + "]";

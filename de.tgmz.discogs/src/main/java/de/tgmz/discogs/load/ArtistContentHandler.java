@@ -42,19 +42,10 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 			artist = new Artist();
 			break;
 		case "[artists, artist, members, name]":
-			long memberId = Long.parseLong(attributes.getValue("id"));
-			
-			Artist member;
-			
-			if (memberId == artist.getId()) {
-				// Stange but happens e.g. artist id = 16401, name = Drunkness
-				member = artist;
-			} else {
-				member = new Artist();
-				member.setId(memberId);
-			}
-			
-			artist.getMembers().add(member);
+			artist.getMembers().add(getOrCreate(Long.parseLong(attributes.getValue("id"))));
+			break;
+		case "[artists, artist, aliases, name]":
+			artist.getAliases().add(getOrCreate(Long.parseLong(attributes.getValue("id"))));
 			break;
 		default:
 		}
@@ -65,9 +56,11 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 		switch (path) {
 		case "[artists, artist, id]":
 			artist.setId(Long.parseLong(getChars()));
+			
 			break;
 		case "[artists, artist, data_quality]":
 			artist.setDataQuality(DataQuality.byName(getChars()));
+			
 			break;
 		case "[artists, artist, name]":
 			artist.setName(getChars(MAX_LENGTH_DEFAULT, true));
@@ -83,6 +76,11 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 			break;
 		case "[artists, artist, members, name]":
 			artist.getMembers().getLast().setName(getChars(MAX_LENGTH_DEFAULT, true));
+			
+			break;
+		case "[artists, artist, aliases, name]":
+			artist.getAliases().getLast().setName(getChars(MAX_LENGTH_DEFAULT, true));
+			
 			break;
 		case "[artists, artist]":
 			save(artist);
@@ -92,5 +90,17 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 		}
 		
 		super.endElement(uri, localName, qName);
+	}
+	private Artist getOrCreate(long id) {
+		Artist a0;
+		
+		if (id == artist.getId()) {
+			a0 = artist;
+		} else {
+			a0 = new Artist();
+			a0.setId(id);
+		}
+		
+		return a0;
 	}
 }

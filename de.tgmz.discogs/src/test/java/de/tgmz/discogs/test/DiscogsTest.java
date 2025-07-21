@@ -200,12 +200,15 @@ public class DiscogsTest {
 		assertTrue(a.getVariations().contains("D M"));
 		assertEquals(DataQuality.NEEDS_VOTE, a.getDataQuality());
 		
-		Optional<Artist> alanWilder = a.getMembers().stream().filter(a0 -> a0.getId() == 25411).findFirst();
+		Artist alanWilder = a.getMembers().stream().filter(a0 -> a0.getId() == 25411).findFirst().orElseThrow();
 		
-		assertTrue(alanWilder.isPresent());
-		assertEquals("Alan Wilder", alanWilder.get().getName());
+		assertEquals("Alan Wilder", alanWilder.getName());
 		
-		assertTrue(alanWilder.get().getVariations().contains("A. Wilder"));
+		assertTrue(alanWilder.getVariations().contains("A. Wilder"));
+
+		Artist blackSwarm = a.getAliases().stream().filter(a0 -> a0.getId() == 3258245).findFirst().orElseThrow();
+		
+		assertEquals("Black Swarm", blackSwarm.getName());
 	}
 	private void checkLabel(Label l) {
 		assertEquals("Mute", l.getName());

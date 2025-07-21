@@ -9,6 +9,8 @@
 **********************************************************************/
 package de.tgmz.discogs.load.persist;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import de.tgmz.discogs.domain.Artist;
@@ -32,15 +34,22 @@ public class ArtistPersistable implements IPersistable<Artist> {
 	@Override
 	public int save(EntityManager em, Artist artist) {
 		if (filter.test(artist)) {
-			artist = af.get(artist);
+			Artist a0 = af.get(artist);
 			
-			artist.getMembers().replaceAll(a -> a = af.get(a));
+			a0.getMembers().replaceAll(a -> a = af.get(a));
+			// In case an artist is both member and alias
+			a0.getAliases().replaceAll(a -> getOrCreate(a, artist.getMembers()));
 			
-			em.merge(artist);
+			em.merge(a0);
 			
 			return 1;
 		} else {
 			return 0;
 		}
+	}
+	private Artist getOrCreate(Artist a0, List<Artist> as) {
+		Optional<Artist> any = as.stream().filter(a -> a.getId() == a0.getId()).findAny();
+		
+		return any.isPresent() ? any.get() : af.get(a0);
 	}
 }
