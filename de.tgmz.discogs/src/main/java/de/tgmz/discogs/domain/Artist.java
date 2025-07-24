@@ -50,13 +50,17 @@ public class Artist implements Serializable {
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	@JoinTable(name = "artist_aliases")
 	private List<Artist> aliases;
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	@JoinTable(name = "artist_groups")
+	private List<Artist> groups;
 	@Enumerated(EnumType.ORDINAL)
 	private DataQuality dataQuality;
 
 	public Artist() {
 		variations = new TreeSet<>();
-		members = new LinkedList<>();
 		aliases = new LinkedList<>();
+		groups = new LinkedList<>();
+		members = new LinkedList<>();
 	}
 	/**
 	 * The artists id obtained from discogs <id> tag.
@@ -98,6 +102,10 @@ public class Artist implements Serializable {
 		return aliases;
 	}
 	
+	public List<Artist> getGroups() {
+		return groups;
+	}
+	
 	public void setId(long id) {
 		this.id = id;
 	}
@@ -113,7 +121,23 @@ public class Artist implements Serializable {
 	public void setDataQuality(DataQuality dataQuality) {
 		this.dataQuality = dataQuality;
 	}
+	
+	public void setVariations(Set<String> variations) {
+		this.variations = variations;
+	}
+	
+	public void setMembers(List<Artist> members) {
+		this.members = members;
+	}
+	
+	public void setAliases(List<Artist> aliases) {
+		this.aliases = aliases;
+	}
 
+	public void setGroups(List<Artist> groups) {
+		this.groups = groups;
+	}
+	
 	@Override
 	public String toString() {
 		return "Artist [id=" + String.format("%,d", id) + ", name=" + name + "]";

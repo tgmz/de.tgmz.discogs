@@ -9,6 +9,8 @@
 **********************************************************************/
 package de.tgmz.discogs.load;
 
+import java.util.function.Predicate;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -22,16 +24,23 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 	@SuppressWarnings("unused")
 	private static final Logger LOG = LoggerFactory.getLogger(ArtistContentHandler.class);
 	private Artist artist;
+	private Predicate<Artist> filter;
 
 	public ArtistContentHandler() {
+		this(x -> true);
+	}
+
+	public ArtistContentHandler(Predicate<Artist> filter) {
 		super();
+		
+		this.filter = filter;
 	}
 
 	@Override
 	public void startDocument() throws SAXException {
 		super.startDocument();
 		
-		persister = new ArtistPersistable();
+		persister = new ArtistPersistable(filter);
 	}
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
@@ -46,6 +55,9 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 			break;
 		case "[artists, artist, aliases, name]":
 			artist.getAliases().add(getOrCreate(Long.parseLong(attributes.getValue("id"))));
+			break;
+		case "[artists, artist, groups, name]":
+			artist.getGroups().add(getOrCreate(Long.parseLong(attributes.getValue("id"))));
 			break;
 		default:
 		}
@@ -80,6 +92,10 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 			break;
 		case "[artists, artist, aliases, name]":
 			artist.getAliases().getLast().setName(getChars(MAX_LENGTH_DEFAULT, true));
+			
+			break;
+		case "[artists, artist, groups, name]":
+			artist.getGroups().getLast().setName(getChars(MAX_LENGTH_DEFAULT, true));
 			
 			break;
 		case "[artists, artist]":

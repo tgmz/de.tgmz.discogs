@@ -9,17 +9,16 @@
 **********************************************************************/
 package de.tgmz.discogs.load.persist;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.function.Predicate;
 
 import de.tgmz.discogs.domain.Artist;
-import de.tgmz.discogs.load.factory.ArtistFactory;
 import jakarta.persistence.EntityManager;
 
 public class ArtistPersistable implements IPersistable<Artist> {
 	private Predicate<Artist> filter;
-	private ArtistFactory af;
+	private Map<Long, Artist> cache;
 	
 	public ArtistPersistable() {
 		this(x -> true);
@@ -27,29 +26,51 @@ public class ArtistPersistable implements IPersistable<Artist> {
 
 	public ArtistPersistable(Predicate<Artist> filter) {
 		this.filter = filter;
-		
-		af = new  ArtistFactory();
+		this.cache = new TreeMap<>();
 	}
 
 	@Override
-	public int save(EntityManager em, Artist artist) {
-		if (filter.test(artist)) {
-			Artist a0 = af.get(artist);
+	public int save(EntityManager em, Artist draft) {
+		if (filter.test(draft)) {
+			Artist a0 = em.find(Artist.class, draft.getId());
 			
-			a0.getMembers().replaceAll(a -> a = af.get(a));
-			// In case an artist is both member and alias
-			a0.getAliases().replaceAll(a -> getOrCreate(a, artist.getMembers()));
+			if (a0 == null) {
+				a0 = draft;
+			} else {
+				a0.setAliases(draft.getAliases());
+				a0.setDataQuality(draft.getDataQuality());
+				a0.setGroups(draft.getGroups());
+				a0.setMembers(draft.getMembers());
+				a0.setName(draft.getName());
+				a0.setRealName(draft.getRealName());
+				a0.setVariations(draft.getVariations());
+			}
+			
+			a0.getAliases().replaceAll(a -> getOrCreate(em, a));
+			a0.getGroups().replaceAll(a -> getOrCreate(em, a));
+			a0.getMembers().replaceAll(a -> getOrCreate(em, a));
 			
 			em.merge(a0);
+			
+			cache.clear();
 			
 			return 1;
 		} else {
 			return 0;
 		}
 	}
-	private Artist getOrCreate(Artist a0, List<Artist> as) {
-		Optional<Artist> any = as.stream().filter(a -> a.getId() == a0.getId()).findAny();
+
+	private Artist findOrCreate(EntityManager em, Artist draft) {
+		Artist a0 = em.find(Artist.class, draft.getId());
 		
-		return any.isPresent() ? any.get() : af.get(a0);
+		if (a0  == null) {
+			a0 = draft;
+		}
+		
+		return a0;
+	}
+	
+	private Artist getOrCreate(EntityManager em, Artist draft) {
+		return cache.computeIfAbsent(draft.getId(), a -> findOrCreate(em, draft));
 	}
 }

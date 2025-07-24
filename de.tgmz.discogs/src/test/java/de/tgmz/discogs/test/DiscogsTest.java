@@ -88,7 +88,9 @@ public class DiscogsTest {
 	}
 	@Test
 	public void testLilaWolken() {
-		assertEquals("Yasha Conen", em.find(Artist.class, 910685L).getName());
+		Artist yashaConen = em.find(Artist.class, 910685L);
+		assertEquals("Yasha Conen", yashaConen.getName());
+		assertEquals("Moabeat", yashaConen.getGroups().stream().filter(a -> a.getId() == 202_465L).findAny().orElseThrow().getName());
 		
 		String displayArtist = "Marteria • Yasha • Miss Platnum";
 		
