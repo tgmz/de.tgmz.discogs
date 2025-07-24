@@ -23,6 +23,7 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -128,7 +129,7 @@ public class DiscogsContentHandler extends DefaultHandler {
 			sb.append(s0 + (",".equals(s1) ? ", " : " " + s1 +" "));
 		}
 		
-		String display = StringUtils.removeEnd(sb.toString(), ", ").trim().replace(" , ", ", ");
+		String display = Strings.CS.removeEnd(sb.toString(), ", ").trim().replace(" , ", ", ");
 		
 		return StringUtils.left(display, MAX_LENGTH_DISPLAY);
 	}

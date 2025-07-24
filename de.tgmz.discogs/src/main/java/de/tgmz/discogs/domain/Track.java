@@ -16,6 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -153,7 +154,7 @@ public class Track implements Serializable {
 		
 		String[] split = tracks.split("\\s*,\\s*");		// e.g. "A1 to A5, B2 to B9"
 
-		if (StringUtils.containsAny(this.position, split)) {	// Obvious
+		if (Strings.CS.containsAny(this.position, split)) {	// Obvious
 			return true;
 		}
 		

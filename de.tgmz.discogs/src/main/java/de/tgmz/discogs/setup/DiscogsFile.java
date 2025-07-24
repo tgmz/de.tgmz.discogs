@@ -16,7 +16,7 @@ import java.net.URL;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 public enum DiscogsFile {
 	ARTISTS("artists.xml.gz"),
@@ -44,7 +44,7 @@ public enum DiscogsFile {
 	public String getUnzippedFileName() {
 		String s = LbrFactory.getInstance().getContents(key).getKey();
 		
-		return isZipped() ? StringUtils.removeEnd(s, ".gz") : s;
+		return isZipped() ? Strings.CS.removeEnd(s, ".gz") : s;
 	}
 
 	public File getUnzippedFile() {
