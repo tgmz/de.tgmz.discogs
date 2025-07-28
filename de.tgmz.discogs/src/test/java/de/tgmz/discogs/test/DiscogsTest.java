@@ -28,6 +28,7 @@ import org.junit.Test;
 
 import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Artist;
+import de.tgmz.discogs.domain.CompanyRole;
 import de.tgmz.discogs.domain.DataQuality;
 import de.tgmz.discogs.domain.Discogs;
 import de.tgmz.discogs.domain.ExtraArtist;
@@ -95,7 +96,13 @@ public class DiscogsTest {
 		String displayArtist = "Marteria • Yasha • Miss Platnum";
 		
 		assertEquals(displayArtist, em.find(Master.class, 482870L).getDisplayArtist());
-		assertEquals(displayArtist, em.find(Release.class, 3870362L).getDisplayArtist());
+		
+		Release lilaWolken = em.find(Release.class, 3870362L);
+		
+		assertEquals(displayArtist, lilaWolken.getDisplayArtist());
+		
+		CompanyRole cr = lilaWolken.getCompanies().stream().filter(k -> k.getCompany().getId() == 264516 && "Copyright (c)".equals(k.getRole())).findAny().orElseThrow();
+		assertEquals("Four Music Productions GmbH", cr.getCompany().getName());
 	}
 	@Test
 	public void testDecca() {

@@ -19,6 +19,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 import de.tgmz.discogs.domain.Artist;
+import de.tgmz.discogs.domain.CompanyRole;
 import de.tgmz.discogs.domain.DataQuality;
 import de.tgmz.discogs.domain.Discogs;
 import de.tgmz.discogs.domain.ExtraArtist;
@@ -43,6 +44,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	private Track track;
 	private SubTrack subTrack;
 	private String applicableTracks;
+	private CompanyRole companyRole;
 	private Release r;
 	private Predicate<Discogs> filter;
 	private GenreFactory genreFactory;
@@ -140,6 +142,10 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 				r.getLabels().put(l, catno);
 			}
+			
+			break;
+		case "[releases, release, companies, company]":
+			companyRole = new CompanyRole();
 			
 			break;
 		default:
@@ -306,6 +312,22 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			break;
 		case "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist, role]":
 			extraArtist.setRole(getChars());
+			
+			break;
+		case "[releases, release, companies, company, id]":
+			companyRole.getCompany().setId(Long.parseLong(getChars()));
+			
+			break;
+		case "[releases, release, companies, company, name]":
+			companyRole.getCompany().setName(getChars());
+			
+			break;
+		case "[releases, release, companies, company, entity_type_name]":
+			companyRole.setRole(getChars());
+			
+			break;
+		case "[releases, release, companies, company]":
+			r.getCompanies().add(companyRole);
 			
 			break;
 		case "[releases, release]":

@@ -13,12 +13,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.TreeMap;
 import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.tgmz.discogs.domain.Artist;
+import de.tgmz.discogs.domain.Company;
 import de.tgmz.discogs.domain.Discogs;
 import de.tgmz.discogs.domain.ExtraArtist;
 import de.tgmz.discogs.domain.Label;
@@ -32,6 +34,7 @@ import jakarta.persistence.TypedQuery;
 public class ReleasePersistable implements IPersistable<Release> {
 	private static final Logger LOG = LoggerFactory.getLogger(ReleasePersistable.class);
 	private Predicate<Discogs> filter;
+	private Map<Long, Company> companyCache;
 	private EntityManager em;
 	
 	public ReleasePersistable() {
@@ -93,8 +96,14 @@ public class ReleasePersistable implements IPersistable<Release> {
 				st.getExtraArtists().removeIf(Objects::isNull);
 			}
 		}
+		
+		companyCache = new TreeMap<>();
+		
+		r.getCompanies().forEach(cr -> cr.setCompany(getOrCreate(cr.getCompany())));
 			
 		em.merge(r);
+		
+		companyCache.clear();
 		
 		return 1;
 	}
@@ -143,5 +152,20 @@ public class ReleasePersistable implements IPersistable<Release> {
 		}
 		
 		return a;
+	}
+	
+	private Company getOrCreate(Company draft) {
+		return companyCache.computeIfAbsent(draft.getId(), l -> findOrCreate(em, draft));
+	}
+	
+	private Company findOrCreate(EntityManager em, Company draft) {
+		Company c0 = em.find(Company.class, draft.getId());
+		
+		if (c0 == null) {
+			c0 = draft;
+		}
+		
+		return c0;
+		
 	}
 }

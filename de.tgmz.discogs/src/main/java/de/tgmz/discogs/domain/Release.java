@@ -21,6 +21,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
@@ -54,7 +55,9 @@ public class Release extends Discogs {
 	private Map<ExtraArtist, String> extraArtists;
 	@ElementCollection(fetch = FetchType.LAZY)
 	@Column(name = "catno")
-	private Map<Label, String> labels;	
+	private Map<Label, String> labels;
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	private List<CompanyRole> companies;
 
 	public Release() {
 		super();
@@ -62,6 +65,7 @@ public class Release extends Discogs {
 		tracklist = new LinkedList<>();
 		extraArtists = new HashMap<>();
 		labels = new HashMap<>();
+		companies = new LinkedList<>();
 	}
 	
 	@Override
@@ -106,6 +110,10 @@ public class Release extends Discogs {
 		return master;
 	}
 
+	public List<CompanyRole> getCompanies() {
+		return companies;
+	}
+
 	public void setMain(boolean newMain) {
 		this._main = newMain;
 	}
@@ -138,6 +146,10 @@ public class Release extends Discogs {
 	 */
 	public void setExtraArtists(Map<ExtraArtist, String> extraArtists) {
 		this.extraArtists = extraArtists;
+	}
+	
+	public void setCompanies(List<CompanyRole> companies) {
+		this.companies = companies;
 	}
 	
 	/**
