@@ -13,17 +13,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
+import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.DataQuality;
+import de.tgmz.discogs.domain.Genre;
 import de.tgmz.discogs.domain.Master;
+import de.tgmz.discogs.domain.Style;
 import de.tgmz.discogs.load.factory.GenreFactory;
 import de.tgmz.discogs.load.factory.StyleFactory;
 import de.tgmz.discogs.load.persist.MasterPersistable;
+import jakarta.persistence.EntityManager;
 
 public class MasterContentHandler extends DiscogsContentHandler {
+	private static final Logger LOG = LoggerFactory.getLogger(MasterContentHandler.class);
 	private long artistId;
 	private String artistName;
 	private Master master;
@@ -32,6 +39,7 @@ public class MasterContentHandler extends DiscogsContentHandler {
 	private Predicate<Master> filter;
 	private GenreFactory genreFactory;
 	private StyleFactory styleFactory;
+	private long artistsBefore;
 
 	public MasterContentHandler() {
 		this (x -> true);
@@ -42,6 +50,10 @@ public class MasterContentHandler extends DiscogsContentHandler {
 		
 		genreFactory = new GenreFactory();
 		styleFactory = new StyleFactory();
+		
+		try (EntityManager em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager()) {
+			artistsBefore = (long) em.createNativeQuery("SELECT COALESCE(COUNT(*), 0) FROM Artist").getSingleResult();
+		}
 	}
 
 	@Override
@@ -90,11 +102,11 @@ public class MasterContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[masters, master, genres, genre]":
-			master.getGenres().add(genreFactory.get(getChars()));
+			master.getGenres().add(genreFactory.get(null, new Genre(getChars())));
 			
 			break;
 		case "[masters, master, styles, style]":
-			master.getStyles().add(styleFactory.get(getChars()));
+			master.getStyles().add(styleFactory.get(null, new Style(getChars())));
 			
 			break;
 		case "[masters, master, artists]":
@@ -108,9 +120,7 @@ public class MasterContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[masters, master, artists, artist]":
-			Artist a = new Artist();
-			
-			a.setId(artistId);
+			Artist a = new Artist(artistId);
 			a.setName(artistName);
 			
 			master.getArtists().add(a);
@@ -132,5 +142,18 @@ public class MasterContentHandler extends DiscogsContentHandler {
 		}
 		
 		super.endElement(uri, localName, qName);
+	}
+	
+	@Override
+	public void endDocument() throws SAXException {
+		if (LOG.isInfoEnabled()) {
+			try (EntityManager em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager()) {
+				long artistsAfter = (long) em.createNativeQuery("SELECT COALESCE(COUNT(*), 0) FROM Artist").getSingleResult();
+				
+				LOG.info("{} artists added", String.format("%,d", artistsAfter - artistsBefore));
+			}
+		}
+		
+		super.endDocument();
 	}
 }

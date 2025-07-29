@@ -1,5 +1,5 @@
 /*********************************************************************
-* Copyright (c) 11.07.2025 Thomas Zierer
+* Copyright (c) 09.07.2025 Thomas Zierer
 *
 * This program and the accompanying materials are made
 * available under the terms of the Eclipse Public License 2.0
@@ -9,22 +9,9 @@
 **********************************************************************/
 package de.tgmz.discogs.load.factory;
 
-import java.util.Map;
-import java.util.TreeMap;
-
-import de.tgmz.discogs.domain.Genre;
 import jakarta.persistence.EntityManager;
 
-public class GenreFactory implements IFactory<Genre>{
-	private Map<String, Genre> cache;
-	
-	public GenreFactory() {
-		super();
-		
-		cache = new TreeMap<>();
-	}
-	
-	public Genre get(EntityManager em, Genre draft) {
-		return cache.computeIfAbsent(draft.getId(), g -> draft);
-	}
+@FunctionalInterface
+public interface IFactory<T> {
+	T get(EntityManager em, T o);
 }

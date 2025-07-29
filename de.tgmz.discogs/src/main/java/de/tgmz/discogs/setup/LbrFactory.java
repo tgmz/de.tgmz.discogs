@@ -16,8 +16,8 @@ import java.util.NoSuchElementException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.tgmz.sonar.discogs.generated.ListBucketResult;
-import de.tgmz.sonar.discogs.generated.ListBucketResult.Contents;
+import de.tgmz.discogs.generated.ListBucketResult;
+import de.tgmz.discogs.generated.ListBucketResult.Contents;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 

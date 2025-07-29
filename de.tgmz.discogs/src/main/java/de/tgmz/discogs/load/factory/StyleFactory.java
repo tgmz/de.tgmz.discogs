@@ -9,31 +9,22 @@
 **********************************************************************/
 package de.tgmz.discogs.load.factory;
 
-import com.github.benmanes.caffeine.cache.CacheLoader;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
+import java.util.Map;
+import java.util.TreeMap;
 
-import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Style;
 import jakarta.persistence.EntityManager;
 
-public class StyleFactory {
-	private LoadingCache<String, Style> styleCache;
+public class StyleFactory implements IFactory<Style>{
+	private Map<String, Style> cache;
 	
 	public StyleFactory() {
 		super();
 		
-		try (EntityManager em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager()) {
-			styleCache = Caffeine.newBuilder().build(new CacheLoader<String, Style>() {
-				@Override
-				public Style load(String key) {
-					return em.find(Style.class, key);
-				}
-			});
-		}
+		cache = new TreeMap<>();
 	}
 	
-	public Style get(String draft) {
-		return styleCache.get(draft, g -> new Style(draft));
+	public Style get(EntityManager em, Style draft) {
+		return cache.computeIfAbsent(draft.getId(), g -> draft);
 	}
 }

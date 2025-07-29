@@ -51,13 +51,13 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 			artist = new Artist();
 			break;
 		case "[artists, artist, members, name]":
-			artist.getMembers().add(getOrCreate(Long.parseLong(attributes.getValue("id"))));
+			artist.getMembers().add(new Artist(Long.parseLong(attributes.getValue("id"))));
 			break;
 		case "[artists, artist, aliases, name]":
-			artist.getAliases().add(getOrCreate(Long.parseLong(attributes.getValue("id"))));
+			artist.getAliases().add(new Artist(Long.parseLong(attributes.getValue("id"))));
 			break;
 		case "[artists, artist, groups, name]":
-			artist.getGroups().add(getOrCreate(Long.parseLong(attributes.getValue("id"))));
+			artist.getGroups().add(new Artist(Long.parseLong(attributes.getValue("id"))));
 			break;
 		default:
 		}
@@ -106,17 +106,5 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 		}
 		
 		super.endElement(uri, localName, qName);
-	}
-	private Artist getOrCreate(long id) {
-		Artist a0;
-		
-		if (id == artist.getId()) {
-			a0 = artist;
-		} else {
-			a0 = new Artist();
-			a0.setId(id);
-		}
-		
-		return a0;
 	}
 }

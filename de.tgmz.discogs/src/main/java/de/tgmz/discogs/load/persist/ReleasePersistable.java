@@ -142,8 +142,7 @@ public class ReleasePersistable implements IPersistable<Release> {
 		if (a == null) {
 			LOG.trace("Artist {} not found", a0.getId());
 				
-			a = new Artist();
-			a.setId(a0.getId());
+			a = new Artist(a0.getId());
 			a.setName(a0.getName());
 				
 			em.persist(a);

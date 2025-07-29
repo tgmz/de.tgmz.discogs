@@ -17,7 +17,7 @@ import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Label;
 import jakarta.persistence.EntityManager;
 
-public class LabelFactory {
+public class LabelFactory implements IFactory<Label>{
 	private LoadingCache<Label, Label> labelCache;
 	
 	public LabelFactory() {
@@ -33,7 +33,7 @@ public class LabelFactory {
 		}
 	}
 	
-	public Label get(Label draft) {
+	public Label get(EntityManager em, Label draft) {
 		return labelCache.get(draft, a -> draft);
 	}
 }

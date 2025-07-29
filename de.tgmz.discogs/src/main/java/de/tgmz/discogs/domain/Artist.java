@@ -25,6 +25,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
@@ -35,6 +36,8 @@ import jakarta.persistence.Transient;
 @Table(indexes = {
 	@Index(columnList = "name", name = "name_idx"),
 })
+@NamedQuery(name = "Artist.byName"
+, query = "FROM Artist a WHERE a.name = ?1") 
 public class Artist implements Serializable {
 	@Transient
 	private static final long serialVersionUID = -5230886354906404806L;
@@ -56,6 +59,11 @@ public class Artist implements Serializable {
 	@Enumerated(EnumType.ORDINAL)
 	private DataQuality dataQuality;
 
+	public Artist(long id) {
+		this();
+		this.id= id;
+	}
+	
 	public Artist() {
 		variations = new TreeSet<>();
 		aliases = new LinkedList<>();

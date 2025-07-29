@@ -158,7 +158,7 @@
 						</goals>
 						<configuration>
 							<!-- Set the package of the generated code -->
-							<packageName>de.tgmz.sonar.discogs.generated</packageName>
+							<packageName>de.tgmz.discogs.generated</packageName>
 
 							<!-- Define the DTD file -->
 							<sources>

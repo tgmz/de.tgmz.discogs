@@ -174,7 +174,7 @@ public class Track implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "Track [sequence=" + sequence + ", trackNumber=" + trackNumber + ", position=" + position + ", title="
+		return "Track [id=" + id + ", sequence=" + sequence + ", trackNumber=" + trackNumber + ", position=" + position + ", title="
 				+ title + ", duration=" + duration + ", artists=" + artists + ", extraArtists=" + extraArtists
 				+ ", subTracklist=" + subTracklist + "]";
 	}

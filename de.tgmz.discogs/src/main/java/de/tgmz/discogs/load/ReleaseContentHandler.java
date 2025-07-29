@@ -23,9 +23,11 @@ import de.tgmz.discogs.domain.CompanyRole;
 import de.tgmz.discogs.domain.DataQuality;
 import de.tgmz.discogs.domain.Discogs;
 import de.tgmz.discogs.domain.ExtraArtist;
+import de.tgmz.discogs.domain.Genre;
 import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
+import de.tgmz.discogs.domain.Style;
 import de.tgmz.discogs.domain.SubTrack;
 import de.tgmz.discogs.domain.Track;
 import de.tgmz.discogs.load.factory.GenreFactory;
@@ -207,11 +209,11 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, genres, genre]":
-			r.getGenres().add(genreFactory.get(getChars()));
+			r.getGenres().add(genreFactory.get(null, new Genre(getChars())));
 			
 			break;
 		case "[releases, release, styles, style]":
-			r.getStyles().add(styleFactory.get(getChars()));
+			r.getStyles().add(styleFactory.get(null, new Style(getChars())));
 			
 			break;
 		// extraartists

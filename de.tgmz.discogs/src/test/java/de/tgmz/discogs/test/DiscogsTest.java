@@ -159,12 +159,10 @@ public class DiscogsTest {
 	}
 	@Test
 	public void testExtraArtist() {
-		Artist a0 = new Artist();
-		a0 .setId(1);
+		Artist a0 = new Artist(1);
 		a0.setName("A");
 		
-		Artist a1 = new Artist();
-		a1 .setId(1);
+		Artist a1 = new Artist(1);
 		a1.setName("B");
 		
 		

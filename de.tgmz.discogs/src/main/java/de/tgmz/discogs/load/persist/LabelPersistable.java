@@ -32,13 +32,13 @@ public class LabelPersistable implements IPersistable<Label> {
 	@Override
 	public int save(EntityManager em, Label label) {
 		if (filter.test(label)) {
-			Label l = lf.get(label);
+			Label l = lf.get(em, label);
 			
 			Label pl = label.getParentLabel();
 			
 			if (pl != null) {
 				if (pl.getId() != l.getId()) {
-					l.setParentLabel(lf.get(pl));
+					l.setParentLabel(lf.get(em, pl));
 				} else {
 					// Crazy, but happens (label.id = 219423, name=RDM Edition)
 					l.setParentLabel(l);
