@@ -10,9 +10,11 @@
 package de.tgmz.discogs.domain;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -57,7 +59,7 @@ public class Release extends Discogs {
 	@Column(name = "catno")
 	private Map<Label, String> labels;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-	private List<CompanyRole> companies;
+	private Set<CompanyRole> companies;
 
 	public Release() {
 		super();
@@ -65,7 +67,7 @@ public class Release extends Discogs {
 		tracklist = new LinkedList<>();
 		extraArtists = new HashMap<>();
 		labels = new HashMap<>();
-		companies = new LinkedList<>();
+		companies = new HashSet<>();
 	}
 	
 	@Override
@@ -110,7 +112,7 @@ public class Release extends Discogs {
 		return master;
 	}
 
-	public List<CompanyRole> getCompanies() {
+	public Set<CompanyRole> getCompanies() {
 		return companies;
 	}
 
@@ -148,7 +150,7 @@ public class Release extends Discogs {
 		this.extraArtists = extraArtists;
 	}
 	
-	public void setCompanies(List<CompanyRole> companies) {
+	public void setCompanies(Set<CompanyRole> companies) {
 		this.companies = companies;
 	}
 	

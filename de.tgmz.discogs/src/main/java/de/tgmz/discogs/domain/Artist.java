@@ -10,8 +10,7 @@
 package de.tgmz.discogs.domain;
 
 import java.io.Serializable;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -49,13 +48,13 @@ public class Artist implements Serializable {
 	private Set<String> variations;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	@JoinTable(name = "artist_members")
-	private List<Artist> members;
+	private Set<Artist> members;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	@JoinTable(name = "artist_aliases")
-	private List<Artist> aliases;
+	private Set<Artist> aliases;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	@JoinTable(name = "artist_groups")
-	private List<Artist> groups;
+	private Set<Artist> groups;
 	@Enumerated(EnumType.ORDINAL)
 	private DataQuality dataQuality;
 
@@ -66,9 +65,9 @@ public class Artist implements Serializable {
 	
 	public Artist() {
 		variations = new TreeSet<>();
-		aliases = new LinkedList<>();
-		groups = new LinkedList<>();
-		members = new LinkedList<>();
+		aliases = new HashSet<>();
+		groups = new HashSet<>();
+		members = new HashSet<>();
 	}
 	/**
 	 * The artists id obtained from discogs <id> tag.
@@ -98,7 +97,7 @@ public class Artist implements Serializable {
 		return variations;
 	}
 
-	public List<Artist> getMembers() {
+	public Set<Artist> getMembers() {
 		return members;
 	}
 
@@ -106,11 +105,11 @@ public class Artist implements Serializable {
 		return dataQuality;
 	}
 	
-	public List<Artist> getAliases() {
+	public Set<Artist> getAliases() {
 		return aliases;
 	}
 	
-	public List<Artist> getGroups() {
+	public Set<Artist> getGroups() {
 		return groups;
 	}
 	
@@ -134,15 +133,15 @@ public class Artist implements Serializable {
 		this.variations = variations;
 	}
 	
-	public void setMembers(List<Artist> members) {
+	public void setMembers(Set<Artist> members) {
 		this.members = members;
 	}
 	
-	public void setAliases(List<Artist> aliases) {
+	public void setAliases(Set<Artist> aliases) {
 		this.aliases = aliases;
 	}
 
-	public void setGroups(List<Artist> groups) {
+	public void setGroups(Set<Artist> groups) {
 		this.groups = groups;
 	}
 	

@@ -11,9 +11,11 @@ package de.tgmz.discogs.domain;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -46,17 +48,17 @@ public class Track implements Serializable {
 	private String position;
 	private String duration;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
-	private List<Artist> artists;
+	private Set<Artist> artists;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private List<ExtraArtist> extraArtists;
+	private Set<ExtraArtist> extraArtists;
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	@OrderBy(value = "trackNumber")
 	private List<SubTrack> subTracklist;
 
 	public Track() {
 		subTracklist = new LinkedList<>();
-		artists = new LinkedList<>();
-		extraArtists = new LinkedList<>();
+		artists = new HashSet<>();
+		extraArtists = new HashSet<>();
 	}
 	
 	public long getId() {
@@ -79,11 +81,11 @@ public class Track implements Serializable {
 		return duration;
 	}
 
-	public List<Artist> getArtists() {
+	public Set<Artist> getArtists() {
 		return artists;
 	}
 
-	public List<ExtraArtist> getExtraArtists() {
+	public Set<ExtraArtist> getExtraArtists() {
 		return extraArtists;
 	}
 
@@ -115,11 +117,11 @@ public class Track implements Serializable {
 		this.duration = duration;
 	}
 
-	public void setExtraArtists(List<ExtraArtist> extraArtists) {
+	public void setExtraArtists(Set<ExtraArtist> extraArtists) {
 		this.extraArtists = extraArtists;
 	}
 
-	public void setArtists(List<Artist> artists) {
+	public void setArtists(Set<Artist> artists) {
 		this.artists = artists;
 	}
 

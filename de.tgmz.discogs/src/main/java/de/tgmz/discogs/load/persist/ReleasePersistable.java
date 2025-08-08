@@ -10,9 +10,13 @@
 package de.tgmz.discogs.load.persist;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Predicate;
 
@@ -69,7 +73,7 @@ public class ReleasePersistable implements IPersistable<Release> {
 			
 		r.setLabels(result);
 		
-		r.getArtists().replaceAll(a -> a = fillArtist(a));
+		r.setArtists(replaceAllArtists(em0,r.getArtists()));
 		r.getArtists().removeIf(Objects::isNull);
 
 		Map<ExtraArtist, String> copyOf = HashMap.newHashMap(r.getExtraArtists().size());
@@ -85,14 +89,14 @@ public class ReleasePersistable implements IPersistable<Release> {
 		r.setExtraArtists(copyOf);
 			
 		for (Track t : r.getUnfilteredTracklist()) {
-			t.getArtists().replaceAll(a -> a = em.find(Artist.class, a.getId()));
+			t.setArtists(replaceAllArtists(em0, t.getArtists()));
 			t.getArtists().removeIf(Objects::isNull);
 			
-			t.getExtraArtists().replaceAll(ea -> ea = fillExtraArtist(ea));
+			t.setExtraArtists(replaceAllExtraArtists(t.getExtraArtists()));
 			t.getExtraArtists().removeIf(Objects::isNull);
 				
 			for (SubTrack st : t.getSubTracklist()) {
-				st.getExtraArtists().replaceAll(ea -> ea = fillExtraArtist(ea));
+				st.setExtraArtists(replaceAllExtraArtists(st.getExtraArtists()));
 				st.getExtraArtists().removeIf(Objects::isNull);
 			}
 		}
@@ -166,5 +170,31 @@ public class ReleasePersistable implements IPersistable<Release> {
 		
 		return c0;
 		
+	}
+	
+	private Set<Artist> replaceAllArtists(EntityManager em, Set<Artist> artists) {
+		List<Artist> l = new LinkedList<>(artists);
+		
+		l.replaceAll(a -> findOrCreate(em, a));
+		
+		return new HashSet<>(l);
+	}
+	
+	private Artist findOrCreate(EntityManager em, Artist draft) {
+		Artist a0 = em.find(Artist.class, draft.getId());
+		
+		if (a0  == null) {
+			a0 = draft;
+		}
+		
+		return a0;
+	}
+
+	private Set<ExtraArtist> replaceAllExtraArtists(Set<ExtraArtist> artists) {
+		List<ExtraArtist> l = new LinkedList<>(artists);
+		
+		l.replaceAll(this::fillExtraArtist);
+		
+		return new HashSet<>(l);
 	}
 }

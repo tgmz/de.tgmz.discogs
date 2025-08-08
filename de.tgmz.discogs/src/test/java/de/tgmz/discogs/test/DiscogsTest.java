@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import org.junit.AfterClass;
@@ -120,9 +121,8 @@ public class DiscogsTest {
 		assertEquals("Ouvertüre", st.getTitle());
 		assertEquals(2, st.sizeOf());
 		
-		ExtraArtist ea = st.getExtraArtists().getFirst();
+		ExtraArtist ea = st.getExtraArtists().stream().filter(ea0 -> ea0.getArtist().getId() == 754974).findFirst().orElseThrow();
 		
-		assertEquals(754974, ea.getArtist().getId());
 		assertEquals("Wiener Philharmoniker", ea.getArtist().getName());
 		assertEquals("Orchestra", ea.getRole());
 	}
@@ -270,7 +270,7 @@ public class DiscogsTest {
 		assertEquals("6:12", t.getDuration());
 		assertTrue(t.getArtists().isEmpty());
 		
-		List<ExtraArtist> eas = t.getExtraArtists();
+		Set<ExtraArtist> eas = t.getExtraArtists();
 		
 		ExtraArtist flood = eas.stream().filter(x -> x.getArtist() != null && 20661 == x.getArtist().getId()).findAny().orElseThrow();
 		

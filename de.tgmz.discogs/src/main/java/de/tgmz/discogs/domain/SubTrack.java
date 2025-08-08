@@ -10,8 +10,8 @@
 package de.tgmz.discogs.domain;
 
 import java.io.Serializable;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -35,10 +35,10 @@ public class SubTrack implements Serializable {
 	private String title;
 	private String position;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
-	private List<ExtraArtist> extraArtists;
+	private Set<ExtraArtist> extraArtists;
 
 	public SubTrack() {
-		extraArtists = new LinkedList<>();
+		extraArtists = new HashSet<>();
 	}
 	public int getTrackNumber() {
 		return trackNumber;
@@ -52,7 +52,7 @@ public class SubTrack implements Serializable {
 		return position;
 	}
 
-	public List<ExtraArtist> getExtraArtists() {
+	public Set<ExtraArtist> getExtraArtists() {
 		return extraArtists;
 	}
 
@@ -70,6 +70,10 @@ public class SubTrack implements Serializable {
 
 	public void setPosition(String position) {
 		this.position = position;
+	}
+
+	public void setExtraArtists(Set<ExtraArtist> extraArtists) {
+		this.extraArtists = extraArtists;
 	}
 
 	/**

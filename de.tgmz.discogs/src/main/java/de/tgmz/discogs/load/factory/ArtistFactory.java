@@ -9,9 +9,11 @@
 **********************************************************************/
 package de.tgmz.discogs.load.factory;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import de.tgmz.discogs.domain.Artist;
@@ -26,14 +28,14 @@ public class ArtistFactory implements IFactory<Artist>{
 		cache = new TreeMap<>();
 	}
 	
-	public List<Artist> get(EntityManager em, List<Artist> drafts) {
+	public Set<Artist> get(EntityManager em, Set<Artist> drafts) {
 		List<Artist> result = new LinkedList<>(drafts);
 		
 		result.replaceAll(a -> getWhileCached(em, a));
 		
 		cache.clear();
 		
-		return result;
+		return new HashSet<>(result);
 	}
 	
 	public Artist get(EntityManager em, Artist draft) {
@@ -75,11 +77,19 @@ public class ArtistFactory implements IFactory<Artist>{
 			a0.setVariations(draft.getVariations());
 		}
 		
-		a0.getAliases().replaceAll(a -> getOrCreate(em, a));
-		a0.getGroups().replaceAll(a -> getOrCreate(em, a));
-		a0.getMembers().replaceAll(a -> getOrCreate(em, a));
+		a0.setAliases(replaceAll(em, a0.getAliases()));
+		a0.setGroups(replaceAll(em, a0.getGroups()));
+		a0.setMembers(replaceAll(em, a0.getMembers()));
 		
 		return a0;
+	}
+
+	private Set<Artist> replaceAll(EntityManager em, Set<Artist> artists) {
+		List<Artist> l = new LinkedList<>(artists);
+		
+		l.replaceAll(a -> getOrCreate(em, a));
+		
+		return new HashSet<>(l);
 	}
 	
 	private Artist getOrCreate(EntityManager em, Artist draft) {

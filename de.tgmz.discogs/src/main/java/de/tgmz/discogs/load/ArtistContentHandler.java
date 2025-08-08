@@ -24,6 +24,9 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 	@SuppressWarnings("unused")
 	private static final Logger LOG = LoggerFactory.getLogger(ArtistContentHandler.class);
 	private Artist artist;
+	private Artist alias;
+	private Artist group;
+	private Artist member;
 	private Predicate<Artist> filter;
 
 	public ArtistContentHandler() {
@@ -51,13 +54,13 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 			artist = new Artist();
 			break;
 		case "[artists, artist, members, name]":
-			artist.getMembers().add(new Artist(Long.parseLong(attributes.getValue("id"))));
+			member = new Artist(Long.parseLong(attributes.getValue("id")));
 			break;
 		case "[artists, artist, aliases, name]":
-			artist.getAliases().add(new Artist(Long.parseLong(attributes.getValue("id"))));
+			alias = new Artist(Long.parseLong(attributes.getValue("id")));
 			break;
 		case "[artists, artist, groups, name]":
-			artist.getGroups().add(new Artist(Long.parseLong(attributes.getValue("id"))));
+			group = new Artist(Long.parseLong(attributes.getValue("id")));
 			break;
 		default:
 		}
@@ -87,15 +90,18 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 				
 			break;
 		case "[artists, artist, members, name]":
-			artist.getMembers().getLast().setName(getChars(MAX_LENGTH_DEFAULT, true));
+			member.setName(getChars(MAX_LENGTH_DEFAULT, true));
+			artist.getMembers().add(member);
 			
 			break;
 		case "[artists, artist, aliases, name]":
-			artist.getAliases().getLast().setName(getChars(MAX_LENGTH_DEFAULT, true));
+			alias.setName(getChars(MAX_LENGTH_DEFAULT, true));
+			artist.getAliases().add(alias);
 			
 			break;
 		case "[artists, artist, groups, name]":
-			artist.getGroups().getLast().setName(getChars(MAX_LENGTH_DEFAULT, true));
+			group.setName(getChars(MAX_LENGTH_DEFAULT, true));
+			artist.getGroups().add(group);
 			
 			break;
 		case "[artists, artist]":

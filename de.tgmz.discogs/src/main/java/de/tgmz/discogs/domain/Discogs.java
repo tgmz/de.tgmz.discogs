@@ -11,8 +11,6 @@ package de.tgmz.discogs.domain;
 
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import jakarta.persistence.CascadeType;
@@ -30,7 +28,7 @@ public abstract class Discogs implements Serializable {
 	private DataQuality dataQuality;
 	private String title;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-	private List<Artist> artists;
+	private Set<Artist> artists;
 	@Column(length = 512)
 	private String displayArtist;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
@@ -39,7 +37,7 @@ public abstract class Discogs implements Serializable {
 	private Set<Style> styles;
 
 	protected Discogs() {
-		artists = new LinkedList<>();
+		artists = new HashSet<>();
 		genres = new HashSet<>();
 		styles = new HashSet<>();
 	}
@@ -59,7 +57,7 @@ public abstract class Discogs implements Serializable {
 	 * The artists involved.
 	 * @return the artists
 	 */
-	public List<Artist> getArtists() {
+	public Set<Artist> getArtists() {
 		return artists;
 	}
 
@@ -107,7 +105,7 @@ public abstract class Discogs implements Serializable {
 		this.dataQuality = dataQuality;
 	}
 
-	public void setArtists(List<Artist> artists) {
+	public void setArtists(Set<Artist> artists) {
 		this.artists = artists;
 	}
 
