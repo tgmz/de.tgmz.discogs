@@ -34,7 +34,7 @@ import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import com.google.common.io.ByteSource;
 
-import de.tgmz.discogs.domain.Discogs;
+import de.tgmz.discogs.domain.Release;
 import de.tgmz.discogs.load.ArtistContentHandler;
 import de.tgmz.discogs.load.LabelContentHandler;
 import de.tgmz.discogs.load.MasterContentHandler;
@@ -83,8 +83,8 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 			}
 		}
 
-		Predicate<Discogs> p = getPredicate(args);
-
+		Predicate<Release> p = getPredicate(args);
+		
 		try (InputStream is0 = new FileInputStream(DiscogsFile.ARTISTS.getUnzippedFile());
 				InputStream is1 = new FileInputStream(DiscogsFile.LABELS.getUnzippedFile());
 				InputStream is2 = new FileInputStream(DiscogsFile.MASTERS.getUnzippedFile());
@@ -257,13 +257,13 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private static Predicate<Discogs> getPredicate(String... clz) {
-		Predicate<Discogs> p = x -> true;
+	private static Predicate<Release> getPredicate(String... clz) {
+		Predicate<Release> p = x -> true;
 		
 		if (clz != null) {
 			try {
 				for (String s : clz) {
-					p = p.and((Predicate<Discogs>) Class.forName(s).getDeclaredConstructor().newInstance());
+					p = p.and((Predicate<Release>) Class.forName(s).getDeclaredConstructor().newInstance());
 				}
 			} catch (ReflectiveOperationException e) {
 				LOG.error("Error in predicate setup", e);

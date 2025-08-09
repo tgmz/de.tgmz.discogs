@@ -17,12 +17,10 @@ import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Label;
 import jakarta.persistence.EntityManager;
 
-public class LabelFactory implements IFactory<Label>{
+public class LabelFactory implements IFactory<Label> {
 	private LoadingCache<Label, Label> labelCache;
 	
 	public LabelFactory() {
-		super();
-		
 		try (EntityManager em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager()) {
 			labelCache = Caffeine.newBuilder().build(new CacheLoader<Label, Label>() {
 				@Override
@@ -33,6 +31,7 @@ public class LabelFactory implements IFactory<Label>{
 		}
 	}
 	
+	@Override
 	public Label get(EntityManager em, Label draft) {
 		return labelCache.get(draft, a -> draft);
 	}

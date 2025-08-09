@@ -18,7 +18,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -31,7 +30,6 @@ import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.CompanyRole;
 import de.tgmz.discogs.domain.DataQuality;
-import de.tgmz.discogs.domain.Discogs;
 import de.tgmz.discogs.domain.ExtraArtist;
 import de.tgmz.discogs.domain.Genre;
 import de.tgmz.discogs.domain.Label;
@@ -41,10 +39,10 @@ import de.tgmz.discogs.domain.Style;
 import de.tgmz.discogs.domain.SubTrack;
 import de.tgmz.discogs.domain.Track;
 import de.tgmz.discogs.load.ArtistContentHandler;
+import de.tgmz.discogs.load.DBDefrag;
 import de.tgmz.discogs.load.LabelContentHandler;
 import de.tgmz.discogs.load.MasterContentHandler;
 import de.tgmz.discogs.load.ReleaseContentHandler;
-import de.tgmz.discogs.logging.LogUtil;
 import de.tgmz.discogs.setup.DiscogsFile;
 import de.tgmz.mp3.discogs.load.predicate.DataQualityFilter;
 import de.tgmz.mp3.discogs.load.predicate.IgnoreUpToFilter;
@@ -71,7 +69,7 @@ public class DiscogsTest {
 	public static void teardownOnce() {
 		em.close();
 		
-		LogUtil.logElapsed();
+		new DBDefrag().run();
 	}
 	
 	@Test
@@ -191,12 +189,12 @@ public class DiscogsTest {
 			new MasterContentHandler(x -> x.getId() != IGNORED).run(is);
 		}
 		
-		Predicate<Discogs> p0 = new IgnoreUpToFilter();
-		Predicate<Discogs> p1 = new MainFilter();
-		Predicate<Discogs> p2 = new DataQualityFilter(DataQuality.values());
-		Predicate<Discogs> p3 = new IgnoreUpToFilter(1);
+		Predicate<Release> p0 = new IgnoreUpToFilter();
+		Predicate<Release> p1 = new MainFilter();
+		Predicate<Release> p2 = new DataQualityFilter(DataQuality.values());
+		Predicate<Release> p3 = new IgnoreUpToFilter(1);
 		
-		Predicate<Discogs> p = p0.or(p1).or(p2).or(p3);
+		Predicate<Release> p = p0.or(p1).or(p2).or(p3);
 		
 		try (InputStream is = new FileInputStream(DiscogsFile.RELEASES.getUnzippedFile())) {
 			new ReleaseContentHandler(p).run(is);
@@ -241,18 +239,21 @@ public class DiscogsTest {
 		assertTrue(r.getGenres().stream().anyMatch(x -> "Electronic".equals(x.getId())));
 		assertTrue(r.getStyles().stream().anyMatch(x -> "Synth-pop".equals(x.getId())));
 		
-		assertEquals(190, r.sizeOf());
+		assertEquals(199, r.sizeOf());
 		
-		ExtraArtist af = r.getExtraArtists().keySet().stream().filter(ea -> 132774 == ea.getArtist().getId()).findAny().orElseThrow();
+		ExtraArtist af = r.getExtraArtists().stream().filter(ea -> 132774 == ea.getArtist().getId()).findAny().orElseThrow();
 
 		assertEquals("Andrew Fletcher", af.getArtist().getName());
 		assertEquals("Performer", af.getRole());
 		
-		Entry<ExtraArtist, String> fk = r.getExtraArtists().entrySet().stream().filter(eea -> 20662 == eea.getKey().getArtist().getId()).findAny().orElseThrow();
+		List<Track> applicableTracks = r.getTracklist().stream().filter(t -> t.isApplicable("1 to 5, 7 to 9")).toList();
+
+		Artist fk = em.find(Artist.class, 20662); // François Kevorkian
+		ExtraArtist efk = new ExtraArtist(fk, "Mixed By");
 		
-		assertEquals("François Kevorkian", fk.getKey().getArtist().getName());
-		assertEquals("Mixed By", fk.getKey().getRole());
-		assertEquals("1 to 5, 7 to 9", fk.getValue());
+		assertTrue(applicableTracks.stream().allMatch(t -> t.getExtraArtists().contains(efk)));
+		
+		assertFalse(r.getTracklist().get(5).getExtraArtists().contains(efk));
 
 		Optional<ExtraArtist> ofk = r.getTracklist().get(5).getExtraArtists().stream().filter(ea -> 20662 == ea.getArtist().getId()).findAny();
 

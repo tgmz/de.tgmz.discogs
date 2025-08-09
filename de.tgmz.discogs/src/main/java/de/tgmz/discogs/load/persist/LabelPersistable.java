@@ -12,6 +12,7 @@ package de.tgmz.discogs.load.persist;
 import java.util.function.Predicate;
 
 import de.tgmz.discogs.domain.Label;
+import de.tgmz.discogs.load.factory.IFactory;
 import de.tgmz.discogs.load.factory.LabelFactory;
 import jakarta.persistence.EntityManager;
 
@@ -51,5 +52,15 @@ public class LabelPersistable implements IPersistable<Label> {
 		} else {
 			return 0;
 		}
+	}
+
+	@Override
+	public IFactory<Label> getFactory() {
+		return null;
+	}
+
+	@Override
+	public Predicate<Label> getFilter() {
+		return filter;
 	}
 }

@@ -12,20 +12,32 @@ package de.tgmz.discogs.load.factory;
 import java.util.Map;
 import java.util.TreeMap;
 
-import de.tgmz.discogs.domain.Style;
+import de.tgmz.discogs.domain.Company;
 import jakarta.persistence.EntityManager;
 
-public class StyleFactory implements IFactory<Style> {
-	private Map<String, Style> cache;
+public class CompanyFactory implements IFactory<Company> {
+	private Map<Long, Company> cache;
 	
-	public StyleFactory() {
-		super();
-		
+	public CompanyFactory() {
 		cache = new TreeMap<>();
 	}
 	
 	@Override
-	public Style get(EntityManager em, Style draft) {
-		return cache.computeIfAbsent(draft.getId(), g -> draft);
+	public Company get(EntityManager em, Company draft) {
+		return getOrCreate(em, draft);
+	}
+	
+	private Company getOrCreate(EntityManager em, Company draft) {
+		return cache.computeIfAbsent(draft.getId(), l -> findOrCreate(em, draft));
+	}
+	
+	private Company findOrCreate(EntityManager em, Company draft) {
+		Company c0 = em.find(Company.class, draft.getId());
+		
+		if (c0 == null) {
+			c0 = draft;
+		}
+		
+		return c0;
 	}
 }

@@ -93,6 +93,10 @@ public abstract class Discogs implements Serializable {
 		return dataQuality;
 	}
 
+	public void setGenres(Set<Genre> genres) {
+		this.genres = genres;
+	}
+	
 	public void setTitle(String title) {
 		this.title = title;
 	}
@@ -107,6 +111,10 @@ public abstract class Discogs implements Serializable {
 
 	public void setArtists(Set<Artist> artists) {
 		this.artists = artists;
+	}
+
+	public void setStyles(Set<Style> styles) {
+		this.styles = styles;
 	}
 
 	@Override

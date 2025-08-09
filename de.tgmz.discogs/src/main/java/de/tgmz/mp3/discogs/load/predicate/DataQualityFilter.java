@@ -16,12 +16,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.tgmz.discogs.domain.DataQuality;
-import de.tgmz.discogs.domain.Discogs;
+import de.tgmz.discogs.domain.Release;
 
 /**
  * Save only masters/releases with given dataQualities.
  */
-public class DataQualityFilter implements Predicate<Discogs> {
+public class DataQualityFilter implements Predicate<Release> {
 	@SuppressWarnings("unused")
 	private static final Logger LOG = LoggerFactory.getLogger(DataQualityFilter.class);
 	private List<DataQuality> dq;
@@ -35,7 +35,7 @@ public class DataQualityFilter implements Predicate<Discogs> {
 	}
 	
 	@Override
-	public boolean test(Discogs d) {
+	public boolean test(Release d) {
 		return dq.contains(d.getDataQuality());  
 	}
 }

@@ -15,7 +15,7 @@ import java.util.TreeMap;
 import de.tgmz.discogs.domain.Genre;
 import jakarta.persistence.EntityManager;
 
-public class GenreFactory implements IFactory<Genre>{
+public class GenreFactory implements IFactory<Genre> {
 	private Map<String, Genre> cache;
 	
 	public GenreFactory() {
@@ -24,6 +24,7 @@ public class GenreFactory implements IFactory<Genre>{
 		cache = new TreeMap<>();
 	}
 	
+	@Override
 	public Genre get(EntityManager em, Genre draft) {
 		return cache.computeIfAbsent(draft.getId(), g -> draft);
 	}

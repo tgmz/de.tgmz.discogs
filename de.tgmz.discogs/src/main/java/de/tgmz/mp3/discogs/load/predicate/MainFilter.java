@@ -11,15 +11,14 @@ package de.tgmz.mp3.discogs.load.predicate;
 
 import java.util.function.Predicate;
 
-import de.tgmz.discogs.domain.Discogs;
 import de.tgmz.discogs.domain.Release;
 
 /**
  * Only save main releases.
  */
-public class MainFilter implements Predicate<Discogs> {
+public class MainFilter implements Predicate<Release> {
 	@Override
-	public boolean test(Discogs d) {
-		return (d instanceof Release r && r.isMain());
+	public boolean test(Release d) {
+		return d.isMain();
 	}
 }

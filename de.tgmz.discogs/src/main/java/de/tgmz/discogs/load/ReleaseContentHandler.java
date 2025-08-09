@@ -10,9 +10,13 @@
 package de.tgmz.discogs.load;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Predicate;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -21,7 +25,6 @@ import org.xml.sax.SAXException;
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.CompanyRole;
 import de.tgmz.discogs.domain.DataQuality;
-import de.tgmz.discogs.domain.Discogs;
 import de.tgmz.discogs.domain.ExtraArtist;
 import de.tgmz.discogs.domain.Genre;
 import de.tgmz.discogs.domain.Label;
@@ -43,20 +46,21 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	private int subTrackNumber;
 	private Artist artist;
 	private ExtraArtist extraArtist;
+	private Map<ExtraArtist, String> applicableExtraArtists;
 	private Track track;
 	private SubTrack subTrack;
 	private String applicableTracks;
 	private CompanyRole companyRole;
 	private Release r;
-	private Predicate<Discogs> filter;
+	private Predicate<Release> filter;
 	private GenreFactory genreFactory;
 	private StyleFactory styleFactory;
-	
+
 	public ReleaseContentHandler() {
 		this (x -> true);
 	}
 	
-	public ReleaseContentHandler(Predicate<Discogs> filter) {
+	public ReleaseContentHandler(Predicate<Release> filter) {
 		super();
 		
 		this.filter = filter;
@@ -81,6 +85,8 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			r = new Release();
 			
 			r.setId(Long.parseLong(attributes.getValue("id")));
+			
+			applicableExtraArtists = new HashMap<>();
 			
 			break;
 		case "[releases, release, master_id]":
@@ -234,11 +240,21 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 				
 			break;
 		case "[releases, release, extraartists, artist]":
-			r.getExtraArtists().put(extraArtist, applicableTracks);
+			if (StringUtils.isEmpty(applicableTracks)) {
+				r.getExtraArtists().add(extraArtist);
+			} else {
+				applicableExtraArtists.put(extraArtist, applicableTracks);
+			}
 				
 			break;
 		//tracks
 		case "[releases, release, tracklist, track]":
+			for (Entry<ExtraArtist, String> entry : applicableExtraArtists.entrySet()) {
+				if (track.isApplicable(entry.getValue())) {
+					track.getExtraArtists().add(entry.getKey());
+				}
+			}
+			
 			r.getUnfilteredTracklist().add(track);
 			
 			if (track.getPosition() == null && track.getSubTracklist().isEmpty()) {

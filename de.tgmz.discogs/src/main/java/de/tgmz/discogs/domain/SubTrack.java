@@ -34,7 +34,7 @@ public class SubTrack implements Serializable {
 	private int trackNumber;
 	private String title;
 	private String position;
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private Set<ExtraArtist> extraArtists;
 
 	public SubTrack() {

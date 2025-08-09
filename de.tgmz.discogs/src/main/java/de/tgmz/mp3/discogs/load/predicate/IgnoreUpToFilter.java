@@ -12,32 +12,24 @@ package de.tgmz.mp3.discogs.load.predicate;
 import java.util.function.Predicate;
 
 import de.tgmz.discogs.database.DatabaseService;
-import de.tgmz.discogs.domain.Discogs;
-import de.tgmz.discogs.domain.Master;
+import de.tgmz.discogs.domain.Release;
 import jakarta.persistence.EntityManager;
 
-public class IgnoreUpToFilter implements Predicate<Discogs> {
+public class IgnoreUpToFilter implements Predicate<Release> {
 	private long rMaxId;
-	private long mMaxId;
 	
 	public IgnoreUpToFilter() {
 		try (EntityManager em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager()) {
 			this.rMaxId = (long) em.createNativeQuery("SELECT COALESCE(MAX(id), 0) FROM Release", Long.class).getSingleResult();
-			this.mMaxId = (long) em.createNativeQuery("SELECT COALESCE(MAX(id), 0) FROM Master", Long.class).getSingleResult();
 		}
 	}
 	
 	public IgnoreUpToFilter(long maxId) {
 		this.rMaxId = maxId;
-		this.mMaxId = maxId;
 	}
 	
 	@Override
-	public boolean test(Discogs d) {
-		if (d instanceof Master) {
-			return d.getId() > mMaxId;
-		} else {
-			return d.getId() > rMaxId;
-		}
+	public boolean test(Release d) {
+		return d.getId() > rMaxId;
 	}
 }

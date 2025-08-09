@@ -9,23 +9,18 @@
 **********************************************************************/
 package de.tgmz.discogs.load.factory;
 
-import java.util.Map;
-import java.util.TreeMap;
-
-import de.tgmz.discogs.domain.Style;
+import de.tgmz.discogs.domain.Artist;
+import de.tgmz.discogs.domain.Master;
 import jakarta.persistence.EntityManager;
 
-public class StyleFactory implements IFactory<Style> {
-	private Map<String, Style> cache;
-	
-	public StyleFactory() {
-		super();
-		
-		cache = new TreeMap<>();
-	}
+public class MasterFactory implements IFactory<Master> {
 	
 	@Override
-	public Style get(EntityManager em, Style draft) {
-		return cache.computeIfAbsent(draft.getId(), g -> draft);
+	public Master get(EntityManager em, Master draft) {
+		SetReplacer<Artist> sra = new SetReplacer<>(em, new ArtistFactory());
+		
+		draft.setArtists(sra.replaceAll(draft.getArtists()));
+		
+		return draft;
 	}
 }

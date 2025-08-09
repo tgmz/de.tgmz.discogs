@@ -13,11 +13,10 @@ import java.util.function.Predicate;
 
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.load.factory.ArtistFactory;
-import jakarta.persistence.EntityManager;
+import de.tgmz.discogs.load.factory.IFactory;
 
 public class ArtistPersistable implements IPersistable<Artist> {
 	private Predicate<Artist> filter;
-	private ArtistFactory af;
 	
 	public ArtistPersistable() {
 		this(x -> true);
@@ -25,21 +24,15 @@ public class ArtistPersistable implements IPersistable<Artist> {
 
 	public ArtistPersistable(Predicate<Artist> filter) {
 		this.filter = filter;
-		
-		af = new ArtistFactory();
 	}
 
 	@Override
-	public int save(EntityManager em, Artist draft) {
-		if (filter.test(draft)) {
-			
-			Artist a0 = af.get(em, draft);
-			
-			em.merge(a0);
-			
-			return 1;
-		} else {
-			return 0;
-		}
+	public IFactory<Artist> getFactory() {
+		return new ArtistFactory();
+	}
+
+	@Override
+	public Predicate<Artist> getFilter() {
+		return filter;
 	}
 }

@@ -19,35 +19,23 @@ import java.util.TreeMap;
 import de.tgmz.discogs.domain.Artist;
 import jakarta.persistence.EntityManager;
 
-public class ArtistFactory implements IFactory<Artist>{
+public class ArtistFactory implements IFactory<Artist> {
 	private Map<Long, Artist> cache;
+	private EntityManager em;
 	
 	public ArtistFactory() {
-		super();
-		
 		cache = new TreeMap<>();
 	}
 	
-	public Set<Artist> get(EntityManager em, Set<Artist> drafts) {
-		List<Artist> result = new LinkedList<>(drafts);
-		
-		result.replaceAll(a -> getWhileCached(em, a));
-		
-		cache.clear();
-		
-		return new HashSet<>(result);
-	}
-	
+	@Override
 	public Artist get(EntityManager em, Artist draft) {
-		Artist whileCached = getWhileCached(em, draft);
+		this.em = em;
 		
-		cache.clear();
-		
-		return whileCached;
+		return getWhileCached(draft);
 	}
 	
-	private Artist getWhileCached(EntityManager em, Artist draft) {
-		Artist a0 = getOrCreate(em, draft);
+	private Artist getWhileCached(Artist draft) {
+		Artist a0 = getOrCreate(draft);
 		
 		if (a0.getAliases().isEmpty()) {
 			a0.setAliases(draft.getAliases());
@@ -77,22 +65,22 @@ public class ArtistFactory implements IFactory<Artist>{
 			a0.setVariations(draft.getVariations());
 		}
 		
-		a0.setAliases(replaceAll(em, a0.getAliases()));
-		a0.setGroups(replaceAll(em, a0.getGroups()));
-		a0.setMembers(replaceAll(em, a0.getMembers()));
+		a0.setAliases(replaceAll(a0.getAliases()));
+		a0.setGroups(replaceAll(a0.getGroups()));
+		a0.setMembers(replaceAll(a0.getMembers()));
 		
 		return a0;
 	}
 
-	private Set<Artist> replaceAll(EntityManager em, Set<Artist> artists) {
+	private Set<Artist> replaceAll(Set<Artist> artists) {
 		List<Artist> l = new LinkedList<>(artists);
 		
-		l.replaceAll(a -> getOrCreate(em, a));
+		l.replaceAll(this::getOrCreate);
 		
 		return new HashSet<>(l);
 	}
 	
-	private Artist getOrCreate(EntityManager em, Artist draft) {
+	private Artist getOrCreate(Artist draft) {
 		return cache.computeIfAbsent(draft.getId(), a -> findOrCreate(em, draft));
 	}
 	

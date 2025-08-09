@@ -38,7 +38,7 @@ public class ExtraArtist implements Serializable {
 	private long id;
 	@Column(length = 512)
 	private String role;
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private Artist artist;
 
 	public ExtraArtist() {
@@ -50,6 +50,10 @@ public class ExtraArtist implements Serializable {
 		this.role = role;
 	}
 
+	public long getId() {
+		return id;
+	}
+	
 	/**
 	 * The artist
 	 * @return the artist

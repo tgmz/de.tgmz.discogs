@@ -136,8 +136,6 @@ public class DiscogsContentHandler extends DefaultHandler {
 	
 	@SuppressWarnings("unchecked")
 	public void save(Object o) {
-		LOG.debug("Save {}", o);
-		
 		DatabaseService.getInstance().inTransaction(x -> saved += persister.save(x, o));
 		
 		if (++count % threshold == 0 && LOG.isInfoEnabled()) {

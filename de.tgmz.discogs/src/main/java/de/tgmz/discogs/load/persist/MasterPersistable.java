@@ -12,12 +12,11 @@ package de.tgmz.discogs.load.persist;
 import java.util.function.Predicate;
 
 import de.tgmz.discogs.domain.Master;
-import de.tgmz.discogs.load.factory.ArtistFactory;
-import jakarta.persistence.EntityManager;
+import de.tgmz.discogs.load.factory.IFactory;
+import de.tgmz.discogs.load.factory.MasterFactory;
 
 public class MasterPersistable implements IPersistable<Master> {
 	private Predicate<Master> filter;
-	private ArtistFactory af;
 	
 	public MasterPersistable() {
 		this(x -> true);
@@ -25,20 +24,16 @@ public class MasterPersistable implements IPersistable<Master> {
 
 	public MasterPersistable(Predicate<Master> filter) {
 		this.filter = filter;
-		
-		af = new ArtistFactory();
+	}
+	
+	@Override
+	public IFactory<Master> getFactory() {
+		return new MasterFactory();
 	}
 
 	@Override
-	public int save(EntityManager em, Master master) {
-		if (filter.test(master)) {
-			master.setArtists(af.get(em, master.getArtists()));
-			
-			em.merge(master);
-			
-			return 1;
-		} else {
-			return 0;
-		}
+	public Predicate<Master> getFilter() {
+		return filter;
 	}
+
 }

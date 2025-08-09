@@ -53,8 +53,8 @@ public class Release extends Discogs {
 	private Master master;
 	private String country;
 	private String released;
-	@ElementCollection(fetch = FetchType.LAZY)
-	private Map<ExtraArtist, String> extraArtists;
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	private Set<ExtraArtist> extraArtists;
 	@ElementCollection(fetch = FetchType.LAZY)
 	@Column(name = "catno")
 	private Map<Label, String> labels;
@@ -65,7 +65,7 @@ public class Release extends Discogs {
 		super();
 		
 		tracklist = new LinkedList<>();
-		extraArtists = new HashMap<>();
+		extraArtists = new HashSet<>();
 		labels = new HashMap<>();
 		companies = new HashSet<>();
 	}
@@ -132,7 +132,7 @@ public class Release extends Discogs {
 		this.master = master;
 	}
 
-	public Map<ExtraArtist, String> getExtraArtists() {
+	public Set<ExtraArtist> getExtraArtists() {
 		return extraArtists;
 	}
 
@@ -143,10 +143,7 @@ public class Release extends Discogs {
 		this.labels = labels;
 	}
 
-	/**
-	 * Setter for extraArtists. We need a setter here because the SAX handler manipulates the keyset.
-	 */
-	public void setExtraArtists(Map<ExtraArtist, String> extraArtists) {
+	public void setExtraArtists(Set<ExtraArtist> extraArtists) {
 		this.extraArtists = extraArtists;
 	}
 	
@@ -159,13 +156,9 @@ public class Release extends Discogs {
 	 * @return A measure for the amount of information this release carries
 	 */
 	public int sizeOf() {
-		int i = 0;
-		
-		for (Track t : tracklist) {
-			i += t.sizeOf();
-			
-			i += extraArtists.entrySet().stream().filter(e -> t.isApplicable(e.getValue())).count();
-		}
+		int i = extraArtists.size() * tracklist.size();
+
+		i += tracklist.stream().mapToInt(Track::sizeOf).sum();
 		
 		return i;
 	}
