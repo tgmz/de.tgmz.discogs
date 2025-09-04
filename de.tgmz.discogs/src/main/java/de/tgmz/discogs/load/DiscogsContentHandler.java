@@ -112,8 +112,10 @@ public class DiscogsContentHandler extends DefaultHandler {
 		if (LOG.isInfoEnabled()) {
 			LOG.info("{} entities added, {} ignored", String.format("%,d", saved), String.format("%,d", count - saved));
 		}
-		
-		Toolkit.getDefaultToolkit().beep();
+
+		if (!Boolean.getBoolean("DISCOGS_TEST")) {	
+			Toolkit.getDefaultToolkit().beep();
+		}
 	}
 	
 	protected String computeBand(List<String> artists, List<String> joins) {

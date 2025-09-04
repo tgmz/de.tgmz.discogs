@@ -30,7 +30,7 @@
 		<dependency>
 			<groupId>org.hibernate.orm</groupId>
 			<artifactId>hibernate-core</artifactId>
-			<version>7.0.6.Final</version>
+			<version>7.1.0.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
@@ -52,7 +52,7 @@
 		<dependency>
 			<groupId>org.jline</groupId>
 			<artifactId>jline-terminal</artifactId>
-			<version>3.30.4</version>
+			<version>3.30.5</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
