@@ -52,7 +52,7 @@ public class Track implements Serializable {
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private Set<ExtraArtist> extraArtists;
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-	@OrderBy(value = "trackNumber")
+	@OrderBy(value = "subTrackNumber")
 	private List<SubTrack> subTracklist;
 
 	public Track() {

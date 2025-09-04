@@ -31,7 +31,7 @@ public class SubTrack implements Serializable {
 	@Id
 	@GeneratedValue
 	private long id;
-	private int trackNumber;
+	private int subTrackNumber;
 	private String title;
 	private String position;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
@@ -40,8 +40,8 @@ public class SubTrack implements Serializable {
 	public SubTrack() {
 		extraArtists = new HashSet<>();
 	}
-	public int getTrackNumber() {
-		return trackNumber;
+	public int getSubTrackNumber() {
+		return subTrackNumber;
 	}
 
 	public String getTitle() {
@@ -60,8 +60,8 @@ public class SubTrack implements Serializable {
 		this.id = id;
 	}
 
-	public void setTrackNumber(int trackNumber) {
-		this.trackNumber = trackNumber;
+	public void setSubTrackNumber(int subTrackNumber) {
+		this.subTrackNumber = subTrackNumber;
 	}
 
 	public void setTitle(String name) {

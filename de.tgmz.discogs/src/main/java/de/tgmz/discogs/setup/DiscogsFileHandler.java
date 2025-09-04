@@ -233,8 +233,8 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 	private long determineUncompressedSize() throws IOException {
 		long size = df.getKey().length();
 		
-		// Based on experience the compression factor is about 5.6
-		float estm = 5.6f;
+		// Based on experience the compression factor is about 5.7
+		float estm = 5.7f;
 		
 		// Let's guess if the uncompressed file is < 4GB
 		if (size * estm < Math.pow(1024, 3) * 4) { 

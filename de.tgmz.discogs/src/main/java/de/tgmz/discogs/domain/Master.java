@@ -21,7 +21,7 @@ import jakarta.persistence.Transient;
 @Entity
 @Table(indexes = {
 		@Index(columnList = "title", name = "title_idx"), 
-		@Index(columnList = "displayArtist", name = "displayArtist_idx"),
+		@Index(columnList = "band", name = "band_idx"),
 	})
 public class Master extends Discogs {
 	@Transient

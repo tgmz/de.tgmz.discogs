@@ -9,6 +9,7 @@
 **********************************************************************/
 package de.tgmz.discogs.load;
 
+import java.awt.Toolkit;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -45,7 +46,7 @@ public class DiscogsContentHandler extends DefaultHandler {
 	private long threshold = 10_000L;
 	private StringBuilder chars;
 	protected static final int MAX_LENGTH_DEFAULT = 254;
-	protected static final int MAX_LENGTH_DISPLAY = 510;
+	protected static final int MAX_LENGTH_LONG = 510;
 	protected String path;
 	@SuppressWarnings("rawtypes")
 	protected IPersistable persister;
@@ -111,9 +112,11 @@ public class DiscogsContentHandler extends DefaultHandler {
 		if (LOG.isInfoEnabled()) {
 			LOG.info("{} entities added, {} ignored", String.format("%,d", saved), String.format("%,d", count - saved));
 		}
+		
+		Toolkit.getDefaultToolkit().beep();
 	}
 	
-	protected String getDisplayArtist(List<String> artists, List<String> joins) {
+	protected String computeBand(List<String> artists, List<String> joins) {
 		StringBuilder sb = new StringBuilder();
 		
 		for (int i = 0; i < artists.size(); ++i) {
@@ -129,9 +132,9 @@ public class DiscogsContentHandler extends DefaultHandler {
 			sb.append(s0 + (",".equals(s1) ? ", " : " " + s1 +" "));
 		}
 		
-		String display = Strings.CS.removeEnd(sb.toString(), ", ").trim().replace(" , ", ", ");
+		String band = Strings.CS.removeEnd(sb.toString(), ", ").trim().replace(" , ", ", ");
 		
-		return StringUtils.left(display, MAX_LENGTH_DISPLAY);
+		return StringUtils.left(band, MAX_LENGTH_LONG);
 	}
 	
 	@SuppressWarnings("unchecked")

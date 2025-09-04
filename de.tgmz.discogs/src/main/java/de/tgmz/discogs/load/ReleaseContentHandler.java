@@ -39,8 +39,8 @@ import de.tgmz.discogs.load.persist.ReleasePersistable;
 
 public class ReleaseContentHandler extends DiscogsContentHandler {
 	protected static final Logger LOG = LoggerFactory.getLogger(ReleaseContentHandler.class);
-	private List<String> displayArtists;
-	private List<String> displayJoins;
+	private List<String> bandArtists;
+	private List<String> bandJoins;
 	private int sequence;
 	private int trackNumber;
 	private int subTrackNumber;
@@ -94,8 +94,8 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 
 			break;
 		case "[releases, release, artists]":
-			displayArtists = new ArrayList<>();
-			displayJoins = new ArrayList<>();
+			bandArtists = new ArrayList<>();
+			bandJoins = new ArrayList<>();
 			
 			break;
 		case "[releases, release, artists, artist]":
@@ -132,7 +132,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			break;
 		case "[releases, release, tracklist, track, sub_tracks, track]":
 			subTrack = new SubTrack();
-			subTrack.setTrackNumber(subTrackNumber++);
+			subTrack.setSubTrackNumber(subTrackNumber++);
 			
 			break;
 		case "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist]":
@@ -188,7 +188,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			break;
 		// artists
 		case "[releases, release, artists]":
-			r.setDisplayArtist(getDisplayArtist(displayArtists, displayJoins));
+			r.setBand(computeBand(bandArtists, bandJoins));
 			
 			break;
 		case "[releases, release, artists, artist]":
@@ -202,16 +202,16 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 		case "[releases, release, artists, artist, name]":
 			String s = getChars(MAX_LENGTH_DEFAULT, true);
 			
-			displayArtists.add(s);
+			bandArtists.add(s);
 			artist.setName(s);
 			
 			break;
 		case "[releases, release, artists, artist, anv]":
-			displayArtists.set(displayArtists.size() - 1, getChars());
+			bandArtists.set(bandArtists.size() - 1, getChars());
 			
 			break;
 		case "[releases, release, artists, artist, join]":
-			displayJoins.add(getChars());
+			bandJoins.add(getChars());
 			
 			break;
 		case "[releases, release, genres, genre]":

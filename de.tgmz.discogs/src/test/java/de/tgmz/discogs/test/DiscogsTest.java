@@ -92,13 +92,13 @@ public class DiscogsTest {
 		assertEquals("Yasha Conen", yashaConen.getName());
 		assertEquals("Moabeat", yashaConen.getGroups().stream().filter(a -> a.getId() == 202_465L).findAny().orElseThrow().getName());
 		
-		String displayArtist = "Marteria • Yasha • Miss Platnum";
+		String band = "Marteria • Yasha • Miss Platnum";
 		
-		assertEquals(displayArtist, em.find(Master.class, 482870L).getDisplayArtist());
+		assertEquals(band, em.find(Master.class, 482870L).getBand());
 		
 		Release lilaWolken = em.find(Release.class, 3870362L);
 		
-		assertEquals(displayArtist, lilaWolken.getDisplayArtist());
+		assertEquals(band, lilaWolken.getBand());
 		
 		CompanyRole cr = lilaWolken.getCompanies().stream().filter(k -> k.getCompany().getId() == 264516 && "Copyright (c)".equals(k.getRole())).findAny().orElseThrow();
 		assertEquals("Four Music Productions GmbH", cr.getCompany().getName());
@@ -230,7 +230,7 @@ public class DiscogsTest {
 	}
 	private void checkRelease(Release r, Master m, Label l) {
 		assertEquals(m, r.getMaster());
-		assertEquals("Depeche Mode", r.getDisplayArtist());
+		assertEquals("Depeche Mode", r.getBand());
 		assertEquals("US", r.getCountry());
 		assertEquals("1990-03-20", r.getReleased());
 		assertEquals(DataQuality.CORRECT, r.getDataQuality());
