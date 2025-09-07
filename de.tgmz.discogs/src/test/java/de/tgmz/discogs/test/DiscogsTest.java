@@ -39,7 +39,6 @@ import de.tgmz.discogs.domain.Style;
 import de.tgmz.discogs.domain.SubTrack;
 import de.tgmz.discogs.domain.Track;
 import de.tgmz.discogs.load.ArtistContentHandler;
-import de.tgmz.discogs.load.DBDefrag;
 import de.tgmz.discogs.load.LabelContentHandler;
 import de.tgmz.discogs.load.MasterContentHandler;
 import de.tgmz.discogs.load.ReleaseContentHandler;
@@ -55,7 +54,7 @@ public class DiscogsTest {
 	
 	@BeforeClass
 	public static void setupOnce() throws IOException {
-		System.setProperty("jakarta.persistence.jdbc.url", "jdbc:h2:mem:discogs_test_mem");
+		System.setProperty("jakarta.persistence.jdbc.url", AllTests.JDBC_URL);
 		System.setProperty("jakarta.persistence.jdbc.user", "sa");
 		System.setProperty("jakarta.persistence.jdbc.password", "sa");
 		System.setProperty(DiscogsFile.DISCOGS_DIR, System.getProperty("java.io.tmpdir"));
@@ -68,8 +67,6 @@ public class DiscogsTest {
 	@AfterClass
 	public static void teardownOnce() {
 		em.close();
-		
-		new DBDefrag().run();
 	}
 	
 	@Test

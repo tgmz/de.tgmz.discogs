@@ -9,6 +9,8 @@
 **********************************************************************/
 package de.tgmz.discogs.load;
 
+import java.util.function.Predicate;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -22,12 +24,21 @@ public class LabelContentHandler extends DiscogsContentHandler {
 	@SuppressWarnings("unused")
 	private static final Logger LOG = LoggerFactory.getLogger(LabelContentHandler.class);
 	private Label label;
+	private Predicate<Label> filter;
+
+	public LabelContentHandler() {
+		this (l -> true);
+	}
+
+	public LabelContentHandler(Predicate<Label> filter) {
+		this.filter = filter;
+	}
 
 	@Override
 	public void startDocument() throws SAXException {
 		super.startDocument();
 		
-		persister = new LabelPersistable();
+		persister = new LabelPersistable(filter);
 	}
 	
 	@Override

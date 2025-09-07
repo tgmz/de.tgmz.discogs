@@ -24,7 +24,7 @@ public class DBDefrag {
 	public void run() {
         try (EntityManager em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager()) {
         	em.runWithConnection((Connection conn) -> {
-        		if (conn.getMetaData().getURL().startsWith("jdbc:h2:")) {
+        		if (conn.getMetaData().getURL().startsWith("jdbc:h2:file")) {
         			LOG.info("Begin database defrag");
         			
         			conn.prepareCall("SHUTDOWN DEFRAG").execute();

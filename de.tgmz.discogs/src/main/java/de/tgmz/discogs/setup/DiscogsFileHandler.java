@@ -20,7 +20,6 @@ import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.function.Predicate;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.io.FileUtils;
@@ -34,11 +33,11 @@ import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import com.google.common.io.ByteSource;
 
-import de.tgmz.discogs.domain.Release;
 import de.tgmz.discogs.load.ArtistContentHandler;
 import de.tgmz.discogs.load.LabelContentHandler;
 import de.tgmz.discogs.load.MasterContentHandler;
 import de.tgmz.discogs.load.ReleaseContentHandler;
+import de.tgmz.mp3.discogs.load.predicate.IgnoreUpToFilter;
 import me.tongfei.progressbar.ProgressBar;
 import me.tongfei.progressbar.ProgressBarBuilder;
 import me.tongfei.progressbar.ProgressBarConsumer;
@@ -83,16 +82,18 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 			}
 		}
 
-		Predicate<Release> p = getPredicate(args);
-		
 		try (InputStream is0 = new FileInputStream(DiscogsFile.ARTISTS.getUnzippedFile());
 				InputStream is1 = new FileInputStream(DiscogsFile.LABELS.getUnzippedFile());
 				InputStream is2 = new FileInputStream(DiscogsFile.MASTERS.getUnzippedFile());
 				InputStream is3 = new FileInputStream(DiscogsFile.RELEASES.getUnzippedFile())) {
-			new ArtistContentHandler().run(is0);
-			new LabelContentHandler().run(is1);
-			new MasterContentHandler().run(is2);
-			new ReleaseContentHandler(p).run(is3);
+			new ArtistContentHandler(a -> false).run(is0);
+			new LabelContentHandler(l -> false).run(is1);
+			new MasterContentHandler(m -> false).run(is2);
+			
+			ReleaseContentHandler rch = new ReleaseContentHandler(new IgnoreUpToFilter());
+			rch.setDefragThreshold(100_000);
+			
+			rch.run(is3);
 		} catch (IOException e) {
 			LOG.error("Cannot setup database, reason", e);
 		}
@@ -254,22 +255,5 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 		}
 		
 		return size;
-	}
-	
-	@SuppressWarnings("unchecked")
-	private static Predicate<Release> getPredicate(String... clz) {
-		Predicate<Release> p = x -> true;
-		
-		if (clz != null) {
-			try {
-				for (String s : clz) {
-					p = p.and((Predicate<Release>) Class.forName(s).getDeclaredConstructor().newInstance());
-				}
-			} catch (ReflectiveOperationException e) {
-				LOG.error("Error in predicate setup", e);
-			}
-		}
-		
-		return p;
 	}
 }

@@ -43,8 +43,10 @@ public class DiscogsContentHandler extends DefaultHandler {
 	private XMLReader xmlReader;
 	private int saved;
 	private int count;
-	private long threshold = 10_000L;
+	private long logThreshold = 10_000L;
 	private StringBuilder chars;
+	private DBDefrag defrag;
+	private int defragThreshold = Integer.MAX_VALUE;
 	protected static final int MAX_LENGTH_DEFAULT = 254;
 	protected static final int MAX_LENGTH_LONG = 510;
 	protected String path;
@@ -52,6 +54,8 @@ public class DiscogsContentHandler extends DefaultHandler {
 	protected IPersistable persister;
 
 	public DiscogsContentHandler() {
+		defrag = new DBDefrag();
+		
 		try {
 			SAXParserFactory spf = SAXParserFactory.newInstance();
 			spf.setNamespaceAware(false);
@@ -112,6 +116,8 @@ public class DiscogsContentHandler extends DefaultHandler {
 		if (LOG.isInfoEnabled()) {
 			LOG.info("{} entities added, {} ignored", String.format("%,d", saved), String.format("%,d", count - saved));
 		}
+		
+		defrag.run();
 
 		if (!Boolean.getBoolean("DISCOGS_TEST")) {	
 			Toolkit.getDefaultToolkit().beep();
@@ -143,8 +149,12 @@ public class DiscogsContentHandler extends DefaultHandler {
 	public void save(Object o) {
 		DatabaseService.getInstance().inTransaction(x -> saved += persister.save(x, o));
 		
-		if (++count % threshold == 0 && LOG.isInfoEnabled()) {
+		if (++count % logThreshold == 0 && LOG.isInfoEnabled()) {
 			LOG.info("{}/{} ({}). {}", String.format("%,d", saved), String.format("%,d", count), String.format("%f%%", (float) saved / count * 100), o);
+		}
+		
+		if (count % defragThreshold == defragThreshold - 1) {
+			defrag.run();
 		}
 	}
 
@@ -178,5 +188,9 @@ public class DiscogsContentHandler extends DefaultHandler {
 	private void popStack() {
 		stack.pop();
 		path = stack.reversed().toString();
+	}
+
+	public void setDefragThreshold(int defragThreshold) {
+		this.defragThreshold = defragThreshold;
 	}
 }

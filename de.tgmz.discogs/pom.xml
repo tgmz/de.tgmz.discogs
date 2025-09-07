@@ -210,7 +210,7 @@
 						</property>
 						<property>
 							<key>jakarta.persistence.jdbc.url</key>
-							<value>jdbc:h2:~/Databases/discogs;MODE=DB2;DEFAULT_NULL_ORDERING=HIGH;AUTO_SERVER=TRUE</value>
+							<value>jdbc:h2:file:~/Databases/mp3jpa;MODE=DB2;DEFAULT_NULL_ORDERING=HIGH;AUTO_SERVER=TRUE</value>
 						</property>
 						<property>
 							<key>jakarta.persistence.jdbc.user</key>
@@ -221,9 +221,6 @@
 							<value>sa</value>
 						</property>
 					</systemProperties>
-					<arguments>
-						<argument>de.tgmz.mp3.discogs.load.predicate.MainFilter</argument>
-					</arguments>
 				</configuration>
 			</plugin>
 		</plugins>
