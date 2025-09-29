@@ -12,6 +12,7 @@ package de.tgmz.discogs.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.FileInputStream;
@@ -114,6 +115,7 @@ public class DiscogsTest {
 		SubTrack st = t.getSubTracklist().getFirst();
 		
 		assertEquals("Ouvertüre", st.getTitle());
+//		assertEquals("6:29", st.getDuration());
 		assertEquals(2, st.sizeOf());
 		
 		ExtraArtist ea = st.getExtraArtists().stream().filter(ea0 -> ea0.getArtist().getId() == 754974).findFirst().orElseThrow();
@@ -172,6 +174,10 @@ public class DiscogsTest {
 		assertTrue(em.createQuery("FROM Genre", Genre.class).getResultStream().anyMatch(x -> "Rock".equals(x.getId())));
 		
 		assertTrue(em.createQuery("FROM Style", Style.class).getResultStream().anyMatch(x -> "Synth-pop".equals(x.getId())));
+	}
+	@Test
+	public void testArtistNoId() {
+		assertNull(em.find(Artist.class, 0L));
 	}
 	private static void load() throws IOException {
 		try (InputStream is = new FileInputStream(DiscogsFile.ARTISTS.getUnzippedFile())) {
@@ -236,7 +242,7 @@ public class DiscogsTest {
 		assertTrue(r.getGenres().stream().anyMatch(x -> "Electronic".equals(x.getId())));
 		assertTrue(r.getStyles().stream().anyMatch(x -> "Synth-pop".equals(x.getId())));
 		
-		assertEquals(199, r.sizeOf());
+		assertEquals(190, r.sizeOf());
 		
 		ExtraArtist af = r.getExtraArtists().stream().filter(ea -> 132774 == ea.getArtist().getId()).findAny().orElseThrow();
 

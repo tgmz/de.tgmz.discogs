@@ -66,6 +66,7 @@ public class SetupTest {
 		System.setProperty(DiscogsFile.DISCOGS_URL, "https://" + mockServer.remoteAddress().getHostName() + ":" + mockServer.remoteAddress().getPort() + "/");
 		
 		FileUtils.deleteDirectory(new File(System.getProperty(DiscogsFile.DISCOGS_DIR), "data"));
+		FileUtils.deleteDirectory(new File(AllTests.JDBC_DATA_DIR));
 	}
 	
 	@AfterClass

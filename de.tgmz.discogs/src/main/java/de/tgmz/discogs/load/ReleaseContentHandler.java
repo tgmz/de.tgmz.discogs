@@ -240,10 +240,12 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 				
 			break;
 		case "[releases, release, extraartists, artist]":
-			if (StringUtils.isEmpty(applicableTracks)) {
-				r.getExtraArtists().add(extraArtist);
-			} else {
-				applicableExtraArtists.put(extraArtist, applicableTracks);
+			if (extraArtist.getArtist().getId() != 0L) {
+				if (StringUtils.isEmpty(applicableTracks)) {
+					r.getExtraArtists().add(extraArtist);
+				} else {
+					applicableExtraArtists.put(extraArtist, applicableTracks);
+				}
 			}
 				
 			break;
@@ -288,7 +290,9 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, tracklist, track, extraartists, artist]":
-			track.getExtraArtists().add(extraArtist);
+			if (extraArtist.getArtist().getId() != 0L) {
+				track.getExtraArtists().add(extraArtist);
+			}
 			
 			break;
 		case "[releases, release, tracklist, track, extraartists, artist, id]":
@@ -317,7 +321,9 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist]":
-			subTrack.getExtraArtists().add(extraArtist);
+			if (extraArtist.getArtist().getId() != 0L) {
+				subTrack.getExtraArtists().add(extraArtist);
+			}
 			
 			break;
 		case "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist, id]":

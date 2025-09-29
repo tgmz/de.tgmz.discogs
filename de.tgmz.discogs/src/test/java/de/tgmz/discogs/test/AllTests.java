@@ -18,9 +18,11 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({SetupTest.class, DiscogsTest.class })
 public class AllTests {
+	public static final String JDBC_DATA_DIR = System.getProperty("java.io.tmpdir") + File.separatorChar + "discogs_test";
+	
+	private static final String JDBC_DATA_FILE = JDBC_DATA_DIR + File.separatorChar + "discogs";
 	private static final String JDBC_PROTOCOL = "jdbc:h2:file:";
-	private static final String JDBC_DATA_DIR = System.getProperty("java.io.tmpdir") + File.separatorChar + "discogs_test";
 	private static final String JDBC_PROPERTIES = ";MODE=DB2;DEFAULT_NULL_ORDERING=HIGH;AUTO_SERVER=TRUE";
 	
-	public static final String JDBC_URL = JDBC_PROTOCOL + JDBC_DATA_DIR + JDBC_PROPERTIES;
+	public static final String JDBC_URL = JDBC_PROTOCOL + JDBC_DATA_FILE + JDBC_PROPERTIES;
 }

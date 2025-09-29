@@ -158,7 +158,7 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 
 		LOG.info("Extracting {} to {}", df.getFileName(), unzipped);
 
-		int block = 4 * 1024 * 1024;	// 4 MB
+		int block = 4 * 1024 * 1024;	// 4 MiB
 
 		ProgressBar pb = pbb.setTaskName(df.getUnzippedFileName()).setInitialMax(determineUncompressedSize()).build();
 
@@ -237,7 +237,7 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 		// Based on experience the compression factor is about 5.7
 		float estm = 5.7f;
 		
-		// Let's guess if the uncompressed file is < 4GB
+		// Let's guess if the uncompressed file is < 4GiB
 		if (size * estm < Math.pow(1024, 3) * 4) { 
 			// This piece of code only works, if the size of the _uncompressed_ file is < 4GB  
 			try (RandomAccessFile fp = new RandomAccessFile(df.getKey(), "r")) {
@@ -248,7 +248,7 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 				LOG.info("Uncompressed size {}", size);
 			}
 		} else {
-			// We simply estimtate the size as "5.6 multiplied compressed size"
+			// We simply estimtate the size as "5.7 multiplied by compressed size"
 			size = (long) (size * estm);
 			
 			LOG.warn("Cannot determine uncompressed size exactly. Using estimated value of {}", size);
