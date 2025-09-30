@@ -14,7 +14,6 @@ import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.DataQuality;
@@ -27,7 +26,6 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 	private Artist alias;
 	private Artist group;
 	private Artist member;
-	private Predicate<Artist> filter;
 
 	public ArtistContentHandler() {
 		this(x -> true);
@@ -36,15 +34,9 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 	public ArtistContentHandler(Predicate<Artist> filter) {
 		super();
 		
-		this.filter = filter;
-	}
-
-	@Override
-	public void startDocument() throws SAXException {
-		super.startDocument();
-		
 		persister = new ArtistPersistable(filter);
 	}
+
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		super.startElement(uri, localName, qName, attributes);

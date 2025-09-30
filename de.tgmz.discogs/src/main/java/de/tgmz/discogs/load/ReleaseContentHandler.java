@@ -20,7 +20,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.CompanyRole;
@@ -52,7 +51,6 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	private String applicableTracks;
 	private CompanyRole companyRole;
 	private Release r;
-	private Predicate<Release> filter;
 	private GenreFactory genreFactory;
 	private StyleFactory styleFactory;
 
@@ -63,15 +61,8 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	public ReleaseContentHandler(Predicate<Release> filter) {
 		super();
 		
-		this.filter = filter;
-		
 		genreFactory = new GenreFactory();
 		styleFactory = new StyleFactory();
-	}
-	
-	@Override
-	public void startDocument() throws SAXException {
-		super.startDocument();
 		
 		persister = new ReleasePersistable(filter);
 	}

@@ -14,6 +14,7 @@ import java.util.function.Predicate;
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.load.factory.ArtistFactory;
 import de.tgmz.discogs.load.factory.IFactory;
+import jakarta.persistence.EntityManager;
 
 public class ArtistPersistable implements IPersistable<Artist> {
 	private Predicate<Artist> filter;
@@ -34,5 +35,14 @@ public class ArtistPersistable implements IPersistable<Artist> {
 	@Override
 	public Predicate<Artist> getFilter() {
 		return filter;
+	}
+	
+	@Override
+	public int save(EntityManager em, Artist a) {
+		if (a.getId() == 0L) {
+			return 0;
+		}
+		
+		return IPersistable.super.save(em, a);
 	}
 }

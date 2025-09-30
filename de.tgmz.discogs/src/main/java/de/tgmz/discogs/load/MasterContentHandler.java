@@ -36,7 +36,6 @@ public class MasterContentHandler extends DiscogsContentHandler {
 	private Master master;
 	private List<String> artistNames;
 	private List<String> joins;
-	private Predicate<Master> filter;
 	private GenreFactory genreFactory;
 	private StyleFactory styleFactory;
 	private long artistsBefore;
@@ -46,22 +45,16 @@ public class MasterContentHandler extends DiscogsContentHandler {
 	}
 	
 	public MasterContentHandler(Predicate<Master> filter) {
-		this.filter = filter;
-		
 		genreFactory = new GenreFactory();
 		styleFactory = new StyleFactory();
 		
 		try (EntityManager em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager()) {
 			artistsBefore = (long) em.createNativeQuery("SELECT COALESCE(COUNT(*), 0) FROM Artist").getSingleResult();
 		}
-	}
-
-	@Override
-	public void startDocument() throws SAXException {
-		super.startDocument();
 		
 		persister = new MasterPersistable(filter);
 	}
+
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		super.startElement(uri, localName, qName, attributes);
