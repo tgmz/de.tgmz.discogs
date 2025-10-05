@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -33,9 +34,12 @@ public class SubTrack implements Serializable {
 	private long id;
 	private int subTrackNumber;
 	private String title;
+	@Column(length = 32)
 	private String position;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private Set<ExtraArtist> extraArtists;
+	@Column(length = 16)
+	private String duration;
 
 	public SubTrack() {
 		extraArtists = new HashSet<>();
@@ -56,6 +60,10 @@ public class SubTrack implements Serializable {
 		return extraArtists;
 	}
 
+	public String getDuration() {
+		return duration;
+	}
+	
 	public void setId(long id) {
 		this.id = id;
 	}
@@ -74,6 +82,10 @@ public class SubTrack implements Serializable {
 
 	public void setExtraArtists(Set<ExtraArtist> extraArtists) {
 		this.extraArtists = extraArtists;
+	}
+	
+	public void setDuration(String duration) {
+		this.duration = duration;
 	}
 
 	/**

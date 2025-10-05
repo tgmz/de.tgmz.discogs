@@ -153,7 +153,7 @@ public class DiscogsContentHandler extends DefaultHandler {
 			LOG.info("{}/{} ({}). {}", String.format("%,d", saved), String.format("%,d", count), String.format("%f%%", (float) saved / count * 100), o);
 		}
 		
-		if (count % defragThreshold == defragThreshold - 1) {
+		if (count % defragThreshold == defragThreshold - 1 && saved > 0) {
 			defrag.run();
 		}
 	}

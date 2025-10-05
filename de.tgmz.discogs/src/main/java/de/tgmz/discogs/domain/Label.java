@@ -37,7 +37,7 @@ public class Label implements Serializable {
 	private String name;
 	@Enumerated(EnumType.ORDINAL)
 	private DataQuality dataQuality;
-	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private Label parentLabel;
 
 	/**

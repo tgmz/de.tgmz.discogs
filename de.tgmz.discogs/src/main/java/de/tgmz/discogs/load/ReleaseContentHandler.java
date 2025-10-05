@@ -311,6 +311,10 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			subTrack.setTitle(getChars(MAX_LENGTH_DEFAULT));
 			
 			break;
+		case "[releases, release, tracklist, track, sub_tracks, track, duration]":
+			subTrack.setDuration(getChars());
+			
+			break;
 		case "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist]":
 			if (extraArtist.getArtist().getId() != 0L) {
 				subTrack.getExtraArtists().add(extraArtist);

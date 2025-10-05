@@ -115,7 +115,7 @@ public class DiscogsTest {
 		SubTrack st = t.getSubTracklist().getFirst();
 		
 		assertEquals("Ouvertüre", st.getTitle());
-//		assertEquals("6:29", st.getDuration());
+		assertEquals("6:29", st.getDuration());
 		assertEquals(2, st.sizeOf());
 		
 		ExtraArtist ea = st.getExtraArtists().stream().filter(ea0 -> ea0.getArtist().getId() == 754974).findFirst().orElseThrow();
