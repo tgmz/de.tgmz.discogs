@@ -30,7 +30,7 @@ public abstract class Discogs implements Serializable {
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private Set<Artist> artists;
 	@Column(length = 512)
-	private String band;
+	private String albumArtist;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private Set<Genre> genres;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
@@ -67,8 +67,8 @@ public abstract class Discogs implements Serializable {
 	 * Corresponds to id3v2 tag &apos;Album Artist&apos; (TPE2)
 	 * @return the artist(s) as displayed on the cover
 	 */
-	public String getBand() {
-		return band;
+	public String getAlbumArtist() {
+		return albumArtist;
 	}
 
 	/**
@@ -103,8 +103,8 @@ public abstract class Discogs implements Serializable {
 		this.title = title;
 	}
 
-	public void setBand(String band) {
-		this.band = band;
+	public void setAlbumArtist(String band) {
+		this.albumArtist = band;
 	}
 
 	public void setDataQuality(DataQuality dataQuality) {
@@ -121,6 +121,6 @@ public abstract class Discogs implements Serializable {
 
 	@Override
 	public String toString() {
-		return "[title=" + title + ", band=" + band + "]";
+		return "[title=" + title + ", albumArtist=" + albumArtist + "]";
 	}
 }

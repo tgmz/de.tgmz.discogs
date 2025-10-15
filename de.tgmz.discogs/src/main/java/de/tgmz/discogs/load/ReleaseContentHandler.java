@@ -179,7 +179,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			break;
 		// artists
 		case "[releases, release, artists]":
-			r.setBand(computeBand(bandArtists, bandJoins));
+			r.setAlbumArtist(computeBand(bandArtists, bandJoins));
 			
 			break;
 		case "[releases, release, artists, artist]":

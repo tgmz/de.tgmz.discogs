@@ -103,7 +103,7 @@ public class MasterContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[masters, master, artists]":
-			master.setBand(computeBand(artistNames, joins));
+			master.setAlbumArtist(computeBand(artistNames, joins));
 			
 			break;
 		case "[masters, master, artists, artist, name]":
