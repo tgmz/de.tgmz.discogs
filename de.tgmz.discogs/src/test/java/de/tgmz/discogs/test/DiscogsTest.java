@@ -98,8 +98,8 @@ public class DiscogsTest {
 		
 		assertEquals(band, lilaWolken.getAlbumArtist());
 		
-		CompanyRole cr = lilaWolken.getCompanies().stream().filter(k -> k.getCompany().getId() == 264516 && "Copyright (c)".equals(k.getRole())).findAny().orElseThrow();
-		assertEquals("Four Music Productions GmbH", cr.getCompany().getName());
+		CompanyRole cr = lilaWolken.getCompanies().stream().filter(k -> k.getId().getCompany().getId() == 264516 && "Copyright (c)".equals(k.getId().getRole())).findAny().orElseThrow();
+		assertEquals("Four Music Productions GmbH", cr.getId().getCompany().getName());
 	}
 	@Test
 	public void testDecca() {
@@ -118,10 +118,10 @@ public class DiscogsTest {
 		assertEquals("6:29", st.getDuration());
 		assertEquals(2, st.sizeOf());
 		
-		ExtraArtist ea = st.getExtraArtists().stream().filter(ea0 -> ea0.getArtist().getId() == 754974).findFirst().orElseThrow();
+		ExtraArtist ea = st.getExtraArtists().stream().filter(ea0 -> ea0.getId().getArtist().getId() == 754974).findFirst().orElseThrow();
 		
-		assertEquals("Wiener Philharmoniker", ea.getArtist().getName());
-		assertEquals("Orchestra", ea.getRole());
+		assertEquals("Wiener Philharmoniker", ea.getId().getArtist().getName());
+		assertEquals("Orchestra", ea.getId().getRole());
 	}
 	@Test
 	public void testSubtrack() {
@@ -244,10 +244,10 @@ public class DiscogsTest {
 		
 		assertEquals(190, r.sizeOf());
 		
-		ExtraArtist af = r.getExtraArtists().stream().filter(ea -> 132774 == ea.getArtist().getId()).findAny().orElseThrow();
+		ExtraArtist af = r.getExtraArtists().stream().filter(ea -> 132774 == ea.getId().getArtist().getId()).findAny().orElseThrow();
 
-		assertEquals("Andrew Fletcher", af.getArtist().getName());
-		assertEquals("Performer", af.getRole());
+		assertEquals("Andrew Fletcher", af.getId().getArtist().getName());
+		assertEquals("Performer", af.getId().getRole());
 		
 		List<Track> applicableTracks = r.getTracklist().stream().filter(t -> t.isApplicable("1 to 5, 7 to 9")).toList();
 
@@ -258,7 +258,7 @@ public class DiscogsTest {
 		
 		assertFalse(r.getTracklist().get(5).getExtraArtists().contains(efk));
 
-		Optional<ExtraArtist> ofk = r.getTracklist().get(5).getExtraArtists().stream().filter(ea -> 20662 == ea.getArtist().getId()).findAny();
+		Optional<ExtraArtist> ofk = r.getTracklist().get(5).getExtraArtists().stream().filter(ea -> 20662 == ea.getId().getArtist().getId()).findAny();
 
 		assertFalse(ofk.isPresent());
 		
@@ -276,11 +276,11 @@ public class DiscogsTest {
 		
 		Set<ExtraArtist> eas = t.getExtraArtists();
 		
-		ExtraArtist flood = eas.stream().filter(x -> x.getArtist() != null && 20661 == x.getArtist().getId()).findAny().orElseThrow();
+		ExtraArtist flood = eas.stream().filter(x -> x.getId().getArtist() != null && 20661 == x.getId().getArtist().getId()).findAny().orElseThrow();
 		
-		assertEquals("Mixed By", flood.getRole());
-		assertEquals("Flood", flood.getArtist().getName());
-		assertEquals("Mark Ellis", flood.getArtist().getRealName());
+		assertEquals("Mixed By", flood.getId().getRole());
+		assertEquals("Flood", flood.getId().getArtist().getName());
+		assertEquals("Mark Ellis", flood.getId().getArtist().getRealName());
 		
 		assertEquals("9 26081-2", r.getLabels().get(l));
 	}

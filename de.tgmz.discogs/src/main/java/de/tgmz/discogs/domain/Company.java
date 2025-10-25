@@ -37,6 +37,7 @@ public class Company implements Serializable {
 	
 	public Company(long id, String name) {
 		this();
+		
 		this.id = id;
 		this.name = name;
 	}

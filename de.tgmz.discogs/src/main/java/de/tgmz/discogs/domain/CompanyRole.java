@@ -12,14 +12,9 @@ package de.tgmz.discogs.domain;
 import java.io.Serializable;
 import java.util.Objects;
 
-import jakarta.persistence.CascadeType;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
 import jakarta.persistence.Index;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
@@ -27,51 +22,34 @@ import jakarta.persistence.Transient;
 @Table(indexes = {
 	@Index(name = "companyRole_idx", columnList = "company, role")
 })
-@NamedQuery(name = "CompanyRole.byCompanyIdAndRole"
-	, query = "FROM CompanyRole WHERE company.id = ?1 AND role = ?2") 
 public class CompanyRole implements Serializable { 
 	@Transient
 	private static final long serialVersionUID = 6542992827176172533L;
-	@Id
-	@GeneratedValue
-	private long id;
-	private String role;
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-	private Company company;
+	@EmbeddedId
+	private CompanyRoleId id;
 
 	public CompanyRole() {
-		company = new Company();
+		id = new CompanyRoleId();
 	}
 	
 	public CompanyRole(Company company, String role) {
-		this.company = company;
-		this.role = role;
+		this();
+		
+		this.id.setCompany(company);
+		this.id.setRole(role);
 	}
 
-	public Company getCompany() {
-		return company;
+	public CompanyRoleId getId() {
+		return id;
 	}
 
-	public String getRole() {
-		return role;
-	}
-
-	public void setCompany(Company company) {
-		this.company = company;
-	}
-
-	public void setRole(String role) {
-		this.role = role;
-	}
-	
-	@Override
-	public String toString() {
-		return "CompanyRole [role=" + role + ", company=" + company + "]";
+	public void setId(CompanyRoleId id) {
+		this.id = id;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(company, role);
+		return Objects.hash(id);
 	}
 
 	@Override
@@ -83,6 +61,11 @@ public class CompanyRole implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		CompanyRole other = (CompanyRole) obj;
-		return this.company.getId() == other.company.getId() && Objects.equals(role, other.role);
+		return Objects.equals(id, other.id);
+	}
+
+	@Override
+	public String toString() {
+		return "CompanyRole [id=" + id + "]";
 	}
 }

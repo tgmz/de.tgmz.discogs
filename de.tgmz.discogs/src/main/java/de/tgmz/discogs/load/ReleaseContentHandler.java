@@ -334,15 +334,15 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, companies, company, id]":
-			companyRole.getCompany().setId(Long.parseLong(getChars()));
+			companyRole.getId().getCompany().setId(Long.parseLong(getChars()));
 			
 			break;
 		case "[releases, release, companies, company, name]":
-			companyRole.getCompany().setName(getChars());
+			companyRole.getId().getCompany().setName(getChars());
 			
 			break;
 		case "[releases, release, companies, company, entity_type_name]":
-			companyRole.setRole(getChars());
+			companyRole.getId().setRole(getChars());
 			
 			break;
 		case "[releases, release, companies, company]":

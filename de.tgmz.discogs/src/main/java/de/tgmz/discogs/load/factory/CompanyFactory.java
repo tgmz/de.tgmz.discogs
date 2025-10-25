@@ -32,12 +32,14 @@ public class CompanyFactory implements IFactory<Company> {
 	}
 	
 	private Company findOrCreate(EntityManager em, Company draft) {
-		Company c0 = em.find(Company.class, draft.getId());
+		Company c = em.find(Company.class, draft.getId());
 		
-		if (c0 == null) {
-			c0 = draft;
+		if (c == null) {
+			c = draft;
+			
+			em.persist(c);
 		}
 		
-		return c0;
+		return c;
 	}
 }

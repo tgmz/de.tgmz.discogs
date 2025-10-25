@@ -30,7 +30,7 @@ public class ReleaseFactory implements IFactory<Release> {
 	
 	public ReleaseFactory() {
 		af = new ArtistFactory();
-		eaf = new ExtraArtistFactory(af);
+		eaf = new ExtraArtistFactory();
 	}
 	
 	@Override
@@ -73,7 +73,7 @@ public class ReleaseFactory implements IFactory<Release> {
 			t.setExtraArtists(srea.replaceAll(t.getExtraArtists()));
 		}
 		
-		draft.getCompanies().forEach(cr -> cr.setCompany(cf.get(em, cr.getCompany())));
+		draft.getCompanies().forEach(cr -> cr.getId().setCompany(cf.get(em, cr.getId().getCompany())));
 		
 		return draft;
 	}
