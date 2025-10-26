@@ -54,7 +54,7 @@ public class CompanyRoleId implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(company, role);
+		return Objects.hash(company.getId(), role);
 	}
 
 	@Override
