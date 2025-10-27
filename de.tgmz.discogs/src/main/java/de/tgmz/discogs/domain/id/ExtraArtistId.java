@@ -7,41 +7,40 @@
 *
 * SPDX-License-Identifier: EPL-2.0
 **********************************************************************/
-package de.tgmz.discogs.domain;
+package de.tgmz.discogs.domain.id;
 
 import java.io.Serializable;
 import java.util.Objects;
 
+import de.tgmz.discogs.domain.Artist;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Transient;
 
-public class CompanyRoleId implements Serializable {
+public class ExtraArtistId implements Serializable {
 	@Transient
 	private static final long serialVersionUID = 8460138400268050387L;
 
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-	private Company company;
+	private Artist artist;
 	private String role;
 	
-	public CompanyRoleId() {
-		company = new Company();
+	public ExtraArtistId() {
 	}
 
-	public CompanyRoleId(Company company, String role) {
-		this();
-		
-		this.company = company;
+	public ExtraArtistId(Artist artist, String role) {
+		super();
+		this.artist = artist;
 		this.role = role;
 	}
 
-	public Company getCompany() {
-		return company;
+	public Artist getArtist() {
+		return artist;
 	}
 
-	public void setCompany(Company company) {
-		this.company = company;
+	public void setArtist(Artist artist) {
+		this.artist = artist;
 	}
 
 	public String getRole() {
@@ -54,7 +53,7 @@ public class CompanyRoleId implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(company.getId(), role);
+		return Objects.hash(artist, role);
 	}
 
 	@Override
@@ -65,12 +64,12 @@ public class CompanyRoleId implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		CompanyRoleId other = (CompanyRoleId) obj;
-		return company.getId() == other.company.getId() && Objects.equals(role, other.role);
+		ExtraArtistId other = (ExtraArtistId) obj;
+		return artist.getId() == other.artist.getId() && Objects.equals(role, other.role);
 	}
 
 	@Override
 	public String toString() {
-		return "CompanyRoleId [company=" + company + ", role=" + role + "]";
+		return "ExtraArtistId [artist=" + artist + ", role=" + role + "]";
 	}
 }

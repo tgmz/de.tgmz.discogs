@@ -20,12 +20,12 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 
+import de.tgmz.discogs.domain.id.TrackId;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
@@ -38,13 +38,9 @@ import jakarta.persistence.Transient;
 public class Track implements Serializable {
 	@Transient
 	private static final long serialVersionUID = 5684918391708831387L;
-	@Id
-	@GeneratedValue
-	private long id;
-	// "sequence" is important for ordering in Release.class. Ordering by postion is impossible due to its inconsitent format and
-	// trackNumber is 0 on headlines which crashes ordering on albums with more than one headline.
-	private int sequence;
-	private int trackNumber;
+	@EmbeddedId
+	private TrackId id;
+	private short trackNumber;
 	private String title;
 	@Column(length = 256)
 	private String position;
@@ -59,16 +55,24 @@ public class Track implements Serializable {
 	private List<SubTrack> subTracklist;
 
 	public Track() {
+		id = new TrackId();
+		
 		subTracklist = new LinkedList<>();
 		artists = new HashSet<>();
 		extraArtists = new HashSet<>();
 	}
 	
-	public long getId() {
+	public Track(Release r) {
+		this();
+		
+		id.setRelease(r);
+	}
+	
+	public TrackId getId() {
 		return id;
 	}
 
-	public int getTrackNumber() {
+	public short getTrackNumber() {
 		return trackNumber;
 	}
 
@@ -96,15 +100,15 @@ public class Track implements Serializable {
 		return subTracklist;
 	}
 
-	public int getSequence() {
-		return sequence;
+	public short getSequence() {
+		return id.getSequence();
 	}
 
-	public void setId(long id) {
+	public void setId(TrackId id) {
 		this.id = id;
 	}
 
-	public void setTrackNumber(int trackNumber) {
+	public void setTrackNumber(short trackNumber) {
 		this.trackNumber = trackNumber;
 	}
 
@@ -128,8 +132,8 @@ public class Track implements Serializable {
 		this.artists = artists;
 	}
 
-	public void setSequence(int sequence) {
-		this.sequence = sequence;
+	public void setSequence(short sequence) {
+		this.id.setSequence(sequence);
 	}
 
 	/**
@@ -179,7 +183,7 @@ public class Track implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "Track [id=" + id + ", sequence=" + sequence + ", trackNumber=" + trackNumber + ", position=" + position + ", title="
+		return "Track [id=" + id + ", trackNumber=" + trackNumber + ", position=" + position + ", title="
 				+ title + ", duration=" + duration + ", artists=" + artists + ", extraArtists=" + extraArtists
 				+ ", subTracklist=" + subTracklist + "]";
 	}

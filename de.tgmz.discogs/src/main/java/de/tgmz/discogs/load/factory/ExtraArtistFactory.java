@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.ExtraArtist;
-import de.tgmz.discogs.domain.ExtraArtistId;
+import de.tgmz.discogs.domain.id.ExtraArtistId;
 import jakarta.persistence.EntityManager;
 
 public class ExtraArtistFactory implements IFactory<ExtraArtist> {

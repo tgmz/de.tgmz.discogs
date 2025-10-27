@@ -7,52 +7,48 @@
 *
 * SPDX-License-Identifier: EPL-2.0
 **********************************************************************/
-package de.tgmz.discogs.domain;
+package de.tgmz.discogs.domain.id;
 
 import java.io.Serializable;
 import java.util.Objects;
 
+import de.tgmz.discogs.domain.Track;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Transient;
 
-public class ExtraArtistId implements Serializable {
+public class SubTrackId implements Serializable {
 	@Transient
 	private static final long serialVersionUID = 8460138400268050387L;
 
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-	private Artist artist;
-	private String role;
+	private Track track;
+	private byte subTrackNumber;
 	
-	public ExtraArtistId() {
-	}
-
-	public ExtraArtistId(Artist artist, String role) {
+	public SubTrackId() {
 		super();
-		this.artist = artist;
-		this.role = role;
 	}
 
-	public Artist getArtist() {
-		return artist;
+	public Track getTrack() {
+		return track;
 	}
 
-	public void setArtist(Artist artist) {
-		this.artist = artist;
+	public void setTrack(Track track) {
+		this.track = track;
 	}
 
-	public String getRole() {
-		return role;
+	public byte getSubTrackNumber() {
+		return subTrackNumber;
 	}
 
-	public void setRole(String role) {
-		this.role = role;
+	public void setSubTrackNumber(byte subTrackNumber) {
+		this.subTrackNumber = subTrackNumber;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(artist, role);
+		return Objects.hash(subTrackNumber, track.getId());
 	}
 
 	@Override
@@ -63,12 +59,12 @@ public class ExtraArtistId implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		ExtraArtistId other = (ExtraArtistId) obj;
-		return artist.getId() == other.artist.getId() && Objects.equals(role, other.role);
+		SubTrackId other = (SubTrackId) obj;
+		return subTrackNumber == other.subTrackNumber && Objects.equals(track.getId(), other.track.getId());
 	}
 
 	@Override
 	public String toString() {
-		return "ExtraArtistId [artist=" + artist + ", role=" + role + "]";
+		return "SubTrackId [track=" + track + ", sequence=" + subTrackNumber + "]";
 	}
 }

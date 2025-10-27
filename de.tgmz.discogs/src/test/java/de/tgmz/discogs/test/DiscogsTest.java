@@ -29,6 +29,7 @@ import org.junit.Test;
 
 import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Artist;
+import de.tgmz.discogs.domain.Company;
 import de.tgmz.discogs.domain.CompanyRole;
 import de.tgmz.discogs.domain.DataQuality;
 import de.tgmz.discogs.domain.ExtraArtist;
@@ -39,6 +40,8 @@ import de.tgmz.discogs.domain.Release;
 import de.tgmz.discogs.domain.Style;
 import de.tgmz.discogs.domain.SubTrack;
 import de.tgmz.discogs.domain.Track;
+import de.tgmz.discogs.domain.id.SubTrackId;
+import de.tgmz.discogs.domain.id.TrackId;
 import de.tgmz.discogs.load.ArtistContentHandler;
 import de.tgmz.discogs.load.LabelContentHandler;
 import de.tgmz.discogs.load.MasterContentHandler;
@@ -155,7 +158,7 @@ public class DiscogsTest {
 		assertEquals(24, ftl.get(21).getSequence());
 	}
 	@Test
-	public void testExtraArtist() {
+	public void testExtraArtistEquals() {
 		Artist a0 = new Artist(1);
 		a0.setName("A");
 		
@@ -168,6 +171,52 @@ public class DiscogsTest {
 
 		// Ensure that ExtraArtists are equal iff the artists _ids_ and roles are equal
 		assertEquals(ea0, ea1);
+	}
+	@Test
+	public void testCompanyRoleEquals() {
+		Company c0 = new Company(1, "0");
+		Company c1 = new Company(1, "1");
+		
+		CompanyRole cr0 = new CompanyRole(c0, "Copyright");
+		CompanyRole cr1 = new CompanyRole(c1, "Copyright");
+
+		// Ensure that CompanyRoles are equal iff the companys _ids_ and roles are equal
+		assertEquals(cr0, cr1);
+	}
+	@Test
+	public void testTrackEquals() {
+		Release r0 = new Release();
+		Release r1 = new Release();
+		
+		r0.setId(1);
+		r1.setId(1);
+		
+		TrackId ti0 = new TrackId();
+		TrackId ti1 = new TrackId();
+		
+		ti0.setRelease(r0);
+		ti1.setRelease(r1);
+		
+		ti0.setSequence((short) 2);
+		ti1.setSequence((short) 2);
+		
+		// Ensure that trackIds are equal iff the releases _ids_ and sequences are equal
+		assertEquals(ti0, ti1);
+
+		Track t0 = new Track(r0);
+		Track t1 = new Track(r1);
+		
+		SubTrackId sti0 = new SubTrackId();
+		SubTrackId sti1 = new SubTrackId();
+		
+		sti0.setTrack(t0);
+		sti1.setTrack(t1);
+
+		sti0.setSubTrackNumber((byte) 3);
+		sti1.setSubTrackNumber((byte) 3);
+		
+		// Ensure that subTracks are equal iff the tracks _ids_ and subtracknumbers are equal
+		assertEquals(sti0, sti1);
 	}
 	@Test
 	public void testGenreStyle() {

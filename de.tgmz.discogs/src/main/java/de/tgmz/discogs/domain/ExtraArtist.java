@@ -12,6 +12,7 @@ package de.tgmz.discogs.domain;
 import java.io.Serializable;
 import java.util.Objects;
 
+import de.tgmz.discogs.domain.id.ExtraArtistId;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Index;

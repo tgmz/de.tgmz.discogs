@@ -13,12 +13,12 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.tgmz.discogs.domain.id.SubTrackId;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Transient;
 
@@ -29,10 +29,8 @@ import jakarta.persistence.Transient;
 public class SubTrack implements Serializable {
 	@Transient
 	private static final long serialVersionUID = 5772183040087284559L;
-	@Id
-	@GeneratedValue
-	private long id;
-	private int subTrackNumber;
+	@EmbeddedId
+	private SubTrackId id;
 	private String title;
 	@Column(length = 32)
 	private String position;
@@ -42,10 +40,19 @@ public class SubTrack implements Serializable {
 	private String duration;
 
 	public SubTrack() {
+		id = new SubTrackId();
+		
 		extraArtists = new HashSet<>();
 	}
-	public int getSubTrackNumber() {
-		return subTrackNumber;
+
+	public SubTrack(Track t) {
+		this();
+		
+		id.setTrack(t);
+	}
+	
+	public byte getSubTrackNumber() {
+		return id.getSubTrackNumber();
 	}
 
 	public String getTitle() {
@@ -64,12 +71,12 @@ public class SubTrack implements Serializable {
 		return duration;
 	}
 	
-	public void setId(long id) {
+	public void setId(SubTrackId id) {
 		this.id = id;
 	}
 
-	public void setSubTrackNumber(int subTrackNumber) {
-		this.subTrackNumber = subTrackNumber;
+	public void setSubTrackNumber(byte subTrackNumber) {
+		this.id.setSubTrackNumber(subTrackNumber);
 	}
 
 	public void setTitle(String name) {

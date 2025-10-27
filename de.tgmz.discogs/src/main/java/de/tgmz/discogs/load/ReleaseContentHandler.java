@@ -40,9 +40,9 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	protected static final Logger LOG = LoggerFactory.getLogger(ReleaseContentHandler.class);
 	private List<String> bandArtists;
 	private List<String> bandJoins;
-	private int sequence;
-	private int trackNumber;
-	private int subTrackNumber;
+	private short sequence;
+	private short trackNumber;
+	private byte subTrackNumber;
 	private Artist artist;
 	private ExtraArtist extraArtist;
 	private Map<ExtraArtist, String> applicableExtraArtists;
@@ -104,7 +104,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, tracklist, track]":
-			track = new Track();
+			track = new Track(r);
 			track.setSequence(sequence++);
 			track.setTrackNumber(trackNumber++);
 			
@@ -122,7 +122,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, tracklist, track, sub_tracks, track]":
-			subTrack = new SubTrack();
+			subTrack = new SubTrack(track);
 			subTrack.setSubTrackNumber(subTrackNumber++);
 			
 			break;
