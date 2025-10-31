@@ -34,7 +34,6 @@ import de.tgmz.discogs.logging.LogUtil;
 import de.tgmz.discogs.setup.DiscogsFile;
 import de.tgmz.discogs.setup.DiscogsFileHandler;
 import de.tgmz.discogs.setup.DiscogsVerificationException;
-import de.tgmz.mp3.discogs.load.predicate.MainFilter;
 
 public class SetupTest {
 	private static final String LOG_LEVEL_KEY = "org.slf4j.simpleLogger.defaultLogLevel";
@@ -111,7 +110,7 @@ public class SetupTest {
 	
 	@Test(expected = None.class)
 	public void testMain() {
-		DiscogsFileHandler.downloadAndImport(MainFilter.class.getCanonicalName());
+		DiscogsFileHandler.downloadAndImport(Integer.MAX_VALUE, false);
 	}
 	
 	private static void setupMockRequest(String file, String path) throws IOException {

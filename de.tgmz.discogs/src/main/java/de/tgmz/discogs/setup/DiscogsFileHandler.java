@@ -22,6 +22,12 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.zip.GZIPInputStream;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.BoundedInputStream;
@@ -33,11 +39,7 @@ import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import com.google.common.io.ByteSource;
 
-import de.tgmz.discogs.load.ArtistContentHandler;
-import de.tgmz.discogs.load.LabelContentHandler;
-import de.tgmz.discogs.load.MasterContentHandler;
 import de.tgmz.discogs.load.ReleaseContentHandler;
-import de.tgmz.mp3.discogs.load.predicate.IgnoreUpToFilter;
 import me.tongfei.progressbar.ProgressBar;
 import me.tongfei.progressbar.ProgressBarBuilder;
 import me.tongfei.progressbar.ProgressBarConsumer;
@@ -60,18 +62,34 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 	}
 
 	public static void main(String[] args) {
-		downloadAndImport(args);
+		Option dt = Option.builder("defragThreshold").hasArg().type(Integer.class).get();
+		Option sv = Option.builder("skipVerification").hasArg().converter(Boolean::parseBoolean).get();
+		
+		Options opts = new Options().addOption(dt).addOption(sv);
+		
+		CommandLineParser clp = new DefaultParser();
+		
+		try {
+			CommandLine cmdl = clp.parse(opts, args);
+			
+			int defragThreshold = cmdl.getParsedOptionValue(dt, 100_000);
+			boolean skipVerification = cmdl.getParsedOptionValue(sv, false);
+			
+			downloadAndImport(defragThreshold, skipVerification);
+		} catch (ParseException e) {
+			LOG.error("Error parsing arguments", e);
+		}
 		
 		System.exit(0);
 	}
 	
-	public static void downloadAndImport(String... args) {
+	public static void downloadAndImport(int defragThreshold, boolean skipVerification) {
 		for (DiscogsFile df : DiscogsFile.values()) {
 			if (df.isZipped()) {
 				try (DiscogsFileHandler dl = new DiscogsFileHandler(df)) { 
 					dl.download();
 					
-					if (!Boolean.getBoolean("de.tgmz.discogs.skipverification")) {
+					if (!skipVerification) {
 						dl.verify();
 					}
 					
@@ -86,12 +104,12 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 				InputStream is1 = new FileInputStream(DiscogsFile.LABELS.getUnzippedFile());
 				InputStream is2 = new FileInputStream(DiscogsFile.MASTERS.getUnzippedFile());
 				InputStream is3 = new FileInputStream(DiscogsFile.RELEASES.getUnzippedFile())) {
-			new ArtistContentHandler(a -> false).run(is0);
-			new LabelContentHandler(l -> false).run(is1);
-			new MasterContentHandler(m -> false).run(is2);
+//			new ArtistContentHandler(a -> false).run(is0);
+//			new LabelContentHandler(l -> false).run(is1);
+//			new MasterContentHandler(m -> false).run(is2);
 			
-			ReleaseContentHandler rch = new ReleaseContentHandler(new IgnoreUpToFilter());
-			rch.setDefragThreshold(100_000);
+			ReleaseContentHandler rch = new ReleaseContentHandler();
+			rch.setDefragThreshold(defragThreshold);
 			
 			rch.run(is3);
 		} catch (IOException e) {
