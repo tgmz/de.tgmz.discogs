@@ -77,4 +77,9 @@ public class ExtraArtist implements Serializable {
 		ExtraArtist other = (ExtraArtist) obj;
 		return Objects.equals(id, other.id);
 	}
+
+	@Override
+	public String toString() {
+		return id.toString();
+	}
 }
