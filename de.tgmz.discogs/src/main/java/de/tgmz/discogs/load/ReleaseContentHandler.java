@@ -10,13 +10,9 @@
 package de.tgmz.discogs.load;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.Predicate;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -45,10 +41,8 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	private byte subTrackNumber;
 	private Artist artist;
 	private ExtraArtist extraArtist;
-	private Map<ExtraArtist, String> applicableExtraArtists;
 	private Track track;
 	private SubTrack subTrack;
-	private String applicableTracks;
 	private CompanyRole companyRole;
 	private Release r;
 	private GenreFactory genreFactory;
@@ -77,8 +71,6 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			r.setId(Long.parseLong(attributes.getValue("id")));
 			
-			applicableExtraArtists = new HashMap<>();
-			
 			break;
 		case "[releases, release, master_id]":
 			r.setMain(Boolean.valueOf(attributes.getValue("is_main_release")));
@@ -95,7 +87,6 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			break;
 		case "[releases, release, extraartists, artist]":
 			extraArtist = new ExtraArtist();
-			applicableTracks = "";
 		
 			break;
 		case "[releases, release, tracklist]":
@@ -227,27 +218,18 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, extraartists, artist, tracks]":
-			applicableTracks = getChars();
+			extraArtist.setTracks(getChars());
 				
 			break;
 		case "[releases, release, extraartists, artist]":
+			// Don't add extraArtist with empty artist.id
 			if (extraArtist.getArtist().getId() != 0L) {
-				if (StringUtils.isEmpty(applicableTracks)) {
-					r.getExtraArtists().add(extraArtist);
-				} else {
-					applicableExtraArtists.put(extraArtist, applicableTracks);
-				}
+				r.getExtraArtists().add(extraArtist);
 			}
 				
 			break;
 		//tracks
 		case "[releases, release, tracklist, track]":
-			for (Entry<ExtraArtist, String> entry : applicableExtraArtists.entrySet()) {
-				if (track.isApplicable(entry.getValue())) {
-					track.getExtraArtists().add(entry.getKey());
-				}
-			}
-			
 			r.getUnfilteredTracklist().add(track);
 			
 			if (track.getPosition() == null && track.getSubTracklist().isEmpty()) {

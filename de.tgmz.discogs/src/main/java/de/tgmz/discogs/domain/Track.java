@@ -149,11 +149,11 @@ public class Track implements Serializable {
 	}
 
 	/**
-	 * Computes if the ExatraArtist applies to a track.
-	 * @param eat the ExatraArtist (unused) and the tracks it applies to
+	 * Computes if the ExatraArtist applies to this track.
+	 * @param ea the ExatraArtist
 	 */
-	public boolean isApplicable(String tracks) {
-		if (StringUtils.isEmpty(tracks)) {
+	public boolean isApplicable(ExtraArtist ea) {
+		if (StringUtils.isEmpty(ea.getTracks())) {
 			return true;
 		}
 		
@@ -161,7 +161,7 @@ public class Track implements Serializable {
 			return false;
 		}
 		
-		String[] split = tracks.split("\\s*,\\s*");		// e.g. "A1 to A5, B2 to B9"
+		String[] split = ea.getTracks().split("\\s*,\\s*");		// e.g. "A1 to A5, B2 to B9"
 
 		if (Strings.CS.containsAny(this.position, split)) {	// Obvious
 			return true;
