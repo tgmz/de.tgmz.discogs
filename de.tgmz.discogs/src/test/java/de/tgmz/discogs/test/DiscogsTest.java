@@ -19,7 +19,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -291,26 +290,21 @@ public class DiscogsTest {
 		assertTrue(r.getGenres().stream().anyMatch(x -> "Electronic".equals(x.getId())));
 		assertTrue(r.getStyles().stream().anyMatch(x -> "Synth-pop".equals(x.getId())));
 		
-		assertEquals(190, r.sizeOf());
+		assertEquals(191, r.sizeOf());
 		
 		ExtraArtist af = r.getExtraArtists().stream().filter(ea -> 132774 == ea.getId().getArtist().getId()).findAny().orElseThrow();
 
 		assertEquals("Andrew Fletcher", af.getId().getArtist().getName());
 		assertEquals("Performer", af.getId().getRole());
 		
-		List<Track> applicableTracks = r.getTracklist().stream().filter(t -> t.isApplicable("1 to 5, 7 to 9")).toList();
+		// Mixed By François Kevorkian
+		ExtraArtist mbfk = r.getExtraArtists().stream().filter(ea -> 20662 == ea.getArtist().getId() && "Mixed By".equals(ea.getRole())).findAny().get();
+		assertEquals("1 to 5, 7 to 9", mbfk.getTracks());
 
-		Artist fk = em.find(Artist.class, 20662); // François Kevorkian
-		ExtraArtist efk = new ExtraArtist(fk, "Mixed By");
+		assertTrue(r.getTracklist().getFirst().isApplicable(mbfk));
 		
-		assertTrue(applicableTracks.stream().allMatch(t -> t.getExtraArtists().contains(efk)));
-		
-		assertFalse(r.getTracklist().get(5).getExtraArtists().contains(efk));
+		assertFalse(r.getTracklist().get(5).isApplicable(mbfk));
 
-		Optional<ExtraArtist> ofk = r.getTracklist().get(5).getExtraArtists().stream().filter(ea -> 20662 == ea.getId().getArtist().getId()).findAny();
-
-		assertFalse(ofk.isPresent());
-		
 		List<Track> tracklist = r.getUnfilteredTracklist();
 		
 		assertEquals(9, tracklist.size());

@@ -25,6 +25,7 @@ public class ExtraArtistId implements Serializable {
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private Artist artist;
 	private String role;
+	private String tracks;
 	
 	public ExtraArtistId() {
 	}
@@ -51,9 +52,17 @@ public class ExtraArtistId implements Serializable {
 		this.role = role;
 	}
 
+	public String getTracks() {
+		return tracks;
+	}
+
+	public void setTracks(String tracks) {
+		this.tracks = tracks;
+	}
+
 	@Override
 	public int hashCode() {
-		return Objects.hash(artist, role);
+		return Objects.hash(artist, role, tracks);
 	}
 
 	@Override
@@ -65,7 +74,7 @@ public class ExtraArtistId implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		ExtraArtistId other = (ExtraArtistId) obj;
-		return artist.getId() == other.artist.getId() && Objects.equals(role, other.role);
+		return artist.getId() == other.artist.getId() && Objects.equals(role, other.role) && Objects.equals(tracks, other.tracks);
 	}
 
 	@Override

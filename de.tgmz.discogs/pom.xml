@@ -207,7 +207,7 @@
 					<mainClass>de.tgmz.discogs.setup.DiscogsFileHandler</mainClass>
 					<arguments>
 						<argument>-skipVerification</argument>
-						<argument>false</argument>
+						<argument>true</argument>
 						<argument>-defragThreshold</argument>
 						<argument>1000000</argument>
 					</arguments>
@@ -219,7 +219,7 @@
 						</property>
 						<property>
 							<key>jakarta.persistence.jdbc.url</key>
-							<value>jdbc:h2:file:~/Databases/mp3jpa;MODE=DB2;DEFAULT_NULL_ORDERING=HIGH;AUTO_SERVER=TRUE</value>
+							<value>jdbc:h2:file:/datadrive/Databases/mp3jpa;MODE=DB2;DEFAULT_NULL_ORDERING=HIGH;AUTO_SERVER=TRUE</value>
 						</property>
 						<property>
 							<key>jakarta.persistence.jdbc.user</key>

@@ -32,6 +32,7 @@ public class ExtraArtist implements Serializable {
 		id = new ExtraArtistId();
 		
 		id.setArtist(new Artist());
+		id.setTracks("");
 	}
 	
 	public ExtraArtist(Artist artist, String role) {
@@ -61,6 +62,14 @@ public class ExtraArtist implements Serializable {
 		id.setRole(a);
 	}
 	
+	public String getTracks() {
+		return id.getTracks();
+	}
+
+	public void setTracks(String tracks) {
+		this.id.setTracks(tracks);
+	}
+	
 	@Override
 	public int hashCode() {
 		return Objects.hash(id);
@@ -76,5 +85,10 @@ public class ExtraArtist implements Serializable {
 			return false;
 		ExtraArtist other = (ExtraArtist) obj;
 		return Objects.equals(id, other.id);
+	}
+
+	@Override
+	public String toString() {
+		return id.toString();
 	}
 }

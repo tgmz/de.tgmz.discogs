@@ -10,14 +10,11 @@
 package de.tgmz.discogs.load.factory;
 
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.HashSet;
 
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.ExtraArtist;
 import de.tgmz.discogs.domain.Genre;
-import de.tgmz.discogs.domain.Label;
-import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
 import de.tgmz.discogs.domain.Style;
 import de.tgmz.discogs.domain.SubTrack;
@@ -36,27 +33,29 @@ public class ReleaseFactory implements IFactory<Release> {
 	@Override
 	public Release get(EntityManager em, Release draft) {
 		SetReplacer<Artist> sra = new SetReplacer<>(em, af);
-		SetReplacer<Genre> srg = new SetReplacer<>(em, new GenreFactory());
-		SetReplacer<Style> srs = new SetReplacer<>(em, new StyleFactory());
-		SetReplacer<ExtraArtist> srea = new SetReplacer<>(em, eaf);
+		SetReplacer<Artist> srae = new EmptySetReplacer<>(em, af);
+		SetReplacer<Genre> srg = new EmptySetReplacer<>(em, new GenreFactory());
+		SetReplacer<Style> srs = new EmptySetReplacer<>(em, new StyleFactory());
+		SetReplacer<ExtraArtist> srea = new EmptySetReplacer<>(em, eaf);
 		
-		CompanyFactory cf = new CompanyFactory();
-
-		if (draft.getMaster() !=  null) {
-			draft.setMaster(em.find(Master.class, draft.getMaster().getId()));
-		}
-		
-		Map<Label, String> result = HashMap.newHashMap(draft.getLabels().size());
-		
-		for (Entry<Label, String> e : draft.getLabels().entrySet()) {
-			Label l = em.find(Label.class, e.getKey().getId());
+//		CompanyFactory cf = new CompanyFactory();
+//
+//		if (draft.getMaster() !=  null) {
+//			draft.setMaster(em.find(Master.class, draft.getMaster().getId()));
+//		}
+		draft.setMaster(null);
+//		
+//		Map<Label, String> result = HashMap.newHashMap(draft.getLabels().size());
+//		
+//		for (Entry<Label, String> e : draft.getLabels().entrySet()) {
+//			Label l = em.find(Label.class, e.getKey().getId());
+//			
+//			if (l != null) {
+//				result.put(l, e.getValue());
+//			}
+//		}
 			
-			if (l != null) {
-				result.put(l, e.getValue());
-			}
-		}
-			
-		draft.setLabels(result);
+		draft.setLabels(new HashMap<>());
 
 		draft.setGenres(srg.replaceAll(draft.getGenres()));
 		draft.setStyles(srs.replaceAll(draft.getStyles()));		
@@ -64,7 +63,7 @@ public class ReleaseFactory implements IFactory<Release> {
 		draft.setExtraArtists(srea.replaceAll(draft.getExtraArtists()));
 		
 		for (Track t : draft.getUnfilteredTracklist()) {
-			t.setArtists(sra.replaceAll(t.getArtists()));
+			t.setArtists(srae.replaceAll(t.getArtists()));
 			
 			for (SubTrack st : t.getSubTracklist()) {
 				st.setExtraArtists(srea.replaceAll(st.getExtraArtists()));
@@ -73,7 +72,8 @@ public class ReleaseFactory implements IFactory<Release> {
 			t.setExtraArtists(srea.replaceAll(t.getExtraArtists()));
 		}
 		
-		draft.getCompanies().forEach(cr -> cr.getId().setCompany(cf.get(em, cr.getId().getCompany())));
+		//draft.getCompanies().forEach(cr -> cr.getId().setCompany(cf.get(em, cr.getId().getCompany())));
+		draft.setCompanies(new HashSet<>());
 		
 		return draft;
 	}

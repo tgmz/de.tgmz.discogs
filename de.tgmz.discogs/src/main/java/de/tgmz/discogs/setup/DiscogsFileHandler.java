@@ -39,6 +39,7 @@ import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import com.google.common.io.ByteSource;
 
+import de.tgmz.discogs.load.ArtistContentHandler;
 import de.tgmz.discogs.load.ReleaseContentHandler;
 import me.tongfei.progressbar.ProgressBar;
 import me.tongfei.progressbar.ProgressBarBuilder;
@@ -104,7 +105,7 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 				InputStream is1 = new FileInputStream(DiscogsFile.LABELS.getUnzippedFile());
 				InputStream is2 = new FileInputStream(DiscogsFile.MASTERS.getUnzippedFile());
 				InputStream is3 = new FileInputStream(DiscogsFile.RELEASES.getUnzippedFile())) {
-//			new ArtistContentHandler(a -> false).run(is0);
+			new ArtistContentHandler().run(is0);
 //			new LabelContentHandler(l -> false).run(is1);
 //			new MasterContentHandler(m -> false).run(is2);
 			
