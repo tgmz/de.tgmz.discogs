@@ -41,6 +41,7 @@ import com.google.common.io.ByteSource;
 
 import de.tgmz.discogs.load.ArtistContentHandler;
 import de.tgmz.discogs.load.ReleaseContentHandler;
+import de.tgmz.mp3.discogs.load.predicate.IgnoreUpToFilter;
 import me.tongfei.progressbar.ProgressBar;
 import me.tongfei.progressbar.ProgressBarBuilder;
 import me.tongfei.progressbar.ProgressBarConsumer;
@@ -109,7 +110,7 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 //			new LabelContentHandler(l -> false).run(is1);
 //			new MasterContentHandler(m -> false).run(is2);
 			
-			ReleaseContentHandler rch = new ReleaseContentHandler();
+			ReleaseContentHandler rch = new ReleaseContentHandler(new IgnoreUpToFilter());
 			rch.setDefragThreshold(defragThreshold);
 			
 			rch.run(is3);

@@ -24,7 +24,7 @@ public class SubTrackId implements Serializable {
 
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private Track track;
-	private byte subTrackNumber;
+	private short subTrackNumber;
 	
 	public SubTrackId() {
 		super();
@@ -38,11 +38,11 @@ public class SubTrackId implements Serializable {
 		this.track = track;
 	}
 
-	public byte getSubTrackNumber() {
+	public short getSubTrackNumber() {
 		return subTrackNumber;
 	}
 
-	public void setSubTrackNumber(byte subTrackNumber) {
+	public void setSubTrackNumber(short subTrackNumber) {
 		this.subTrackNumber = subTrackNumber;
 	}
 

@@ -51,7 +51,7 @@ public class SubTrack implements Serializable {
 		id.setTrack(t);
 	}
 	
-	public byte getSubTrackNumber() {
+	public short getSubTrackNumber() {
 		return id.getSubTrackNumber();
 	}
 
@@ -75,7 +75,7 @@ public class SubTrack implements Serializable {
 		this.id = id;
 	}
 
-	public void setSubTrackNumber(byte subTrackNumber) {
+	public void setSubTrackNumber(short subTrackNumber) {
 		this.id.setSubTrackNumber(subTrackNumber);
 	}
 

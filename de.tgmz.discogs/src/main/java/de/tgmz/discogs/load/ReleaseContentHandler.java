@@ -38,7 +38,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	private List<String> bandJoins;
 	private short sequence;
 	private short trackNumber;
-	private byte subTrackNumber;
+	private short subTrackNumber;
 	private Artist artist;
 	private ExtraArtist extraArtist;
 	private Track track;
