@@ -211,8 +211,8 @@ public class DiscogsTest {
 		sti0.setTrack(t0);
 		sti1.setTrack(t1);
 
-		sti0.setSubTrackNumber((byte) 3);
-		sti1.setSubTrackNumber((byte) 3);
+		sti0.setSubTrackNumber((short) 3);
+		sti1.setSubTrackNumber((short) 3);
 		
 		// Ensure that subTracks are equal iff the tracks _ids_ and subtracknumbers are equal
 		assertEquals(sti0, sti1);
