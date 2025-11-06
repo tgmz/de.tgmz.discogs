@@ -174,7 +174,10 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, artists, artist]":
-			r.getArtists().add(artist);
+			// Don't add artist with empty id
+			if (artist.getId() != 0L) {
+				r.getArtists().add(artist);
+			}
 			
 			break;
 		case "[releases, release, artists, artist, id]":
@@ -251,8 +254,11 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 				
 			break;
 		case "[releases, release, tracklist, track, artists, artist]":
-			track.getArtists().add(artist);
-			
+			// Don't add artist with empty id
+			if (artist.getId() != 0L) {
+				track.getArtists().add(artist);
+			}
+
 			break;
 		case "[releases, release, tracklist, track, artists, artist, id]":
 			artist.setId(Long.valueOf(getChars()));
