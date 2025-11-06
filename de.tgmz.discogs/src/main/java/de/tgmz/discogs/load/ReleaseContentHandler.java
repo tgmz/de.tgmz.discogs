@@ -81,11 +81,14 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			bandJoins = new ArrayList<>();
 			
 			break;
-		case "[releases, release, artists, artist]":
+		case "[releases, release, artists, artist]"
+			, "[releases, release, tracklist, track, artists, artist]":
 			artist = new Artist();
 			
 			break;
-		case "[releases, release, extraartists, artist]":
+		case "[releases, release, extraartists, artist]"
+			, "[releases, release, tracklist, track, extraartists, artist]"
+			, "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist]":
 			extraArtist = new ExtraArtist();
 		
 			break;
@@ -100,14 +103,6 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			track.setTrackNumber(trackNumber++);
 			
 			break;
-		case "[releases, release, tracklist, track, artists, artist]":
-			artist = new Artist();
-			
-			break;
-		case "[releases, release, tracklist, track, extraartists, artist]":
-			extraArtist = new ExtraArtist();
-			
-			break;
 		case "[releases, release, tracklist, track, sub_tracks]":
 			subTrackNumber = 1;
 			
@@ -115,10 +110,6 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 		case "[releases, release, tracklist, track, sub_tracks, track]":
 			subTrack = new SubTrack(track);
 			subTrack.setSubTrackNumber(subTrackNumber++);
-			
-			break;
-		case "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist]":
-			extraArtist = new ExtraArtist();
 			
 			break;
 		case "[releases, release, labels, label]":
@@ -180,7 +171,8 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			}
 			
 			break;
-		case "[releases, release, artists, artist, id]":
+		case "[releases, release, artists, artist, id]"
+			, "[releases, release, tracklist, track, artists, artist, id]":
 			artist.setId(Long.valueOf(getChars()));
 			
 			break;
@@ -208,15 +200,21 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		// extraartists
-		case "[releases, release, extraartists, artist, id]":
+		case "[releases, release, extraartists, artist, id]"
+			, "[releases, release, tracklist, track, extraartists, artist, id]"
+			, "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist, id]":
 			extraArtist.getArtist().setId(Long.parseLong(getChars()));
 				
 			break;
-		case "[releases, release, extraartists, artist, name]":
+		case "[releases, release, extraartists, artist, name]"
+			, "[releases, release, tracklist, track, extraartists, artist, name]"
+			, "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist, name]":
 			extraArtist.getArtist().setName(getChars(MAX_LENGTH_DEFAULT, true));
 			
 			break;
-		case "[releases, release, extraartists, artist, role]":
+		case "[releases, release, extraartists, artist, role]"
+			, "[releases, release, tracklist, track, extraartists, artist, role]"
+			, "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist, role]":
 			extraArtist.setRole(getChars());
 			
 			break;
@@ -260,10 +258,6 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			}
 
 			break;
-		case "[releases, release, tracklist, track, artists, artist, id]":
-			artist.setId(Long.valueOf(getChars()));
-			
-			break;
 		case "[releases, release, tracklist, track, artists, artist, name]":
 			artist.setName(getChars(MAX_LENGTH_DEFAULT, true));
 			
@@ -272,18 +266,6 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			if (extraArtist.getArtist().getId() != 0L) {
 				track.getExtraArtists().add(extraArtist);
 			}
-			
-			break;
-		case "[releases, release, tracklist, track, extraartists, artist, id]":
-			extraArtist.getArtist().setId(Long.parseLong(getChars()));
-
-			break;
-		case "[releases, release, tracklist, track, extraartists, artist, name]":
-			extraArtist.getArtist().setName(getChars(MAX_LENGTH_DEFAULT, true));
-			
-			break;
-		case "[releases, release, tracklist, track, extraartists, artist, role]":
-			extraArtist.setRole(getChars(MAX_LENGTH_DEFAULT));
 			
 			break;
 		case "[releases, release, tracklist, track, sub_tracks, track]":
@@ -307,18 +289,6 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			if (extraArtist.getArtist().getId() != 0L) {
 				subTrack.getExtraArtists().add(extraArtist);
 			}
-			
-			break;
-		case "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist, id]":
-			extraArtist.getArtist().setId(Long.parseLong(getChars()));
-			
-			break;
-		case "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist, name]":
-			extraArtist.getArtist().setName(getChars(MAX_LENGTH_DEFAULT, true));
-			
-			break;
-		case "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist, role]":
-			extraArtist.setRole(getChars());
 			
 			break;
 		case "[releases, release, companies, company, id]":
