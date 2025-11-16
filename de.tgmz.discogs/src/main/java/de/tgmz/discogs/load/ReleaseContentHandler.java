@@ -41,6 +41,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	private short subTrackNumber;
 	private Artist artist;
 	private ExtraArtist extraArtist;
+	private String eaTracks;
 	private Track track;
 	private SubTrack subTrack;
 	private CompanyRole companyRole;
@@ -90,7 +91,8 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			, "[releases, release, tracklist, track, extraartists, artist]"
 			, "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist]":
 			extraArtist = new ExtraArtist();
-		
+			eaTracks = "";
+
 			break;
 		case "[releases, release, tracklist]":
 			sequence = 0;
@@ -219,13 +221,13 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, extraartists, artist, tracks]":
-			extraArtist.setTracks(getChars());
+			eaTracks = getChars();
 				
 			break;
 		case "[releases, release, extraartists, artist]":
 			// Don't add extraArtist with empty artist.id
 			if (extraArtist.getArtist().getId() != 0L) {
-				r.getExtraArtists().add(extraArtist);
+				r.getExtraArtists().put(extraArtist, eaTracks);
 			}
 				
 			break;

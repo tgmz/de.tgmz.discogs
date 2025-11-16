@@ -19,8 +19,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -120,10 +123,10 @@ public class DiscogsTest {
 		assertEquals("6:29", st.getDuration());
 		assertEquals(2, st.sizeOf());
 		
-		ExtraArtist ea = st.getExtraArtists().stream().filter(ea0 -> ea0.getId().getArtist().getId() == 754974).findFirst().orElseThrow();
+		ExtraArtist ea = st.getExtraArtists().stream().filter(ea0 -> ea0.getArtist().getId() == 754974).findFirst().orElseThrow();
 		
-		assertEquals("Wiener Philharmoniker", ea.getId().getArtist().getName());
-		assertEquals("Orchestra", ea.getId().getRole());
+		assertEquals("Wiener Philharmoniker", ea.getArtist().getName());
+		assertEquals("Orchestra", ea.getRole());
 	}
 	@Test
 	public void testSubtrack() {
@@ -290,20 +293,26 @@ public class DiscogsTest {
 		assertTrue(r.getGenres().stream().anyMatch(x -> "Electronic".equals(x.getId())));
 		assertTrue(r.getStyles().stream().anyMatch(x -> "Synth-pop".equals(x.getId())));
 		
-		assertEquals(191, r.sizeOf());
+		// 20 ExtraArtists apply to all 9 Tracks: => 180
+		// One ExtraArtist (Mixed By François Kevorkian) applies to tracks 1 to 5, 7 to 9 i.e. it does NOT apply to track 6: => 188
+		// Track 6 has two ExtraArtist: => 190
+		// No Track has SubTracks: => 190
+		assertEquals(190, r.sizeOf());
 		
-		ExtraArtist af = r.getExtraArtists().stream().filter(ea -> 132774 == ea.getId().getArtist().getId()).findAny().orElseThrow();
+		// Performer Andrew Fletcher
+		Entry<ExtraArtist, String> paf = getExtraArtist(r, 132774, "Performer");
 
-		assertEquals("Andrew Fletcher", af.getId().getArtist().getName());
-		assertEquals("Performer", af.getId().getRole());
+		assertEquals("Andrew Fletcher", paf.getKey().getArtist().getName());
+		assertEquals("Performer", paf.getKey().getRole());
 		
 		// Mixed By François Kevorkian
-		ExtraArtist mbfk = r.getExtraArtists().stream().filter(ea -> 20662 == ea.getArtist().getId() && "Mixed By".equals(ea.getRole())).findAny().get();
-		assertEquals("1 to 5, 7 to 9", mbfk.getTracks());
-
-		assertTrue(r.getTracklist().getFirst().isApplicable(mbfk));
+		Entry<ExtraArtist, String> embfk = getExtraArtist(r, 20662, "Mixed By");
+		ExtraArtist mbfk = embfk.getKey(); 
+		String tracks = embfk.getValue();
 		
-		assertFalse(r.getTracklist().get(5).isApplicable(mbfk));
+		assertEquals("1 to 5, 7 to 9", tracks);
+		assertTrue(r.getTracklist().getFirst().isApplicable(mbfk, tracks));
+		assertFalse(r.getTracklist().get(5).isApplicable(mbfk, tracks));
 
 		List<Track> tracklist = r.getUnfilteredTracklist();
 		
@@ -319,12 +328,19 @@ public class DiscogsTest {
 		
 		Set<ExtraArtist> eas = t.getExtraArtists();
 		
-		ExtraArtist flood = eas.stream().filter(x -> x.getId().getArtist() != null && 20661 == x.getId().getArtist().getId()).findAny().orElseThrow();
+		ExtraArtist flood = eas.stream().filter(x -> x.getArtist() != null && 20661 == x.getArtist().getId()).findAny().orElseThrow();
 		
-		assertEquals("Mixed By", flood.getId().getRole());
-		assertEquals("Flood", flood.getId().getArtist().getName());
-		assertEquals("Mark Ellis", flood.getId().getArtist().getRealName());
+		assertEquals("Mixed By", flood.getRole());
+		assertEquals("Flood", flood.getArtist().getName());
+		assertEquals("Mark Ellis", flood.getArtist().getRealName());
 		
 		assertEquals("9 26081-2", r.getLabels().get(l));
+	}
+	
+	private Entry<ExtraArtist, String> getExtraArtist(Release r, long id, String role) {
+		return r.getExtraArtists()
+				.entrySet()
+				.stream()
+				.filter(e -> id == e.getKey().getArtist().getId() && role.equals(e.getKey().getRole())).findAny().orElseThrow();
 	}
 }

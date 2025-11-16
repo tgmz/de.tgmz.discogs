@@ -89,6 +89,8 @@ public class ArtistFactory implements IFactory<Artist> {
 		
 		if (a0  == null) {
 			a0 = draft;
+			
+			em.persist(a0);
 		}
 		
 		return a0;

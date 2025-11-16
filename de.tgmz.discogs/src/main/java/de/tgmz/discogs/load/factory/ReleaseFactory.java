@@ -12,6 +12,7 @@ package de.tgmz.discogs.load.factory;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.ExtraArtist;
@@ -61,7 +62,12 @@ public class ReleaseFactory implements IFactory<Release> {
 		draft.setGenres(srg.replaceAll(draft.getGenres()));
 		draft.setStyles(srs.replaceAll(draft.getStyles()));		
 		draft.setArtists(sra.replaceAll(draft.getArtists()));
-		draft.setExtraArtists(srea.replaceAll(draft.getExtraArtists()));
+		
+		Map<ExtraArtist, String> eas = new HashMap<>();
+		Set<ExtraArtist> keys = srea.replaceAll(draft.getExtraArtists().keySet());
+		keys.forEach(ea -> eas.put(ea, draft.getExtraArtists().get(ea)));
+		
+		draft.setExtraArtists(eas);
 		
 		for (Track t : draft.getUnfilteredTracklist()) {
 			t.setArtists(sra.replaceAll(t.getArtists()));

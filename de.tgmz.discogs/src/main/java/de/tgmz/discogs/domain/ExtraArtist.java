@@ -12,67 +12,69 @@ package de.tgmz.discogs.domain;
 import java.io.Serializable;
 import java.util.Objects;
 
-import de.tgmz.discogs.domain.id.ExtraArtistId;
-import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 import jakarta.persistence.Index;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
 @Entity
 @Table(indexes = {
-	@Index(name = "artistRole_idx", columnList = "artist, role")
+	@Index(name = "artistRole_idx", columnList = "artist,role")
 })
+@NamedQuery(name = "ExtraArtist.byArtistIdAndRole"
+, query = "FROM ExtraArtist WHERE artist.id = ?1 AND role = ?2") 
 public class ExtraArtist implements Serializable { 
 	@Transient
 	private static final long serialVersionUID = 2296552658329482485L;
-	@EmbeddedId
-	private ExtraArtistId id;
-	public ExtraArtist() {
-		id = new ExtraArtistId();
-		
-		id.setArtist(new Artist());
-		id.setTracks("");
-	}
+	@Id
+	@GeneratedValue
+	private long id;
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	private Artist artist;
+	private String role;
 	
-	public ExtraArtist(Artist artist, String role) {
-		this();
-		
-		this.id.setArtist(artist);
-		this.id.setRole(role);
+	public ExtraArtist() {
+		artist = new Artist();
 	}
 
-	public ExtraArtistId getId() {
+	public ExtraArtist(Artist artist, String role) {
+		this.artist = artist;
+		this.role = role;
+	}
+
+	public long getId() {
 		return id;
 	}
-	
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
 	public Artist getArtist() {
-		return id.getArtist();
+		return artist;
+	}
+
+	public void setArtist(Artist artist) {
+		this.artist = artist;
 	}
 
 	public String getRole() {
-		return id.getRole();
+		return role;
 	}
 
-	public void setArtist(Artist a) {
-		id.setArtist(a);
-	}
-	
-	public void setRole(String a) {
-		id.setRole(a);
-	}
-	
-	public String getTracks() {
-		return id.getTracks();
+	public void setRole(String role) {
+		this.role = role;
 	}
 
-	public void setTracks(String tracks) {
-		this.id.setTracks(tracks);
-	}
-	
 	@Override
 	public int hashCode() {
-		return Objects.hash(id);
+		return Objects.hash(artist.getId(), role);
 	}
 
 	@Override
@@ -84,11 +86,7 @@ public class ExtraArtist implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		ExtraArtist other = (ExtraArtist) obj;
-		return Objects.equals(id, other.id);
+		return artist.getId() == other.artist.getId() && Objects.equals(role, other.role);
 	}
-
-	@Override
-	public String toString() {
-		return id.toString();
-	}
+	
 }

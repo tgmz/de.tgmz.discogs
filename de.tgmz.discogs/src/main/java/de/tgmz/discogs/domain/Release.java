@@ -53,8 +53,8 @@ public class Release extends Discogs {
 	private Master master;
 	private String country;
 	private String released;
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-	private Set<ExtraArtist> extraArtists;
+	@ElementCollection(fetch = FetchType.LAZY)
+	private Map<ExtraArtist, String> extraArtists;
 	@ElementCollection(fetch = FetchType.LAZY)
 	@Column(name = "catno")
 	private Map<Label, String> labels;
@@ -65,7 +65,7 @@ public class Release extends Discogs {
 		super();
 		
 		tracklist = new LinkedList<>();
-		extraArtists = new HashSet<>();
+		extraArtists = new HashMap<>();
 		labels = new HashMap<>();
 		companies = new HashSet<>();
 	}
@@ -132,7 +132,7 @@ public class Release extends Discogs {
 		this.master = master;
 	}
 
-	public Set<ExtraArtist> getExtraArtists() {
+	public Map<ExtraArtist, String> getExtraArtists() {
 		return extraArtists;
 	}
 
@@ -143,7 +143,7 @@ public class Release extends Discogs {
 		this.labels = labels;
 	}
 
-	public void setExtraArtists(Set<ExtraArtist> extraArtists) {
+	public void setExtraArtists(Map<ExtraArtist, String> extraArtists) {
 		this.extraArtists = extraArtists;
 	}
 	
@@ -156,9 +156,15 @@ public class Release extends Discogs {
 	 * @return A measure for the amount of information this release carries
 	 */
 	public int sizeOf() {
-		int i = extraArtists.size() * tracklist.size();
-
-		i += tracklist.stream().mapToInt(Track::sizeOf).sum();
+		int i = 0;
+		
+		for (Track t : tracklist) {
+			for (Map.Entry<ExtraArtist, String> e : extraArtists.entrySet()) {
+				i += t.isApplicable(e.getKey(), e.getValue()) ? 1 : 0;
+			}
+			
+			i += t.sizeOf();
+		}
 		
 		return i;
 	}

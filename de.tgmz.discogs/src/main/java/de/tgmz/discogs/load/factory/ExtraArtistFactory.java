@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.ExtraArtist;
-import de.tgmz.discogs.domain.id.ExtraArtistId;
 import jakarta.persistence.EntityManager;
 
 public class ExtraArtistFactory implements IFactory<ExtraArtist> {
@@ -46,12 +45,17 @@ public class ExtraArtistFactory implements IFactory<ExtraArtist> {
 		
 		String role = draft.getRole();
 		
-		ExtraArtist ea = em.find(ExtraArtist.class, new ExtraArtistId(a, role));
+		ExtraArtist ea = em.createNamedQuery("ExtraArtist.byArtistIdAndRole", ExtraArtist.class)
+				.setParameter(1, draft.getArtist().getId())
+				.setParameter(2, role)
+				.getSingleResultOrNull();
 		
 		if (ea  == null) {
 			ea = draft;
 			
 			ea.setArtist(a);
+			
+			em.persist(ea);
 		}
 		
 		return ea;
