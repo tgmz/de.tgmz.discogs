@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.tgmz.discogs.domain.id.SubTrackId;
+import de.tgmz.discogs.relevance.RelevanceService;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
@@ -100,7 +101,7 @@ public class SubTrack implements Serializable {
 	 * @return A measure for the amount of information this track carries
 	 */
 	public int sizeOf() {
-		return extraArtists.size();
+		return (int) extraArtists.stream().filter(ea -> RelevanceService.getInstance().isRelevant(ea.getRole())).count();
 	}
 
 	@Override

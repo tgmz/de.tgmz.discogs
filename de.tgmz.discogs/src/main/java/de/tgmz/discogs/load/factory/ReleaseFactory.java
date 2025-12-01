@@ -23,6 +23,7 @@ import de.tgmz.discogs.domain.Release;
 import de.tgmz.discogs.domain.Style;
 import de.tgmz.discogs.domain.SubTrack;
 import de.tgmz.discogs.domain.Track;
+import de.tgmz.discogs.relevance.RelevanceService;
 import jakarta.persistence.EntityManager;
 
 public class ReleaseFactory implements IFactory<Release> {
@@ -64,7 +65,9 @@ public class ReleaseFactory implements IFactory<Release> {
 		draft.setArtists(sra.replaceAll(draft.getArtists()));
 		
 		Map<ExtraArtist, String> eas = new HashMap<>();
-		Set<ExtraArtist> keys = srea.replaceAll(draft.getExtraArtists().keySet());
+		Set<ExtraArtist> keys = draft.getExtraArtists().keySet();
+		keys.removeIf(ea -> !RelevanceService.getInstance().isRelevant(ea.getRole()));
+		keys = srea.replaceAll(keys);
 		keys.forEach(ea -> eas.put(ea, draft.getExtraArtists().get(ea)));
 		
 		draft.setExtraArtists(eas);
@@ -73,9 +76,11 @@ public class ReleaseFactory implements IFactory<Release> {
 			t.setArtists(sra.replaceAll(t.getArtists()));
 			
 			for (SubTrack st : t.getSubTracklist()) {
+				st.getExtraArtists().removeIf(ea -> !RelevanceService.getInstance().isRelevant(ea.getRole()));
 				st.setExtraArtists(srea.replaceAll(st.getExtraArtists()));
 			}
 			
+			t.getExtraArtists().removeIf(ea -> !RelevanceService.getInstance().isRelevant(ea.getRole()));
 			t.setExtraArtists(srea.replaceAll(t.getExtraArtists()));
 		}
 		

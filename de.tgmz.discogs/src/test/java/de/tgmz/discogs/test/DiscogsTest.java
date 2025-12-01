@@ -20,10 +20,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -48,6 +46,7 @@ import de.tgmz.discogs.load.ArtistContentHandler;
 import de.tgmz.discogs.load.LabelContentHandler;
 import de.tgmz.discogs.load.MasterContentHandler;
 import de.tgmz.discogs.load.ReleaseContentHandler;
+import de.tgmz.discogs.relevance.RelevanceService;
 import de.tgmz.discogs.setup.DiscogsFile;
 import de.tgmz.mp3.discogs.load.predicate.DataQualityFilter;
 import de.tgmz.mp3.discogs.load.predicate.IgnoreUpToFilter;
@@ -335,6 +334,10 @@ public class DiscogsTest {
 		assertEquals("Mark Ellis", flood.getArtist().getRealName());
 		
 		assertEquals("9 26081-2", r.getLabels().get(l));
+		
+		RelevanceService.getInstance().setRelevantRoles("Performer", "Producer");
+		assertEquals(54, r.sizeOf());
+		RelevanceService.getInstance().setRelevantRoles((String[]) null);
 	}
 	
 	private Entry<ExtraArtist, String> getExtraArtist(Release r, long id, String role) {

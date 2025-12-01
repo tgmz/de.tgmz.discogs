@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.tgmz.discogs.relevance.RelevanceService;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -160,7 +161,7 @@ public class Release extends Discogs {
 		
 		for (Track t : tracklist) {
 			for (Map.Entry<ExtraArtist, String> e : extraArtists.entrySet()) {
-				i += t.isApplicable(e.getKey(), e.getValue()) ? 1 : 0;
+				i += t.isApplicable(e.getKey(), e.getValue()) && RelevanceService.getInstance().isRelevant(e.getKey().getRole())  ? 1 : 0;
 			}
 			
 			i += t.sizeOf();
