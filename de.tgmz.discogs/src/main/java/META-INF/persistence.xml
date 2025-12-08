@@ -30,6 +30,8 @@
 		<class>de.tgmz.discogs.domain.Label</class>
 		<class>de.tgmz.discogs.domain.Company</class>
 		<class>de.tgmz.discogs.domain.CompanyRole</class>
+		<class>de.tgmz.discogs.domain.Format</class>
+		<class>de.tgmz.discogs.domain.Series</class>
 
 		<properties>
 			<!-- Database connection settings -->

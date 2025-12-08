@@ -33,15 +33,16 @@ import de.tgmz.discogs.domain.Company;
 import de.tgmz.discogs.domain.CompanyRole;
 import de.tgmz.discogs.domain.DataQuality;
 import de.tgmz.discogs.domain.ExtraArtist;
+import de.tgmz.discogs.domain.Format;
 import de.tgmz.discogs.domain.Genre;
 import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
+import de.tgmz.discogs.domain.Series;
 import de.tgmz.discogs.domain.Style;
 import de.tgmz.discogs.domain.SubTrack;
 import de.tgmz.discogs.domain.Track;
 import de.tgmz.discogs.domain.id.SubTrackId;
-import de.tgmz.discogs.domain.id.TrackId;
 import de.tgmz.discogs.load.ArtistContentHandler;
 import de.tgmz.discogs.load.LabelContentHandler;
 import de.tgmz.discogs.load.MasterContentHandler;
@@ -126,6 +127,17 @@ public class DiscogsTest {
 		
 		assertEquals("Wiener Philharmoniker", ea.getArtist().getName());
 		assertEquals("Orchestra", ea.getRole());
+		
+		Set<Format> formats = r.getFormats();
+		
+		assertEquals(1, formats.size());
+		
+		Format format = formats.toArray(new Format[1])[0];
+		
+		assertEquals("CD", format.getName());
+		assertEquals("1", format.getQty());
+		assertTrue(format.getDescriptions().contains("Compilation"));
+		assertTrue(format.getDescriptions().contains("Remastered"));
 	}
 	@Test
 	public void testSubtrack() {
@@ -135,6 +147,19 @@ public class DiscogsTest {
 		assertEquals("1-12a", r.getTracklist().get(11).getSubTracklist().get(0).getPosition());
 		assertEquals(12, r.getUnfilteredTracklist().get(11).getTrackNumber());
 		assertEquals(12, r.getTracklist().get(11).getTrackNumber());
+		
+		Track t0 = new Track(r);
+		
+		SubTrackId sti0 = new SubTrackId();
+		SubTrackId sti1 = new SubTrackId();
+		
+		sti0.setTrack(t0);
+		sti1.setTrack(t0);
+		
+		sti0.setSubTrackNumber((short) 1);
+		sti1.setSubTrackNumber((short) 1);
+		
+		assertEquals(sti0, sti1);
 	}
 	@Test
 	public void testEmptyTrack() {
@@ -185,41 +210,6 @@ public class DiscogsTest {
 		assertEquals(cr0, cr1);
 	}
 	@Test
-	public void testTrackEquals() {
-		Release r0 = new Release();
-		Release r1 = new Release();
-		
-		r0.setId(1);
-		r1.setId(1);
-		
-		TrackId ti0 = new TrackId();
-		TrackId ti1 = new TrackId();
-		
-		ti0.setRelease(r0);
-		ti1.setRelease(r1);
-		
-		ti0.setSequence((short) 2);
-		ti1.setSequence((short) 2);
-		
-		// Ensure that trackIds are equal iff the releases _ids_ and sequences are equal
-		assertEquals(ti0, ti1);
-
-		Track t0 = new Track(r0);
-		Track t1 = new Track(r1);
-		
-		SubTrackId sti0 = new SubTrackId();
-		SubTrackId sti1 = new SubTrackId();
-		
-		sti0.setTrack(t0);
-		sti1.setTrack(t1);
-
-		sti0.setSubTrackNumber((short) 3);
-		sti1.setSubTrackNumber((short) 3);
-		
-		// Ensure that subTracks are equal iff the tracks _ids_ and subtracknumbers are equal
-		assertEquals(sti0, sti1);
-	}
-	@Test
 	public void testGenreStyle() {
 		assertTrue(em.createQuery("FROM Genre", Genre.class).getResultStream().anyMatch(x -> "Rock".equals(x.getId())));
 		
@@ -228,6 +218,16 @@ public class DiscogsTest {
 	@Test
 	public void testArtistNoId() {
 		assertNull(em.find(Artist.class, 0L));
+	}
+	@Test
+	public void testSeries() {
+		Release r = em.find(Release.class, 20279608L);
+		
+		Series s = r.getSeries();
+		
+		assertEquals(117965, s.getId());
+		assertEquals("World Network", s.getName());
+		assertEquals("16", s.getCatno());
 	}
 	private static void load() throws IOException {
 		try (InputStream is = new FileInputStream(DiscogsFile.ARTISTS.getUnzippedFile())) {

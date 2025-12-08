@@ -35,6 +35,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.load.persist.IPersistable;
+import jakarta.persistence.PersistenceException;
 
 public class DiscogsContentHandler extends DefaultHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(DiscogsContentHandler.class);
@@ -100,13 +101,12 @@ public class DiscogsContentHandler extends DefaultHandler {
 
 	@Override
 	public void characters(char[] ch, int start, int length) {
-		switch (stack.peek()) {
+		if ("notes".equals(stack.peek())) {
 		// Ignore irrelevant sections
-		case "notes", "description":
 			return;
-		default:
-			chars.append(String.valueOf(Arrays.copyOfRange(ch, start, start + length)));
 		}
+		
+		chars.append(String.valueOf(Arrays.copyOfRange(ch, start, start + length)));
 	}
 
 	@Override
@@ -147,7 +147,13 @@ public class DiscogsContentHandler extends DefaultHandler {
 	
 	@SuppressWarnings("unchecked")
 	public void save(Object o) {
-		DatabaseService.getInstance().inTransaction(x -> saved += persister.save(x, o));
+		try {
+			DatabaseService.getInstance().inTransaction(x -> saved += persister.save(x, o));
+		} catch (PersistenceException e) {
+			LOG.error("Error storing {}", o, e);
+			
+			return;
+		}
 		
 		if (++count % logThreshold == 0 && LOG.isInfoEnabled()) {
 			LOG.info("{}/{} ({}). {}", String.format("%,d", saved), String.format("%,d", count), String.format("%f%%", (float) saved / count * 100), o);

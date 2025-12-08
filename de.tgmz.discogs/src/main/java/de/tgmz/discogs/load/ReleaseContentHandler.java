@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -21,10 +22,12 @@ import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.CompanyRole;
 import de.tgmz.discogs.domain.DataQuality;
 import de.tgmz.discogs.domain.ExtraArtist;
+import de.tgmz.discogs.domain.Format;
 import de.tgmz.discogs.domain.Genre;
 import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
+import de.tgmz.discogs.domain.Series;
 import de.tgmz.discogs.domain.Style;
 import de.tgmz.discogs.domain.SubTrack;
 import de.tgmz.discogs.domain.Track;
@@ -48,6 +51,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	private Release r;
 	private GenreFactory genreFactory;
 	private StyleFactory styleFactory;
+	private Format format;
 
 	public ReleaseContentHandler() {
 		this (x -> true);
@@ -129,6 +133,18 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			break;
 		case "[releases, release, companies, company]":
 			companyRole = new CompanyRole();
+			
+			break;
+		case "[releases, release, formats, format]":
+			format = new Format(attributes.getValue("name"), attributes.getValue("qty"), attributes.getValue("text"));
+			
+			break;
+		case "[releases, release, series, series]":
+			String s = attributes.getValue("id");
+			
+			if (StringUtils.isNotEmpty(s)) {
+				r.setSeries(new Series(Long.parseLong(s), attributes.getValue("catno"), attributes.getValue("name")));
+			}
 			
 			break;
 		default:
@@ -307,6 +323,14 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			break;
 		case "[releases, release, companies, company]":
 			r.getCompanies().add(companyRole);
+			
+			break;
+		case "[releases, release, formats, format, descriptions, description]":
+			format.getDescriptions().add(getChars());
+			
+			break;
+		case "[releases, release, formats, format]":
+			r.getFormats().add(format);
 			
 			break;
 		case "[releases, release]":

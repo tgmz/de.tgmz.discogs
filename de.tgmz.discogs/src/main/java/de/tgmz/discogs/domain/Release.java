@@ -61,6 +61,10 @@ public class Release extends Discogs {
 	private Map<Label, String> labels;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private Set<CompanyRole> companies;
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<Format> formats;
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	private Series series;
 
 	public Release() {
 		super();
@@ -69,6 +73,7 @@ public class Release extends Discogs {
 		extraArtists = new HashMap<>();
 		labels = new HashMap<>();
 		companies = new HashSet<>();
+		formats = new HashSet<>();
 	}
 	
 	@Override
@@ -104,6 +109,10 @@ public class Release extends Discogs {
 		return labels;
 	}
 
+	public Set<Format> getFormats() {
+		return formats;
+	}
+
 	@Override
 	public void setId(long id) {
 		this.id = id;
@@ -115,6 +124,10 @@ public class Release extends Discogs {
 
 	public Set<CompanyRole> getCompanies() {
 		return companies;
+	}
+
+	public Series getSeries() {
+		return series;
 	}
 
 	public void setMain(boolean newMain) {
@@ -150,6 +163,14 @@ public class Release extends Discogs {
 	
 	public void setCompanies(Set<CompanyRole> companies) {
 		this.companies = companies;
+	}
+
+	public void setFormats(Set<Format> formats) {
+		this.formats = formats;
+	}
+
+	public void setSeries(Series series) {
+		this.series = series;
 	}
 	
 	/**
