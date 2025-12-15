@@ -35,7 +35,6 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.load.persist.IPersistable;
-import jakarta.persistence.PersistenceException;
 
 public class DiscogsContentHandler extends DefaultHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(DiscogsContentHandler.class);
@@ -147,13 +146,7 @@ public class DiscogsContentHandler extends DefaultHandler {
 	
 	@SuppressWarnings("unchecked")
 	public void save(Object o) {
-		try {
-			DatabaseService.getInstance().inTransaction(x -> saved += persister.save(x, o));
-		} catch (PersistenceException e) {
-			LOG.error("Error storing {}", o, e);
-			
-			return;
-		}
+		DatabaseService.getInstance().inTransaction(x -> saved += persister.save(x, o));
 		
 		if (++count % logThreshold == 0 && LOG.isInfoEnabled()) {
 			LOG.info("{}/{} ({}). {}", String.format("%,d", saved), String.format("%,d", count), String.format("%f%%", (float) saved / count * 100), o);

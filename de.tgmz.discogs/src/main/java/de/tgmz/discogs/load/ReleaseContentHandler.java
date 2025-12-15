@@ -18,9 +18,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 
+import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.CompanyRole;
 import de.tgmz.discogs.domain.DataQuality;
+import de.tgmz.discogs.domain.Discogs;
 import de.tgmz.discogs.domain.ExtraArtist;
 import de.tgmz.discogs.domain.Format;
 import de.tgmz.discogs.domain.Genre;
@@ -34,6 +36,7 @@ import de.tgmz.discogs.domain.Track;
 import de.tgmz.discogs.load.factory.GenreFactory;
 import de.tgmz.discogs.load.factory.StyleFactory;
 import de.tgmz.discogs.load.persist.ReleasePersistable;
+import jakarta.persistence.PersistenceException;
 
 public class ReleaseContentHandler extends DiscogsContentHandler {
 	protected static final Logger LOG = LoggerFactory.getLogger(ReleaseContentHandler.class);
@@ -341,5 +344,20 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 		}
 		
 		super.endElement(uri, localName, qName);
+	}
+	@Override
+	public void save(Object o) {
+		try {
+			super.save(o);
+		} catch (PersistenceException e) {
+			// Existing release with subTracks yields "Duplicate row was found and `ASSERT` was specified"
+			// so we must remove it first
+			DatabaseService.getInstance().inTransaction(em -> {
+				Release r0 = em.find(Release.class, ((Discogs) o).getId());
+				em.remove(r0);
+			});
+			
+			super.save(o);
+		}
 	}
 }

@@ -51,7 +51,7 @@ public class Track implements Serializable {
 	private Set<Artist> artists;
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
 	private Set<ExtraArtist> extraArtists;
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@OrderBy(value = "subTrackNumber")
 	private List<SubTrack> subTracklist;
 
