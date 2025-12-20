@@ -352,6 +352,8 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 		} catch (PersistenceException e) {
 			// Existing release with subTracks yields "Duplicate row was found and `ASSERT` was specified"
 			// so we must remove it first
+			LOG.warn("Unable to merge release {}, removing and inserting it", r.getId());
+			
 			DatabaseService.getInstance().inTransaction(em -> {
 				Release r0 = em.find(Release.class, ((Discogs) o).getId());
 				em.remove(r0);
