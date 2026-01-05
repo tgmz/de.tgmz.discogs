@@ -9,11 +9,6 @@
 **********************************************************************/
 package de.tgmz.discogs.load.factory;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.ExtraArtist;
 import de.tgmz.discogs.domain.Genre;
@@ -23,7 +18,8 @@ import de.tgmz.discogs.domain.Release;
 import de.tgmz.discogs.domain.Style;
 import de.tgmz.discogs.domain.SubTrack;
 import de.tgmz.discogs.domain.Track;
-import de.tgmz.discogs.relevance.RelevanceService;
+import de.tgmz.discogs.load.factory.collections.MapFactory;
+import de.tgmz.discogs.load.factory.collections.SetFactory;
 import jakarta.persistence.EntityManager;
 
 public class ReleaseFactory implements IFactory<Release> {
@@ -37,10 +33,16 @@ public class ReleaseFactory implements IFactory<Release> {
 	
 	@Override
 	public Release get(EntityManager em, Release draft) {
-		SetReplacer<Artist> sra = new SetReplacer<>(em, af);
-		SetReplacer<Genre> srg = new SetReplacer<>(em, new GenreFactory());
-		SetReplacer<Style> srs = new SetReplacer<>(em, new StyleFactory());
-		SetReplacer<ExtraArtist> srea = new SetReplacer<>(em, eaf);
+		SetFactory<Artist> sfa = new SetFactory<>(em, af);
+		SetFactory<Genre> sfg = new SetFactory<>(em, new GenreFactory());
+		SetFactory<Style> sfs = new SetFactory<>(em, new StyleFactory());
+		SetFactory<ExtraArtist> sfea = new SetFactory<>(em, eaf);
+		
+		// Do not use the LabelFactory here. It will never return null and we want to remove non-existing labels
+		IFactory<Label> lf = (EntityManager x, Label l) -> x.find(Label.class, l.getId());
+		MapFactory<Label, String> mfls = new MapFactory<>(em, lf);
+		
+		MapFactory<ExtraArtist, String> mfeas = new MapFactory<>(em, new ExtraArtistFactory());
 		
 		CompanyFactory cf = new CompanyFactory();
 
@@ -48,40 +50,22 @@ public class ReleaseFactory implements IFactory<Release> {
 			draft.setMaster(em.find(Master.class, draft.getMaster().getId()));
 		}
 		
-		Map<Label, String> result = HashMap.newHashMap(draft.getLabels().size());
-		
-		for (Entry<Label, String> e : draft.getLabels().entrySet()) {
-			Label l = em.find(Label.class, e.getKey().getId());
-			
-			if (l != null) {
-				result.put(l, e.getValue());
-			}
-		}
-			
-		draft.setLabels(result);
+		draft.setLabels(mfls.replaceAll(draft.getLabels()));
 
-		draft.setGenres(srg.replaceAll(draft.getGenres()));
-		draft.setStyles(srs.replaceAll(draft.getStyles()));		
-		draft.setArtists(sra.replaceAll(draft.getArtists()));
+		draft.setGenres(sfg.replaceAll(draft.getGenres()));
+		draft.setStyles(sfs.replaceAll(draft.getStyles()));		
+		draft.setArtists(sfa.replaceAll(draft.getArtists()));
 		
-		Map<ExtraArtist, String> eas = new HashMap<>();
-		Set<ExtraArtist> keys = draft.getExtraArtists().keySet();
-		keys.removeIf(ea -> !RelevanceService.getInstance().isRelevant(ea.getRole()));
-		keys = srea.replaceAll(keys);
-		keys.forEach(ea -> eas.put(ea, draft.getExtraArtists().get(ea)));
-		
-		draft.setExtraArtists(eas);
+		draft.setExtraArtists(mfeas.replaceAll(draft.getExtraArtists()));
 		
 		for (Track t : draft.getUnfilteredTracklist()) {
-			t.setArtists(sra.replaceAll(t.getArtists()));
+			t.setArtists(sfa.replaceAll(t.getArtists()));
 			
 			for (SubTrack st : t.getSubTracklist()) {
-				st.getExtraArtists().removeIf(ea -> !RelevanceService.getInstance().isRelevant(ea.getRole()));
-				st.setExtraArtists(srea.replaceAll(st.getExtraArtists()));
+				st.setExtraArtists(sfea.replaceAll(st.getExtraArtists()));
 			}
 			
-			t.getExtraArtists().removeIf(ea -> !RelevanceService.getInstance().isRelevant(ea.getRole()));
-			t.setExtraArtists(srea.replaceAll(t.getExtraArtists()));
+			t.setExtraArtists(sfea.replaceAll(t.getExtraArtists()));
 		}
 		
 		draft.getCompanies().forEach(cr -> cr.getId().setCompany(cf.get(em, cr.getId().getCompany())));

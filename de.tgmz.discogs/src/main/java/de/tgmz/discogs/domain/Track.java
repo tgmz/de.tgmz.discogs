@@ -21,7 +21,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 
 import de.tgmz.discogs.domain.id.TrackId;
-import de.tgmz.discogs.relevance.RelevanceService;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
@@ -142,13 +141,13 @@ public class Track implements Serializable {
 	 * @return A measure for the amount of information this track carries
 	 */
 	public int sizeOf() {
-		long res = Math.max(1, subTracklist.size()) * extraArtists.stream().filter(ea -> RelevanceService.getInstance().isRelevant(ea.getRole())).count();
+		int res = Math.max(1, subTracklist.size()) * extraArtists.size();
 		
 		res += artists.size();
 		
 		res += getSubTracklist().stream().map(SubTrack::sizeOf).reduce(0, Integer::sum);
 		
-		return (int) res;
+		return res;
 	}
 
 	/**

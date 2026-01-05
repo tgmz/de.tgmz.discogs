@@ -7,33 +7,40 @@
 *
 * SPDX-License-Identifier: EPL-2.0
 **********************************************************************/
-package de.tgmz.discogs.load.factory;
+package de.tgmz.discogs.load.factory.collections;
 
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
+import de.tgmz.discogs.load.factory.IFactory;
 import jakarta.persistence.EntityManager;
 
 /**
  * Utilityclass to replace all elements of a java.util.Set
  * @param <T> the type of the sets element
  */
-public class SetReplacer<T> {
+public class SetFactory<T> {
 	private EntityManager em;
 	private IFactory<T> factory;
 	
-	public SetReplacer(EntityManager em, IFactory<T> factory) {
+	public SetFactory(EntityManager em, IFactory<T> factory) {
 		this.em = em;
 		this.factory = factory;
 	}
 
 	public Set<T> replaceAll(Set<T> param) {
-		List<T> l = new LinkedList<>(param);
+		Set<T> s = new HashSet<>();
 		
-		l.replaceAll(a -> factory.get(em, a));
+		param.stream().forEach(t -> addIfNotNull(s, t));
 		
-		return new HashSet<>(l);
+		return s;
+	}
+	
+	private void addIfNotNull(Set<T> s, T t) {
+		T t0 = factory.get(em, t);
+		
+		if (t0 != null) {
+			s.add(t0);
+		}
 	}
 }
