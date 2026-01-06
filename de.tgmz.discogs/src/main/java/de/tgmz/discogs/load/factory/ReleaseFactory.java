@@ -9,26 +9,35 @@
 **********************************************************************/
 package de.tgmz.discogs.load.factory;
 
+import java.util.Collections;
+
 import de.tgmz.discogs.domain.Artist;
+import de.tgmz.discogs.domain.CompanyRole;
 import de.tgmz.discogs.domain.ExtraArtist;
+import de.tgmz.discogs.domain.Format;
 import de.tgmz.discogs.domain.Genre;
 import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
+import de.tgmz.discogs.domain.Series;
 import de.tgmz.discogs.domain.Style;
 import de.tgmz.discogs.domain.SubTrack;
 import de.tgmz.discogs.domain.Track;
 import de.tgmz.discogs.load.factory.collections.MapFactory;
 import de.tgmz.discogs.load.factory.collections.SetFactory;
+import de.tgmz.discogs.relevance.RelevanceService;
 import jakarta.persistence.EntityManager;
 
 public class ReleaseFactory implements IFactory<Release> {
 	private ArtistFactory af;
 	private ExtraArtistFactory eaf;
+	private RelevanceService rs;
 	
 	public ReleaseFactory() {
 		af = new ArtistFactory();
 		eaf = new ExtraArtistFactory();
+		
+		rs = RelevanceService.getInstance();
 	}
 	
 	@Override
@@ -37,6 +46,7 @@ public class ReleaseFactory implements IFactory<Release> {
 		SetFactory<Genre> sfg = new SetFactory<>(em, new GenreFactory());
 		SetFactory<Style> sfs = new SetFactory<>(em, new StyleFactory());
 		SetFactory<ExtraArtist> sfea = new SetFactory<>(em, eaf);
+		SetFactory<Format> sff = new SetFactory<>(em, new FormatFactory());
 		
 		// Do not use the LabelFactory here. It will never return null and we want to remove non-existing labels
 		IFactory<Label> lf = (EntityManager x, Label l) -> x.find(Label.class, l.getId());
@@ -68,7 +78,17 @@ public class ReleaseFactory implements IFactory<Release> {
 			t.setExtraArtists(sfea.replaceAll(t.getExtraArtists()));
 		}
 		
-		draft.getCompanies().forEach(cr -> cr.getId().setCompany(cf.get(em, cr.getId().getCompany())));
+		draft.setFormats(sff.replaceAll(draft.getFormats()));
+
+		if (rs.isRelevant(CompanyRole.class)) {
+			draft.getCompanies().forEach(cr -> cr.getId().setCompany(cf.get(em, cr.getId().getCompany())));
+		} else {
+			draft.setCompanies(Collections.emptySet());
+		}
+		
+		if (!rs.isRelevant(Series.class)) {
+			draft.setSeries(null);
+		}
 		
 		return draft;
 	}

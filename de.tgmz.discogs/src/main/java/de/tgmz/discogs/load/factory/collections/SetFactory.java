@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.tgmz.discogs.load.factory.IFactory;
+import de.tgmz.discogs.relevance.RelevanceService;
 import jakarta.persistence.EntityManager;
 
 /**
@@ -37,10 +38,12 @@ public class SetFactory<T> {
 	}
 	
 	private void addIfNotNull(Set<T> s, T t) {
-		T t0 = factory.get(em, t);
+		if (RelevanceService.getInstance().isRelevant(t)) {
+			T t0 = factory.get(em, t);
 		
-		if (t0 != null) {
-			s.add(t0);
+			if (t0 != null) {
+				s.add(t0);
+			}
 		}
 	}
 }

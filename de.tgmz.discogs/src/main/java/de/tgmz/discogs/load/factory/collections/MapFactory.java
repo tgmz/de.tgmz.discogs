@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.tgmz.discogs.load.factory.IFactory;
+import de.tgmz.discogs.relevance.RelevanceService;
 import jakarta.persistence.EntityManager;
 
 /**
@@ -39,10 +40,14 @@ public class MapFactory<K,V> {
 	}
 	
 	private void addIfNotNull(Map<K,V> m, Entry<K, V> e) {
-		K k = factory.get(em, e.getKey());
+		K k = e.getKey();
 		
-		if (k != null) { 
-			m.put(k, e.getValue());
+		if (RelevanceService.getInstance().isRelevant(k)) {
+			K k0 = factory.get(em, e.getKey());
+		
+			if (k0 != null) { 
+				m.put(k0, e.getValue());
+			}
 		}
 	}
 }
