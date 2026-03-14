@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.BiPredicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,7 +47,7 @@ public class DiscogsContentHandler extends DefaultHandler {
 	private long logThreshold = 10_000L;
 	private StringBuilder chars;
 	private DBDefrag defrag;
-	private int defragThreshold = Integer.MAX_VALUE;
+	private BiPredicate<Integer, Integer> defragThreshold = (count,saved) -> false;
 	protected static final int MAX_LENGTH_DEFAULT = 254;
 	protected static final int MAX_LENGTH_LONG = 510;
 	protected String path;
@@ -152,7 +153,7 @@ public class DiscogsContentHandler extends DefaultHandler {
 			LOG.info("{}/{} ({}). {}", String.format("%,d", saved), String.format("%,d", count), String.format("%f%%", (float) saved / count * 100), o);
 		}
 		
-		if (count % defragThreshold == defragThreshold - 1 && saved > 0) {
+		if (defragThreshold.test(count,  saved)) {
 			defrag.run();
 		}
 	}
@@ -190,6 +191,10 @@ public class DiscogsContentHandler extends DefaultHandler {
 	}
 
 	public void setDefragThreshold(int defragThreshold) {
+		this.defragThreshold = (count,saved) -> count % defragThreshold == defragThreshold - 1 && saved > 0;
+	}
+
+	public void setDefragThreshold(BiPredicate<Integer, Integer> defragThreshold) {
 		this.defragThreshold = defragThreshold;
 	}
 }
