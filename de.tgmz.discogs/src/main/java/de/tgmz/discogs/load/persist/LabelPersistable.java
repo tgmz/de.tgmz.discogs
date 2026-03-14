@@ -11,12 +11,13 @@ package de.tgmz.discogs.load.persist;
 
 import java.util.function.Predicate;
 
+import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.load.factory.IFactory;
 import de.tgmz.discogs.load.factory.LabelFactory;
 import jakarta.persistence.EntityManager;
 
-public class LabelPersistable implements IPersistable<Label> {
+public class LabelPersistable extends AbstractDefaultPersistable<Label> {
 	private Predicate<Label> filter;
 	private LabelFactory lf;
 	
@@ -31,22 +32,28 @@ public class LabelPersistable implements IPersistable<Label> {
 	}
 
 	@Override
-	public int save(EntityManager em, Label label) {
+	public int save(int threshold, Label label) {
 		if (filter.test(label)) {
-			Label l = lf.get(em, label);
+			try (EntityManager em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager()) {
+				em.getTransaction().begin();
+				
+				Label l = lf.get(em, label);
 			
-			Label pl = label.getParentLabel();
+				Label pl = label.getParentLabel();
 			
-			if (pl != null) {
-				if (pl.getId() != l.getId()) {
-					l.setParentLabel(lf.get(em, pl));
-				} else {
-					// Crazy, but happens (label.id = 219423, name=RDM Edition)
-					l.setParentLabel(l);
+				if (pl != null) {
+					if (pl.getId() != l.getId()) {
+						l.setParentLabel(lf.get(em, pl));
+					} else {
+						// Crazy, but happens (label.id = 219423, name=RDM Edition)
+						l.setParentLabel(l);
+					}
 				}
-			}
 			
-			em.merge(l);
+				em.merge(l);
+				
+				em.getTransaction().commit();
+			}
 			
 			return 1;
 		} else {

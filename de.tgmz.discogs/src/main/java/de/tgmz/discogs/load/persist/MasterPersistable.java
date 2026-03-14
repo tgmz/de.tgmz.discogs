@@ -15,7 +15,7 @@ import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.load.factory.IFactory;
 import de.tgmz.discogs.load.factory.MasterFactory;
 
-public class MasterPersistable implements IPersistable<Master> {
+public class MasterPersistable extends AbstractDefaultPersistable<Master> {
 	private Predicate<Master> filter;
 	
 	public MasterPersistable() {

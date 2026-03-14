@@ -9,31 +9,8 @@
 **********************************************************************/
 package de.tgmz.discogs.load.persist;
 
-import java.util.function.Predicate;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import de.tgmz.discogs.load.factory.IFactory;
-import jakarta.persistence.EntityManager;
-
 public interface IPersistable<T> {
-	static final Logger LOG = LoggerFactory.getLogger(IPersistable.class);
+	int save(int threshold, T o);
 	
-	IFactory<T> getFactory();
-	Predicate<T> getFilter();
-	
-	default	int save(EntityManager em, T o) {
-		if (getFilter().test(o)) {
-			LOG.debug("Save {}", o);
-			
-			em.merge(getFactory().get(em, o));
-			
-			return 1;
-		} else {
-			LOG.debug("Ignore {}", o);
-			
-			return 0;
-		}
-	}
+	int flush();
 }

@@ -39,6 +39,8 @@
 			<property name="jakarta.persistence.jdbc.user" value="${jakarta.persistence.jdbc.user}" />
 			<property name="jakarta.persistence.jdbc.password" value="${jakarta.persistence.jdbc.password}" />
 			
+			<property name="jakarta.persistence.jdbc.batchSize" value="500" />
+			
 			<!-- Automatically export the schema -->
 			<property name="jakarta.persistence.schema-generation.database.action" value="create" />
 

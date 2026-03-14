@@ -34,7 +34,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
-import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.load.persist.IPersistable;
 
 public class DiscogsContentHandler extends DefaultHandler {
@@ -45,9 +44,10 @@ public class DiscogsContentHandler extends DefaultHandler {
 	private int saved;
 	private int count;
 	private long logThreshold = 10_000L;
+	private int saveThreshold = 1_000;
 	private StringBuilder chars;
 	private DBDefrag defrag;
-	private BiPredicate<Integer, Integer> defragThreshold = (count,saved) -> false;
+	private BiPredicate<Integer, Integer> defragThreshold = (c,s) -> false;
 	protected static final int MAX_LENGTH_DEFAULT = 254;
 	protected static final int MAX_LENGTH_LONG = 510;
 	protected String path;
@@ -111,6 +111,8 @@ public class DiscogsContentHandler extends DefaultHandler {
 
 	@Override
 	public void endDocument() throws SAXException {
+		saved += persister.flush();
+		
 		super.endDocument();
 		
 		if (LOG.isInfoEnabled()) {
@@ -137,7 +139,15 @@ public class DiscogsContentHandler extends DefaultHandler {
 				s0 = m.group(1);
 			}
 			
-			sb.append(s0 + (",".equals(s1) ? ", " : " " + s1 +" "));
+			sb.append(s0);
+
+			if (",".equals(s1)) {
+				sb.append(", ");
+			} else {
+				sb.append(" ");
+				sb.append(s1);
+				sb.append(" ");
+			}
 		}
 		
 		String band = Strings.CS.removeEnd(sb.toString(), ", ").trim().replace(" , ", ", ");
@@ -147,13 +157,13 @@ public class DiscogsContentHandler extends DefaultHandler {
 	
 	@SuppressWarnings("unchecked")
 	public void save(Object o) {
-		DatabaseService.getInstance().inTransaction(x -> saved += persister.save(x, o));
+		saved += persister.save(saveThreshold, o);
 		
 		if (++count % logThreshold == 0 && LOG.isInfoEnabled()) {
 			LOG.info("{}/{} ({}). {}", String.format("%,d", saved), String.format("%,d", count), String.format("%f%%", (float) saved / count * 100), o);
 		}
 		
-		if (defragThreshold.test(count,  saved)) {
+		if (defragThreshold.test(count, saved)) {
 			defrag.run();
 		}
 	}
@@ -191,10 +201,14 @@ public class DiscogsContentHandler extends DefaultHandler {
 	}
 
 	public void setDefragThreshold(int defragThreshold) {
-		this.defragThreshold = (count,saved) -> count % defragThreshold == defragThreshold - 1 && saved > 0;
+		this.defragThreshold = (c,s) -> c % defragThreshold == defragThreshold - 1 && s > 0;
 	}
 
 	public void setDefragThreshold(BiPredicate<Integer, Integer> defragThreshold) {
 		this.defragThreshold = defragThreshold;
+	}
+
+	public void setSaveThreshold(int saveThreshold) {
+		this.saveThreshold = saveThreshold;
 	}
 }
