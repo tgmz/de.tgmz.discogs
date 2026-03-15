@@ -28,7 +28,7 @@
   </logger>
 
   <logger name="de.tgmz">
-    <level value="debug" />
+    <level value="ALL" />
     <appender-ref ref="console"/>
   </logger>
   

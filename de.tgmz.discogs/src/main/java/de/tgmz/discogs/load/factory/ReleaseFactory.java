@@ -29,19 +29,17 @@ import de.tgmz.discogs.relevance.RelevanceService;
 import jakarta.persistence.EntityManager;
 
 public class ReleaseFactory implements IFactory<Release> {
-	private ArtistFactory af;
-	private ExtraArtistFactory eaf;
 	private RelevanceService rs;
 	
 	public ReleaseFactory() {
-		af = new ArtistFactory();
-		eaf = new ExtraArtistFactory();
-		
 		rs = RelevanceService.getInstance();
 	}
 	
 	@Override
 	public Release get(EntityManager em, Release draft) {
+		ArtistFactory af = new ArtistFactory();
+		ExtraArtistFactory eaf = new ExtraArtistFactory();
+		
 		SetFactory<Artist> sfa = new SetFactory<>(em, af);
 		SetFactory<Genre> sfg = new SetFactory<>(em, new GenreFactory());
 		SetFactory<Style> sfs = new SetFactory<>(em, new StyleFactory());

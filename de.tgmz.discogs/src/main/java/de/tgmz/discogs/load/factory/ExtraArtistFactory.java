@@ -9,10 +9,10 @@
 **********************************************************************/
 package de.tgmz.discogs.load.factory;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,17 +21,11 @@ import de.tgmz.discogs.domain.ExtraArtist;
 import jakarta.persistence.EntityManager;
 
 public class ExtraArtistFactory implements IFactory<ExtraArtist> {
-	@SuppressWarnings("unused")
 	private static final Logger LOG = LoggerFactory.getLogger(ExtraArtistFactory.class);
-	private Map<Pair<Long, String>, ExtraArtist> cache;
 	
-	public ExtraArtistFactory() {
-		cache = new HashMap<>();
-	}
-
 	@Override
 	public ExtraArtist get(EntityManager em, ExtraArtist draft) {
-		return cache.computeIfAbsent(Pair.of(draft.getArtist().getId(), draft.getRole()) , a -> findOrCreate(em, draft));
+		return findOrCreate(em, draft);
 	}
 	
 	private ExtraArtist findOrCreate(EntityManager em, ExtraArtist draft) {
@@ -40,22 +34,45 @@ public class ExtraArtistFactory implements IFactory<ExtraArtist> {
 		if (a == null) {
 			a = draft.getArtist();
 
+			LOG.trace("Artist {} not present, creating...", a);
+			
 			em.persist(a);
 		}
 		
 		String role = draft.getRole();
 		
-		ExtraArtist ea = em.createNamedQuery("ExtraArtist.byArtistIdAndRole", ExtraArtist.class)
-				.setParameter(1, draft.getArtist().getId())
-				.setParameter(2, role)
-				.getSingleResultOrNull();
+		// This trick let us use a variable in a lambda: The array eaid is final, eaid[0] is not.
+		final Long[] eaid = new Long[1];
 		
-		if (ea  == null) {
+		ExtraArtist ea;
+		
+		// Bypass Hibernate: It yields super-strange primary key violation when it tries to INSERT an artist_member 
+		// when we only want to select an ExtraArtist by artist.id and role (???)
+    	em.runWithConnection((Connection conn) -> {
+    		try (PreparedStatement pstmt = conn.prepareStatement("SELECT ea.ID FROM EXTRAARTIST ea WHERE ea.ARTIST_ID = ? AND ea.ROLE = ?")) {
+    			pstmt.setLong(1, draft.getArtist().getId());
+    			pstmt.setString(2, role);
+    		
+    			ResultSet rs = pstmt.executeQuery();
+    		
+    			if (rs.next()) {
+    				eaid[0] = rs.getLong(1);
+    			}
+    		
+    			rs.close();
+    		}
+    	});
+
+		if (eaid[0] == null) {
+			LOG.trace("ExtraArtist {} not present, creating...", draft);
+			
 			ea = draft;
 			
 			ea.setArtist(a);
 			
 			em.persist(ea);
+		} else {
+			ea = em.find(ExtraArtist.class, eaid[0]);
 		}
 		
 		return ea;

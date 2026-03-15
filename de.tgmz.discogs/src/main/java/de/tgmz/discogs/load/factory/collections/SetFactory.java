@@ -32,7 +32,7 @@ public class SetFactory<T> {
 	public Set<T> replaceAll(Set<T> param) {
 		Set<T> s = new HashSet<>();
 		
-		param.stream().forEach(t -> addIfNotNull(s, t));
+		param.forEach(t -> addIfNotNull(s, t));
 		
 		return s;
 	}

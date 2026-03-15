@@ -10,32 +10,23 @@
 package de.tgmz.discogs.load.factory;
 
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import de.tgmz.discogs.domain.Artist;
 import jakarta.persistence.EntityManager;
 
 public class ArtistFactory implements IFactory<Artist> {
-	private Map<Long, Artist> cache;
 	private EntityManager em;
-	
-	public ArtistFactory() {
-		cache = new TreeMap<>();
-	}
 	
 	@Override
 	public Artist get(EntityManager em, Artist draft) {
 		this.em = em;
 		
-		return getWhileCached(draft);
+		return enrich(draft);
 	}
 	
-	private Artist getWhileCached(Artist draft) {
-		Artist a0 = getOrCreate(draft);
+	private Artist enrich(Artist draft) {
+		Artist a0 = findOrCreate(draft);
 		
 		if (a0.getAliases().isEmpty()) {
 			a0.setAliases(draft.getAliases());
@@ -73,18 +64,14 @@ public class ArtistFactory implements IFactory<Artist> {
 	}
 
 	private Set<Artist> replaceAll(Set<Artist> artists) {
-		List<Artist> l = new LinkedList<>(artists);
+		Set<Artist> l = new HashSet<>();
 		
-		l.replaceAll(this::getOrCreate);
+		artists.forEach(a -> l.add(findOrCreate(a)));
 		
-		return new HashSet<>(l);
+		return l;
 	}
 	
-	private Artist getOrCreate(Artist draft) {
-		return cache.computeIfAbsent(draft.getId(), a -> findOrCreate(em, draft));
-	}
-	
-	private Artist findOrCreate(EntityManager em, Artist draft) {
+	private Artist findOrCreate(Artist draft) {
 		Artist a0 = em.find(Artist.class, draft.getId());
 		
 		if (a0  == null) {

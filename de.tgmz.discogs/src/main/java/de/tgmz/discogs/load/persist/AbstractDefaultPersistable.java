@@ -64,16 +64,22 @@ public abstract class AbstractDefaultPersistable<T> implements IPersistable<T> {
 					if ("Duplicate row was found and `ASSERT` was specified".equals(e.getMessage())) {
 						// Existing release with subTracks yields "Duplicate row was found and `ASSERT` was specified"
 						// so we must remove it first
-						LOG.warn("Unable to merge entity {}, removing and inserting it", ((Discogs) t).getId());
+						LOG.warn("Unable to merge entity {}, removing and inserting it", t);
 				
 						// Happens only for releases
 						@SuppressWarnings("unchecked")
 						T r0 = (T) em.find(t.getClass(), ((Discogs) t).getId());
 						em.remove(r0);
 					
+						LOG.debug("Save {}", t);
+						
 						em.persist(t);
 					} else {
 						LOG.error("Unable to merge release {}", ((Discogs) t).getId(), e);
+						
+						em.getTransaction().rollback();
+						
+						throw e;
 					}
 				}
 			}

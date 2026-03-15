@@ -19,7 +19,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
@@ -27,8 +26,6 @@ import jakarta.persistence.Transient;
 @Table(indexes = {
 	@Index(name = "artistRole_idx", columnList = "artist,role")
 })
-@NamedQuery(name = "ExtraArtist.byArtistIdAndRole"
-, query = "FROM ExtraArtist WHERE artist.id = ?1 AND role = ?2") 
 public class ExtraArtist implements Serializable { 
 	@Transient
 	private static final long serialVersionUID = 2296552658329482485L;
@@ -87,6 +84,11 @@ public class ExtraArtist implements Serializable {
 			return false;
 		ExtraArtist other = (ExtraArtist) obj;
 		return artist.getId() == other.artist.getId() && Objects.equals(role, other.role);
+	}
+
+	@Override
+	public String toString() {
+		return "ExtraArtist [id=" + id + ", role=" + role + ", artist=" + artist + "]";
 	}
 	
 }
