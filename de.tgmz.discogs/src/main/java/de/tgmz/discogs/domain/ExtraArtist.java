@@ -19,6 +19,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
@@ -26,6 +27,8 @@ import jakarta.persistence.Transient;
 @Table(indexes = {
 	@Index(name = "artistRole_idx", columnList = "artist,role")
 })
+@NamedQuery(name = "ExtraArtist.byArtistIdAndRole"
+, query = "FROM ExtraArtist ea WHERE ea.artist.id = ?1 AND ea.role.id = ?2") 
 public class ExtraArtist implements Serializable { 
 	@Transient
 	private static final long serialVersionUID = 2296552658329482485L;
@@ -34,13 +37,14 @@ public class ExtraArtist implements Serializable {
 	private long id;
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private Artist artist;
-	private String role;
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	private Role role;
 	
 	public ExtraArtist() {
 		artist = new Artist();
 	}
 
-	public ExtraArtist(Artist artist, String role) {
+	public ExtraArtist(Artist artist, Role role) {
 		this.artist = artist;
 		this.role = role;
 	}
@@ -61,11 +65,11 @@ public class ExtraArtist implements Serializable {
 		this.artist = artist;
 	}
 
-	public String getRole() {
+	public Role getRole() {
 		return role;
 	}
 
-	public void setRole(String role) {
+	public void setRole(Role role) {
 		this.role = role;
 	}
 

@@ -27,6 +27,7 @@ import de.tgmz.discogs.domain.Genre;
 import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
+import de.tgmz.discogs.domain.Role;
 import de.tgmz.discogs.domain.Series;
 import de.tgmz.discogs.domain.Style;
 import de.tgmz.discogs.domain.SubTrack;
@@ -233,7 +234,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 		case "[releases, release, extraartists, artist, role]"
 			, "[releases, release, tracklist, track, extraartists, artist, role]"
 			, "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist, role]":
-			extraArtist.setRole(getChars());
+			extraArtist.setRole(new Role(getChars()));
 			
 			break;
 		case "[releases, release, extraartists, artist, tracks]":

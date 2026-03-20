@@ -38,6 +38,7 @@ import de.tgmz.discogs.domain.Genre;
 import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
+import de.tgmz.discogs.domain.Role;
 import de.tgmz.discogs.domain.Series;
 import de.tgmz.discogs.domain.Style;
 import de.tgmz.discogs.domain.SubTrack;
@@ -125,7 +126,7 @@ public class DiscogsTest {
 		ExtraArtist ea = st.getExtraArtists().stream().filter(ea0 -> ea0.getArtist().getId() == 754974).findFirst().orElseThrow();
 		
 		assertEquals("Wiener Philharmoniker", ea.getArtist().getName());
-		assertEquals("Orchestra", ea.getRole());
+		assertEquals("Orchestra", ea.getRole().getId());
 		
 		Set<Format> formats = r.getFormats();
 		
@@ -190,9 +191,10 @@ public class DiscogsTest {
 		Artist a1 = new Artist(1);
 		a1.setName("B");
 		
+		Role mixedBy = em.find(Role.class, "Mixed By");
 		
-		ExtraArtist ea0 = new ExtraArtist(a0, "Mixed By");
-		ExtraArtist ea1 = new ExtraArtist(a1, "Mixed By");
+		ExtraArtist ea0 = new ExtraArtist(a0, mixedBy);
+		ExtraArtist ea1 = new ExtraArtist(a1, mixedBy);
 
 		// Ensure that ExtraArtists are equal iff the artists _ids_ and roles are equal
 		assertEquals(ea0, ea1);
@@ -301,7 +303,7 @@ public class DiscogsTest {
 		Entry<ExtraArtist, String> paf = getExtraArtist(r, 132774, "Performer");
 
 		assertEquals("Andrew Fletcher", paf.getKey().getArtist().getName());
-		assertEquals("Performer", paf.getKey().getRole());
+		assertEquals("Performer", paf.getKey().getRole().getId());
 		
 		// Mixed By François Kevorkian
 		Entry<ExtraArtist, String> embfk = getExtraArtist(r, 20662, "Mixed By");
@@ -328,7 +330,7 @@ public class DiscogsTest {
 		
 		ExtraArtist flood = eas.stream().filter(x -> x.getArtist() != null && 20661 == x.getArtist().getId()).findAny().orElseThrow();
 		
-		assertEquals("Mixed By", flood.getRole());
+		assertEquals("Mixed By", flood.getRole().getId());
 		assertEquals("Flood", flood.getArtist().getName());
 		assertEquals("Mark Ellis", flood.getArtist().getRealName());
 		
@@ -339,6 +341,6 @@ public class DiscogsTest {
 		return r.getExtraArtists()
 				.entrySet()
 				.stream()
-				.filter(e -> id == e.getKey().getArtist().getId() && role.equals(e.getKey().getRole())).findAny().orElseThrow();
+				.filter(e -> id == e.getKey().getArtist().getId() && role.equals(e.getKey().getRole().getId())).findAny().orElseThrow();
 	}
 }

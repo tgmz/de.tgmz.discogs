@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.ExtraArtist;
+import de.tgmz.discogs.domain.Role;
 import jakarta.persistence.EntityManager;
 
 public class ExtraArtistFactory implements IFactory<ExtraArtist> {
@@ -39,7 +40,19 @@ public class ExtraArtistFactory implements IFactory<ExtraArtist> {
 			em.persist(a);
 		}
 		
-		String role = draft.getRole();
+		Role r = em.find(Role.class, draft.getRole().getId());
+		
+		if (r == null) {
+			r = draft.getRole();
+
+			LOG.trace("Role {} not present, creating...", r);
+			
+			em.persist(r);
+		}
+		
+		draft.setRole(r);
+		
+		String role = draft.getRole().getId();
 		
 		// This trick let us use a variable in a lambda: The array eaid is final, eaid[0] is not.
 		final Long[] eaid = new Long[1];
@@ -49,7 +62,7 @@ public class ExtraArtistFactory implements IFactory<ExtraArtist> {
 		// Bypass Hibernate: It yields super-strange primary key violation when it tries to INSERT an artist_member 
 		// when we only want to select an ExtraArtist by artist.id and role (???)
     	em.runWithConnection((Connection conn) -> {
-    		try (PreparedStatement pstmt = conn.prepareStatement("SELECT ea.ID FROM EXTRAARTIST ea WHERE ea.ARTIST_ID = ? AND ea.ROLE = ?")) {
+    		try (PreparedStatement pstmt = conn.prepareStatement("SELECT ea.ID FROM EXTRAARTIST ea WHERE ea.ARTIST_ID = ? AND ea.ROLE_ID = ?")) {
     			pstmt.setLong(1, draft.getArtist().getId());
     			pstmt.setString(2, role);
     		
