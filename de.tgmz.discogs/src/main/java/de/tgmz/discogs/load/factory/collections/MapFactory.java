@@ -24,11 +24,19 @@ import jakarta.persistence.EntityManager;
  */
 public class MapFactory<K,V> {
 	private EntityManager em;
-	private IFactory<K> factory;
+	private IFactory<K> kFactory;
+	private IFactory<V> vFactory;
 	
-	public MapFactory(EntityManager em, IFactory<K> factory) {
+	public MapFactory(EntityManager em, IFactory<K> kFactory) {
 		this.em = em;
-		this.factory = factory;
+		this.kFactory = kFactory;
+		this.vFactory = (x,v) -> v;	// Simply return the value 
+	}
+
+	public MapFactory(EntityManager em, IFactory<K> kFactory, IFactory<V> vFactory) {
+		this.em = em;
+		this.kFactory = kFactory;
+		this.vFactory = vFactory;
 	}
 
 	public Map<K,V> replaceAll(Map<K,V> param) {
@@ -43,10 +51,10 @@ public class MapFactory<K,V> {
 		K k = e.getKey();
 		
 		if (RelevanceService.getInstance().isRelevant(k)) {
-			K k0 = factory.get(em, e.getKey());
+			K k0 = kFactory.get(em, e.getKey());
 		
 			if (k0 != null) { 
-				m.put(k0, e.getValue());
+				m.put(k0, vFactory.get(em, e.getValue()));
 			}
 		}
 	}

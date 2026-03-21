@@ -9,10 +9,8 @@
 **********************************************************************/
 package de.tgmz.discogs.load.factory;
 
-import java.util.Collections;
-
 import de.tgmz.discogs.domain.Artist;
-import de.tgmz.discogs.domain.CompanyRole;
+import de.tgmz.discogs.domain.Company;
 import de.tgmz.discogs.domain.ExtraArtist;
 import de.tgmz.discogs.domain.Format;
 import de.tgmz.discogs.domain.Genre;
@@ -51,8 +49,7 @@ public class ReleaseFactory implements IFactory<Release> {
 		MapFactory<Label, String> mfls = new MapFactory<>(em, lf);
 		
 		MapFactory<ExtraArtist, String> mfeas = new MapFactory<>(em, new ExtraArtistFactory());
-		
-		CompanyFactory cf = new CompanyFactory();
+		MapFactory<Company, String> mfc = new MapFactory<>(em, new CompanyFactory());		
 
 		if (draft.getMaster() !=  null) {
 			draft.setMaster(em.find(Master.class, draft.getMaster().getId()));
@@ -77,12 +74,7 @@ public class ReleaseFactory implements IFactory<Release> {
 		}
 		
 		draft.setFormats(sff.replaceAll(draft.getFormats()));
-
-		if (rs.isRelevant(CompanyRole.class)) {
-			draft.getCompanies().forEach(cr -> cr.getId().setCompany(cf.get(em, cr.getId().getCompany())));
-		} else {
-			draft.setCompanies(Collections.emptySet());
-		}
+		draft.setCompanies(mfc.replaceAll(draft.getCompanies()));
 		
 		if (!rs.isRelevant(Series.class)) {
 			draft.setSeries(null);

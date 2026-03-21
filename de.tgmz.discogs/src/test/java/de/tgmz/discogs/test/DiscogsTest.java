@@ -30,7 +30,6 @@ import org.junit.Test;
 import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.Company;
-import de.tgmz.discogs.domain.CompanyRole;
 import de.tgmz.discogs.domain.DataQuality;
 import de.tgmz.discogs.domain.ExtraArtist;
 import de.tgmz.discogs.domain.Format;
@@ -103,8 +102,8 @@ public class DiscogsTest {
 		
 		assertEquals(band, lilaWolken.getAlbumArtist());
 		
-		CompanyRole cr = lilaWolken.getCompanies().stream().filter(k -> k.getId().getCompany().getId() == 264516 && "Copyright (c)".equals(k.getId().getRole())).findAny().orElseThrow();
-		assertEquals("Four Music Productions GmbH", cr.getId().getCompany().getName());
+		Company c = lilaWolken.getCompanies().entrySet().stream().filter(e -> "Distributed By".equals(e.getValue())).findFirst().orElseThrow().getKey();
+		assertEquals("Sony Music Entertainment Germany GmbH", c.getName());
 	}
 	@Test
 	public void testDecca() {
@@ -198,17 +197,6 @@ public class DiscogsTest {
 
 		// Ensure that ExtraArtists are equal iff the artists _ids_ and roles are equal
 		assertEquals(ea0, ea1);
-	}
-	@Test
-	public void testCompanyRoleEquals() {
-		Company c0 = new Company(1, "0");
-		Company c1 = new Company(1, "1");
-		
-		CompanyRole cr0 = new CompanyRole(c0, "Copyright");
-		CompanyRole cr1 = new CompanyRole(c1, "Copyright");
-
-		// Ensure that CompanyRoles are equal iff the companys _ids_ and roles are equal
-		assertEquals(cr0, cr1);
 	}
 	@Test
 	public void testGenreStyle() {

@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 
 import de.tgmz.discogs.domain.Artist;
-import de.tgmz.discogs.domain.CompanyRole;
+import de.tgmz.discogs.domain.Company;
 import de.tgmz.discogs.domain.DataQuality;
 import de.tgmz.discogs.domain.ExtraArtist;
 import de.tgmz.discogs.domain.Format;
@@ -48,7 +48,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	private String eaTracks;
 	private Track track;
 	private SubTrack subTrack;
-	private CompanyRole companyRole;
+	private Company company;
 	private Release r;
 	private GenreFactory genreFactory;
 	private StyleFactory styleFactory;
@@ -133,7 +133,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, companies, company]":
-			companyRole = new CompanyRole();
+			company = new Company();
 			
 			break;
 		case "[releases, release, formats, format]":
@@ -311,19 +311,20 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, companies, company, id]":
-			companyRole.getId().getCompany().setId(Long.parseLong(getChars()));
+			company.setId(Long.parseLong(getChars()));
 			
 			break;
 		case "[releases, release, companies, company, name]":
-			companyRole.getId().getCompany().setName(getChars());
+			company.setName(getChars());
 			
 			break;
 		case "[releases, release, companies, company, entity_type_name]":
-			companyRole.getId().setRole(getChars());
+			String entityType = getChars();
+			String entityTypeOld = r.getCompanies().put(company, entityType);
 			
-			break;
-		case "[releases, release, companies, company]":
-			r.getCompanies().add(companyRole);
+			if (entityTypeOld != null) {
+				LOG.error("Multiple roles for company {}: {} / {}", company, entityType, entityTypeOld);
+			}
 			
 			break;
 		case "[releases, release, formats, format, descriptions, description]":
