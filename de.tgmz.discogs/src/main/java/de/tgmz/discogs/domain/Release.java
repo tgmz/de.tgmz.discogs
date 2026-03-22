@@ -58,9 +58,8 @@ public class Release extends Discogs {
 	@ElementCollection(fetch = FetchType.LAZY)
 	@Column(name = "catno")
 	private Map<Label, String> labels;
-	@ElementCollection(fetch = FetchType.LAZY)
-	@Column(name = "entity_type_name")
-	private Map<Company, String> companies;
+	@OneToMany(mappedBy = "release", cascade = CascadeType.ALL)
+	private Set<ReleaseCompany> releaseCompanies;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<Format> formats;
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
@@ -72,7 +71,7 @@ public class Release extends Discogs {
 		tracklist = new LinkedList<>();
 		extraArtists = new HashMap<>();
 		labels = new HashMap<>();
-		companies = new HashMap<>();
+		releaseCompanies = new HashSet<>();
 		formats = new HashSet<>();
 	}
 	
@@ -122,8 +121,8 @@ public class Release extends Discogs {
 		return master;
 	}
 
-	public Map<Company, String> getCompanies() {
-		return companies;
+	public Set<ReleaseCompany> getReleaseCompanies() {
+		return releaseCompanies;
 	}
 
 	public Series getSeries() {
@@ -161,16 +160,16 @@ public class Release extends Discogs {
 		this.extraArtists = extraArtists;
 	}
 	
-	public void setCompanies(Map<Company, String> companies) {
-		this.companies = companies;
-	}
-
 	public void setFormats(Set<Format> formats) {
 		this.formats = formats;
 	}
 
 	public void setSeries(Series series) {
 		this.series = series;
+	}
+
+	public void setReleaseCompanies(Set<ReleaseCompany> releaseCompanies) {
+		this.releaseCompanies = releaseCompanies;
 	}
 	
 	/**

@@ -21,12 +21,14 @@ import org.xml.sax.Attributes;
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.Company;
 import de.tgmz.discogs.domain.DataQuality;
+import de.tgmz.discogs.domain.EntityType;
 import de.tgmz.discogs.domain.ExtraArtist;
 import de.tgmz.discogs.domain.Format;
 import de.tgmz.discogs.domain.Genre;
 import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
+import de.tgmz.discogs.domain.ReleaseCompany;
 import de.tgmz.discogs.domain.Role;
 import de.tgmz.discogs.domain.Series;
 import de.tgmz.discogs.domain.Style;
@@ -48,7 +50,9 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	private String eaTracks;
 	private Track track;
 	private SubTrack subTrack;
+	private ReleaseCompany releaseCompany;
 	private Company company;
+	private EntityType entityType;
 	private Release r;
 	private GenreFactory genreFactory;
 	private StyleFactory styleFactory;
@@ -133,7 +137,9 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, companies, company]":
+			releaseCompany = new ReleaseCompany();
 			company = new Company();
+			entityType = new EntityType();
 			
 			break;
 		case "[releases, release, formats, format]":
@@ -313,18 +319,27 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 		case "[releases, release, companies, company, id]":
 			company.setId(Long.parseLong(getChars()));
 			
+			releaseCompany.setCompany(company);
+			
 			break;
 		case "[releases, release, companies, company, name]":
 			company.setName(getChars());
 			
 			break;
-		case "[releases, release, companies, company, entity_type_name]":
-			String entityType = getChars();
-			String entityTypeOld = r.getCompanies().put(company, entityType);
+		case "[releases, release, companies, company, entity_type]":
+			entityType.setId(Byte.parseByte(getChars()));
 			
-			if (entityTypeOld != null) {
-				LOG.error("Multiple roles for company {}: {} / {}", company, entityType, entityTypeOld);
-			}
+			break;
+		case "[releases, release, companies, company, entity_type_name]":
+			entityType.setName(getChars());
+			
+			break;
+		case "[releases, release, companies, company]":
+			releaseCompany.setRelease(r);
+			releaseCompany.setCompany(company);
+			releaseCompany.setEntityType(entityType);
+			
+			r.getReleaseCompanies().add(releaseCompany);
 			
 			break;
 		case "[releases, release, formats, format, descriptions, description]":

@@ -29,7 +29,6 @@ import org.junit.Test;
 
 import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Artist;
-import de.tgmz.discogs.domain.Company;
 import de.tgmz.discogs.domain.DataQuality;
 import de.tgmz.discogs.domain.ExtraArtist;
 import de.tgmz.discogs.domain.Format;
@@ -37,6 +36,7 @@ import de.tgmz.discogs.domain.Genre;
 import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
+import de.tgmz.discogs.domain.ReleaseCompany;
 import de.tgmz.discogs.domain.Role;
 import de.tgmz.discogs.domain.Series;
 import de.tgmz.discogs.domain.Style;
@@ -102,8 +102,28 @@ public class DiscogsTest {
 		
 		assertEquals(band, lilaWolken.getAlbumArtist());
 		
-		Company c = lilaWolken.getCompanies().entrySet().stream().filter(e -> "Distributed By".equals(e.getValue())).findFirst().orElseThrow().getKey();
-		assertEquals("Sony Music Entertainment Germany GmbH", c.getName());
+		assertEquals(4, lilaWolken.getReleaseCompanies().size());
+		
+		// Four Music Productions GmbH
+		List<ReleaseCompany> fmp = lilaWolken.getReleaseCompanies().stream().filter(rc -> rc.getCompany().getId() == 264516L).toList();
+		
+		assertEquals(2, fmp.size());
+		
+		assertTrue(fmp.stream().allMatch(rc -> "Four Music Productions GmbH".equals(rc.getCompany().getName()) 
+				&& lilaWolken.equals(rc.getRelease())));
+
+		// Four Music Productions GmbH Copyright
+		ReleaseCompany fmpc = fmp.stream().filter(rc -> rc.getEntityType().getId() == 14).findAny().orElseThrow();
+		
+		assertEquals("Copyright (c)", fmpc.getEntityType().getName());
+		
+		// Four Music Productions GmbH Phnographic Copyright
+		ReleaseCompany fmpp = fmp.stream().filter(rc -> rc.getEntityType().getId() == 13).findAny().orElseThrow();
+		
+		assertEquals(lilaWolken, fmpp.getRelease());
+		assertEquals("Phonographic Copyright (p)", fmpp.getEntityType().getName());
+		
+		assertTrue(fmpp.toString().contains(band));
 	}
 	@Test
 	public void testDecca() {
@@ -239,7 +259,10 @@ public class DiscogsTest {
 		Predicate<Release> p = p0.or(p1).or(p2).or(p3);
 		
 		try (InputStream is = new FileInputStream(DiscogsFile.RELEASES.getUnzippedFile())) {
-			new ReleaseContentHandler(p).run(is);
+			ReleaseContentHandler rch = new ReleaseContentHandler(p);
+			
+			rch.setSaveThreshold(1);
+			rch.run(is);
 		}
 	}
 	private void checkArtist(Artist a) {

@@ -10,13 +10,13 @@
 package de.tgmz.discogs.load.factory;
 
 import de.tgmz.discogs.domain.Artist;
-import de.tgmz.discogs.domain.Company;
 import de.tgmz.discogs.domain.ExtraArtist;
 import de.tgmz.discogs.domain.Format;
 import de.tgmz.discogs.domain.Genre;
 import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
+import de.tgmz.discogs.domain.ReleaseCompany;
 import de.tgmz.discogs.domain.Series;
 import de.tgmz.discogs.domain.Style;
 import de.tgmz.discogs.domain.SubTrack;
@@ -43,13 +43,13 @@ public class ReleaseFactory implements IFactory<Release> {
 		SetFactory<Style> sfs = new SetFactory<>(em, new StyleFactory());
 		SetFactory<ExtraArtist> sfea = new SetFactory<>(em, eaf);
 		SetFactory<Format> sff = new SetFactory<>(em, new FormatFactory());
+		SetFactory<ReleaseCompany> sfrc = new SetFactory<>(em, new ReleaseCompanyFactory());
 		
 		// Do not use the LabelFactory here. It will never return null and we want to remove non-existing labels
 		IFactory<Label> lf = (EntityManager x, Label l) -> x.find(Label.class, l.getId());
 		MapFactory<Label, String> mfls = new MapFactory<>(em, lf);
 		
 		MapFactory<ExtraArtist, String> mfeas = new MapFactory<>(em, new ExtraArtistFactory());
-		MapFactory<Company, String> mfc = new MapFactory<>(em, new CompanyFactory());		
 
 		if (draft.getMaster() !=  null) {
 			draft.setMaster(em.find(Master.class, draft.getMaster().getId()));
@@ -74,7 +74,8 @@ public class ReleaseFactory implements IFactory<Release> {
 		}
 		
 		draft.setFormats(sff.replaceAll(draft.getFormats()));
-		draft.setCompanies(mfc.replaceAll(draft.getCompanies()));
+		
+		draft.setReleaseCompanies(sfrc.replaceAll(draft.getReleaseCompanies()));
 		
 		if (!rs.isRelevant(Series.class)) {
 			draft.setSeries(null);

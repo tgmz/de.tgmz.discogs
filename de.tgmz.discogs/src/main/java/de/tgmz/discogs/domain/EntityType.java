@@ -16,26 +16,28 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
 
 @Entity
-public class Role implements Serializable {
+public class EntityType implements Serializable {
 	@Transient
-	private static final long serialVersionUID = -5492233327108668138L;
+	private static final long serialVersionUID = -4122244830701398362L;
+
 	@Id
-	private String id;
-
-	public Role() {
-		super();
-	}
-
-	public Role(String id) {
-		this.id = id;
-	}
-
-	public String getId() {
+	private byte id;
+	private String name;
+	
+	public byte getId() {
 		return id;
 	}
-
+	public String getName() {
+		return name;
+	}
+	public void setId(byte id) {
+		this.id = id;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
 	@Override
 	public String toString() {
-		return "Role [id=" + id + "]";
+		return "EntityType [id=" + id + ", name=" + name + "]";
 	}
 }

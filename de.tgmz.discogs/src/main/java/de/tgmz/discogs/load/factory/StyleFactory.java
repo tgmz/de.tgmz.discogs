@@ -16,16 +16,10 @@ import de.tgmz.discogs.domain.Style;
 import jakarta.persistence.EntityManager;
 
 public class StyleFactory implements IFactory<Style> {
-	private Map<String, Style> cache;
-	
-	public StyleFactory() {
-		super();
-		
-		cache = new TreeMap<>();
-	}
+	private static Map<String, Style> cache = new TreeMap<>(); 
 	
 	@Override
 	public Style get(EntityManager em, Style draft) {
-		return cache.computeIfAbsent(draft.getId(), g -> draft);
+		return cache.computeIfAbsent(draft.getId(), s -> draft);
 	}
 }

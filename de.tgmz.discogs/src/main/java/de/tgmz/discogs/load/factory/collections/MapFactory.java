@@ -28,9 +28,7 @@ public class MapFactory<K,V> {
 	private IFactory<V> vFactory;
 	
 	public MapFactory(EntityManager em, IFactory<K> kFactory) {
-		this.em = em;
-		this.kFactory = kFactory;
-		this.vFactory = (x,v) -> v;	// Simply return the value 
+		this(em, kFactory, (x,v) -> v);	// Simply return the value 
 	}
 
 	public MapFactory(EntityManager em, IFactory<K> kFactory, IFactory<V> vFactory) {

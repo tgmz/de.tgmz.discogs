@@ -29,9 +29,11 @@
 		<class>de.tgmz.discogs.domain.SubTrack</class>
 		<class>de.tgmz.discogs.domain.Label</class>
 		<class>de.tgmz.discogs.domain.Company</class>
+		<class>de.tgmz.discogs.domain.ReleaseCompany</class>
 		<class>de.tgmz.discogs.domain.Format</class>
 		<class>de.tgmz.discogs.domain.Series</class>
 		<class>de.tgmz.discogs.domain.Role</class>
+		<class>de.tgmz.discogs.domain.EntityType</class>
 
 		<properties>
 			<!-- Database connection settings -->
