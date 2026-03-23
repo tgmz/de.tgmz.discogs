@@ -23,7 +23,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
 /**
- * Artist entity.
+ * Label entity.
  */
 @Entity
 @Table(indexes = {

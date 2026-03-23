@@ -154,7 +154,7 @@ public class Track implements Serializable {
 	 * Computes if the ExatraArtist applies to this track.
 	 * @param ea the ExatraArtist
 	 */
-	public boolean isApplicable(ExtraArtist ea, String tracks) {
+	public boolean isApplicable(String tracks) {
 		if (StringUtils.isEmpty(tracks)) {
 			return true;
 		}

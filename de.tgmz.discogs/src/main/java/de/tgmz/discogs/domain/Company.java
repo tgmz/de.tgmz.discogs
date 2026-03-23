@@ -18,7 +18,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
 /**
- * Artist entity.
+ * Company entity.
  */
 @Entity
 @Table(indexes = {
@@ -43,7 +43,7 @@ public class Company implements Serializable {
 	}
 
 	/**
-	 * The artists id obtained from discogs <id> tag.
+	 * The companys id obtained from discogs <id> tag.
 	 * @return the id
 	 */
 	public long getId() {
@@ -51,7 +51,7 @@ public class Company implements Serializable {
 	}
 
 	/**
-	 * The artists name obtained from discogs <name> tag.
+	 * The companys name obtained from discogs <name> tag.
 	 * @return the id
 	 */
 	public String getName() {

@@ -15,6 +15,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
 
+/**
+ * The entity describes the companys kind of contribution to a release e.g. "Distributed By".   
+ */
 @Entity
 public class EntityType implements Serializable {
 	@Transient

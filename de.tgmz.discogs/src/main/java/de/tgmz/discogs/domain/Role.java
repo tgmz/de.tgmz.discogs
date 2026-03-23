@@ -15,6 +15,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
 
+/**
+ * Role entity. It describes the kind of contribution of an artist in a release/track/subtrack e.g. "Written-By".
+ */
 @Entity
 public class Role implements Serializable {
 	@Transient

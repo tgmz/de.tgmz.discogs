@@ -15,14 +15,21 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import org.apache.commons.io.FileUtils;
+import org.jline.utils.Log;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -44,34 +51,49 @@ import de.tgmz.discogs.domain.SubTrack;
 import de.tgmz.discogs.domain.Track;
 import de.tgmz.discogs.domain.id.SubTrackId;
 import de.tgmz.discogs.load.ArtistContentHandler;
+import de.tgmz.discogs.load.DiscogsContentHandler;
 import de.tgmz.discogs.load.LabelContentHandler;
 import de.tgmz.discogs.load.MasterContentHandler;
 import de.tgmz.discogs.load.ReleaseContentHandler;
-import de.tgmz.discogs.setup.DiscogsFile;
 import de.tgmz.mp3.discogs.load.predicate.DataQualityFilter;
 import de.tgmz.mp3.discogs.load.predicate.IgnoreUpToFilter;
 import de.tgmz.mp3.discogs.load.predicate.MainFilter;
 import jakarta.persistence.EntityManager;
 
 public class DiscogsTest {
-	private static EntityManager em;
+	public static final String JDBC_DATA_DIR = System.getProperty("java.io.tmpdir") + File.separatorChar + "discogs_test";
+	
+	private static final String JDBC_DATA_FILE = JDBC_DATA_DIR + File.separatorChar + "discogs";
+	private static final String JDBC_PROTOCOL = "jdbc:h2:file:";
+	private static final String JDBC_PROPERTIES = ";MODE=DB2;DEFAULT_NULL_ORDERING=HIGH;AUTO_SERVER=TRUE";
+	
+	public static final String JDBC_URL = JDBC_PROTOCOL + JDBC_DATA_FILE + JDBC_PROPERTIES;
+	
 	private static final long IGNORED = 115L;
+	
+	private static Path dataDir;
+
+	private static EntityManager em;
 	
 	@BeforeClass
 	public static void setupOnce() throws IOException {
-		System.setProperty("jakarta.persistence.jdbc.url", AllTests.JDBC_URL);
+		System.setProperty("jakarta.persistence.jdbc.url", JDBC_URL);
 		System.setProperty("jakarta.persistence.jdbc.user", "sa");
 		System.setProperty("jakarta.persistence.jdbc.password", "sa");
-		System.setProperty(DiscogsFile.DISCOGS_DIR, System.getProperty("java.io.tmpdir"));
+		System.setProperty("DISCOGS_TEST", "true");
 		
 		em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager();
+		
+		dataDir = Files.createTempDirectory("discogsdata");
 		
 		load();
 	}
 	
 	@AfterClass
-	public static void teardownOnce() {
+	public static void teardownOnce() throws IOException {
 		em.close();
+		
+		FileUtils.forceDelete(dataDir.toFile());
 	}
 	
 	@Test
@@ -238,18 +260,18 @@ public class DiscogsTest {
 		assertEquals("World Network", s.getName());
 		assertEquals("16", s.getCatno());
 	}
+	
 	private static void load() throws IOException {
-		try (InputStream is = new FileInputStream(DiscogsFile.ARTISTS.getUnzippedFile())) {
-			new ArtistContentHandler().run(is);
-		}
+		DiscogsContentHandler dch;
 		
-		try (InputStream is = new FileInputStream(DiscogsFile.LABELS.getUnzippedFile())) {
-			new LabelContentHandler().run(is);
-		}
+		dch = new ArtistContentHandler();
+		extractAndLoad("discogs_artists.xml.gz", dch);
 		
-		try (InputStream is = new FileInputStream(DiscogsFile.MASTERS.getUnzippedFile())) {
-			new MasterContentHandler(x -> x.getId() != IGNORED).run(is);
-		}
+		dch = new LabelContentHandler();
+		extractAndLoad("discogs_labels.xml.gz", dch);
+		
+		dch = new MasterContentHandler(x -> x.getId() != IGNORED);
+		extractAndLoad("discogs_masters.xml.gz", dch);
 		
 		Predicate<Release> p0 = new IgnoreUpToFilter();
 		Predicate<Release> p1 = new MainFilter();
@@ -258,13 +280,31 @@ public class DiscogsTest {
 		
 		Predicate<Release> p = p0.or(p1).or(p2).or(p3);
 		
-		try (InputStream is = new FileInputStream(DiscogsFile.RELEASES.getUnzippedFile())) {
-			ReleaseContentHandler rch = new ReleaseContentHandler(p);
+		dch = new ReleaseContentHandler(p);
+		dch.setSaveThreshold(2);
+		extractAndLoad("discogs_releases.xml.gz", dch);
+	}
+	
+	private static void extractAndLoad(String resource, DiscogsContentHandler dch) throws IOException {
+		URL aUrl = null;
+		
+		try (DiscogsFileHandler dfh = new DiscogsFileHandler()) {
+			aUrl = DiscogsTest.class.getClassLoader().getResource(resource);
 			
-			rch.setSaveThreshold(1);
-			rch.run(is);
+			File zipped = new File(aUrl.toURI());
+			
+			dfh.verify(zipped);
+			
+			File extracted = dfh.extract(zipped, dataDir);
+			
+			try (InputStream is = new FileInputStream(extracted)) {
+				dch.run(is);
+			}
+		} catch (URISyntaxException e) {
+			Log.error("Invalid URI {}", aUrl);
 		}
 	}
+	
 	private void checkArtist(Artist a) {
 		assertEquals("Depeche Mode", a.getName());
 		assertTrue(a.getVariations().contains("D M"));
@@ -318,12 +358,11 @@ public class DiscogsTest {
 		
 		// Mixed By François Kevorkian
 		Entry<ExtraArtist, String> embfk = getExtraArtist(r, 20662, "Mixed By");
-		ExtraArtist mbfk = embfk.getKey(); 
 		String tracks = embfk.getValue();
 		
 		assertEquals("1 to 5, 7 to 9", tracks);
-		assertTrue(r.getTracklist().getFirst().isApplicable(mbfk, tracks));
-		assertFalse(r.getTracklist().get(5).isApplicable(mbfk, tracks));
+		assertTrue(r.getTracklist().getFirst().isApplicable(tracks));
+		assertFalse(r.getTracklist().get(5).isApplicable(tracks));
 
 		List<Track> tracklist = r.getUnfilteredTracklist();
 		

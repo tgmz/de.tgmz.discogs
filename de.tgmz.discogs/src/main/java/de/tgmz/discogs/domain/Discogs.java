@@ -21,6 +21,9 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.MappedSuperclass;
 
+/**
+ * Common attributes of master/releases entities.
+ */
 @MappedSuperclass
 public abstract class Discogs implements Serializable {
 	private static final long serialVersionUID = -8920772069254927533L;

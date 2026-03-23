@@ -16,7 +16,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
 
 /**
- * Genre entity
+ * Style entity
  */
 @Entity
 public class Style implements Serializable {

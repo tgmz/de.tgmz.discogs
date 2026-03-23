@@ -41,11 +41,6 @@
 			<version>3.20.0</version>
 		</dependency>
 		<dependency>
-			<groupId>me.tongfei</groupId>
-			<artifactId>progressbar</artifactId>
-			<version>0.10.2</version>
-		</dependency>
-		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>33.5.0-jre</version>
@@ -89,9 +84,9 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.mock-server</groupId>
-			<artifactId>mockserver-netty</artifactId>
-			<version>5.15.0</version>
+			<groupId>me.tongfei</groupId>
+			<artifactId>progressbar</artifactId>
+			<version>0.10.2</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -136,11 +131,6 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>3.5.5</version>
-				<configuration>
-					<includes>
-						<include>**/AllTests.class</include>
-					</includes>
-				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -191,39 +181,6 @@
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>3.6.3</version>
-				<configuration>
-					<mainClass>de.tgmz.discogs.setup.DiscogsFileHandler</mainClass>
-					<arguments>
-						<argument>-skipVerification</argument>
-						<argument>false</argument>
-						<argument>-defragThreshold</argument>
-						<argument>1000000</argument>
-					</arguments>
-					<classpathScope>test</classpathScope>
-					<systemProperties>
-						<property>
-							<key>log4j.configuration</key>
-							<value>file:${project.basedir}/src/main/resources/log4j.xml</value>
-						</property>
-						<property>
-							<key>jakarta.persistence.jdbc.url</key>
-							<value>jdbc:h2:file:~/Databases/mp3jpa;MODE=DB2;DEFAULT_NULL_ORDERING=HIGH;AUTO_SERVER=TRUE</value>
-						</property>
-						<property>
-							<key>jakarta.persistence.jdbc.user</key>
-							<value>sa</value>
-						</property>
-						<property>
-							<key>jakarta.persistence.jdbc.password</key>
-							<value>sa</value>
-						</property>
-					</systemProperties>
-				</configuration>
 			</plugin>
 		</plugins>
 		<pluginManagement>

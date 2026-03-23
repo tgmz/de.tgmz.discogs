@@ -181,7 +181,7 @@ public class Release extends Discogs {
 		
 		for (Track t : tracklist) {
 			for (Map.Entry<ExtraArtist, String> e : extraArtists.entrySet()) {
-				i += t.isApplicable(e.getKey(), e.getValue()) ? 1 : 0;
+				i += t.isApplicable(e.getValue()) ? 1 : 0;
 			}
 			
 			i += t.sizeOf();
