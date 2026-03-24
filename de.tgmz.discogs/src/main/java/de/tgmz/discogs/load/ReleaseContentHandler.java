@@ -34,8 +34,6 @@ import de.tgmz.discogs.domain.Series;
 import de.tgmz.discogs.domain.Style;
 import de.tgmz.discogs.domain.SubTrack;
 import de.tgmz.discogs.domain.Track;
-import de.tgmz.discogs.load.factory.GenreFactory;
-import de.tgmz.discogs.load.factory.StyleFactory;
 import de.tgmz.discogs.load.persist.ReleasePersistable;
 
 public class ReleaseContentHandler extends DiscogsContentHandler {
@@ -54,8 +52,6 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	private Company company;
 	private EntityType entityType;
 	private Release r;
-	private GenreFactory genreFactory;
-	private StyleFactory styleFactory;
 	private Format format;
 
 	public ReleaseContentHandler() {
@@ -64,9 +60,6 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	
 	public ReleaseContentHandler(Predicate<Release> filter) {
 		super();
-		
-		genreFactory = new GenreFactory();
-		styleFactory = new StyleFactory();
 		
 		persister = new ReleasePersistable(filter);
 	}
@@ -217,11 +210,11 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, genres, genre]":
-			r.getGenres().add(genreFactory.get(null, new Genre(getChars())));
+			r.getGenres().add(new Genre(getChars()));
 			
 			break;
 		case "[releases, release, styles, style]":
-			r.getStyles().add(styleFactory.get(null, new Style(getChars())));
+			r.getStyles().add(new Style(getChars()));
 			
 			break;
 		// extraartists

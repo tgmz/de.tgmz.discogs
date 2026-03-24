@@ -59,6 +59,8 @@ import de.tgmz.mp3.discogs.load.predicate.DataQualityFilter;
 import de.tgmz.mp3.discogs.load.predicate.IgnoreUpToFilter;
 import de.tgmz.mp3.discogs.load.predicate.MainFilter;
 import jakarta.persistence.EntityManager;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 
 public class DiscogsTest {
 	public static final String JDBC_DATA_DIR = System.getProperty("java.io.tmpdir") + File.separatorChar + "discogs_test";
@@ -245,7 +247,15 @@ public class DiscogsTest {
 		assertTrue(em.createQuery("FROM Genre", Genre.class).getResultStream().anyMatch(x -> "Rock".equals(x.getId())));
 		
 		assertTrue(em.createQuery("FROM Style", Style.class).getResultStream().anyMatch(x -> "Synth-pop".equals(x.getId())));
+		
+		for (Class<?> clz : List.of(Genre.class, Style.class)) {
+			EqualsVerifier.forClass(clz)
+			.usingGetClass()
+			.suppress(Warning.SURROGATE_KEY)
+			.verify();
+		}
 	}
+	
 	@Test
 	public void testArtistNoId() {
 		assertNull(em.find(Artist.class, 0L));

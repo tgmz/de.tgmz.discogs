@@ -24,8 +24,6 @@ import de.tgmz.discogs.domain.DataQuality;
 import de.tgmz.discogs.domain.Genre;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Style;
-import de.tgmz.discogs.load.factory.GenreFactory;
-import de.tgmz.discogs.load.factory.StyleFactory;
 import de.tgmz.discogs.load.persist.MasterPersistable;
 import jakarta.persistence.EntityManager;
 
@@ -36,8 +34,6 @@ public class MasterContentHandler extends DiscogsContentHandler {
 	private Master master;
 	private List<String> artistNames;
 	private List<String> joins;
-	private GenreFactory genreFactory;
-	private StyleFactory styleFactory;
 	private long artistsBefore;
 
 	public MasterContentHandler() {
@@ -45,9 +41,6 @@ public class MasterContentHandler extends DiscogsContentHandler {
 	}
 	
 	public MasterContentHandler(Predicate<Master> filter) {
-		genreFactory = new GenreFactory();
-		styleFactory = new StyleFactory();
-		
 		try (EntityManager em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager()) {
 			artistsBefore = (long) em.createNativeQuery("SELECT COALESCE(COUNT(*), 0) FROM Artist").getSingleResult();
 		}
@@ -95,11 +88,11 @@ public class MasterContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[masters, master, genres, genre]":
-			master.getGenres().add(genreFactory.get(null, new Genre(getChars())));
+			master.getGenres().add(new Genre(getChars()));
 			
 			break;
 		case "[masters, master, styles, style]":
-			master.getStyles().add(styleFactory.get(null, new Style(getChars())));
+			master.getStyles().add(new Style(getChars()));
 			
 			break;
 		case "[masters, master, artists]":

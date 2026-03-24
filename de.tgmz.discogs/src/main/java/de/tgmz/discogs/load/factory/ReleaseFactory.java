@@ -11,14 +11,11 @@ package de.tgmz.discogs.load.factory;
 
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.ExtraArtist;
-import de.tgmz.discogs.domain.Format;
-import de.tgmz.discogs.domain.Genre;
 import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
 import de.tgmz.discogs.domain.ReleaseCompany;
 import de.tgmz.discogs.domain.Series;
-import de.tgmz.discogs.domain.Style;
 import de.tgmz.discogs.domain.SubTrack;
 import de.tgmz.discogs.domain.Track;
 import de.tgmz.discogs.load.factory.collections.MapFactory;
@@ -39,10 +36,7 @@ public class ReleaseFactory implements IFactory<Release> {
 		ExtraArtistFactory eaf = new ExtraArtistFactory();
 		
 		SetFactory<Artist> sfa = new SetFactory<>(em, af);
-		SetFactory<Genre> sfg = new SetFactory<>(em, new GenreFactory());
-		SetFactory<Style> sfs = new SetFactory<>(em, new StyleFactory());
 		SetFactory<ExtraArtist> sfea = new SetFactory<>(em, eaf);
-		SetFactory<Format> sff = new SetFactory<>(em, new FormatFactory());
 		SetFactory<ReleaseCompany> sfrc = new SetFactory<>(em, new ReleaseCompanyFactory());
 		
 		// Do not use the LabelFactory here. It will never return null and we want to remove non-existing labels
@@ -57,8 +51,6 @@ public class ReleaseFactory implements IFactory<Release> {
 		
 		draft.setLabels(mfls.replaceAll(draft.getLabels()));
 
-		draft.setGenres(sfg.replaceAll(draft.getGenres()));
-		draft.setStyles(sfs.replaceAll(draft.getStyles()));		
 		draft.setArtists(sfa.replaceAll(draft.getArtists()));
 		
 		draft.setExtraArtists(mfeas.replaceAll(draft.getExtraArtists()));
@@ -72,8 +64,6 @@ public class ReleaseFactory implements IFactory<Release> {
 			
 			t.setExtraArtists(sfea.replaceAll(t.getExtraArtists()));
 		}
-		
-		draft.setFormats(sff.replaceAll(draft.getFormats()));
 		
 		draft.setReleaseCompanies(sfrc.replaceAll(draft.getReleaseCompanies()));
 		

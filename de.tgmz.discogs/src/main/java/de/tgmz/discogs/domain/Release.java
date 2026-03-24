@@ -160,10 +160,6 @@ public class Release extends Discogs {
 		this.extraArtists = extraArtists;
 	}
 	
-	public void setFormats(Set<Format> formats) {
-		this.formats = formats;
-	}
-
 	public void setSeries(Series series) {
 		this.series = series;
 	}
