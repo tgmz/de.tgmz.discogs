@@ -184,7 +184,9 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			break;
 		case "[releases, release, artists, artist]":
 			// Don't add artist with empty id
-			if (artist.getId() != 0L) {
+			if (artist.getId() == 0L) {
+				LOG.debug("Empty id on {}. Removing it", extraArtist);
+			} else {
 				r.getArtists().add(artist);
 			}
 			
@@ -242,7 +244,9 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			break;
 		case "[releases, release, extraartists, artist]":
 			// Don't add extraArtist with empty artist.id
-			if (extraArtist.getArtist().getId() != 0L) {
+			if (extraArtist.getArtist().getId() == 0L) {
+				LOG.debug("Empty id on {}. Removing it", extraArtist);
+			} else {
 				r.getExtraArtists().put(extraArtist, eaTracks);
 			}
 				
@@ -312,8 +316,6 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 		case "[releases, release, companies, company, id]":
 			company.setId(Long.parseLong(getChars()));
 			
-			releaseCompany.setCompany(company);
-			
 			break;
 		case "[releases, release, companies, company, name]":
 			company.setName(getChars());
@@ -328,11 +330,16 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, companies, company]":
-			releaseCompany.setRelease(r);
-			releaseCompany.setCompany(company);
-			releaseCompany.setEntityType(entityType);
+			// cf release 3759: Copyright company "Infinite Jazz Recordings" carries no id. 
+			if (company.getId() == null) {
+				LOG.debug("Id is null for {} {}. Removing it", entityType, company);
+			} else {
+				releaseCompany.setRelease(r);
+				releaseCompany.setCompany(company);
+				releaseCompany.setEntityType(entityType);
 			
-			r.getReleaseCompanies().add(releaseCompany);
+				r.getReleaseCompanies().add(releaseCompany);
+			}
 			
 			break;
 		case "[releases, release, formats, format, descriptions, description]":
