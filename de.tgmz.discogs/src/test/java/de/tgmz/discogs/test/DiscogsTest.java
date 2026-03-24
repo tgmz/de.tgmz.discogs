@@ -250,7 +250,6 @@ public class DiscogsTest {
 		
 		for (Class<?> clz : List.of(Genre.class, Style.class)) {
 			EqualsVerifier.forClass(clz)
-			.usingGetClass()
 			.suppress(Warning.SURROGATE_KEY)
 			.verify();
 		}
@@ -266,7 +265,7 @@ public class DiscogsTest {
 		
 		Series s = r.getSeries();
 		
-		assertEquals(117965, s.getId());
+		assertEquals(117965L, (long) s.getId());
 		assertEquals("World Network", s.getName());
 		assertEquals("16", s.getCatno());
 	}

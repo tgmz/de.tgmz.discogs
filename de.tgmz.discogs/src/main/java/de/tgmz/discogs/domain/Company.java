@@ -9,10 +9,7 @@
 **********************************************************************/
 package de.tgmz.discogs.domain;
 
-import java.io.Serializable;
-
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
@@ -24,11 +21,9 @@ import jakarta.persistence.Transient;
 @Table(indexes = {
 	@Index(columnList = "name", name = "name_idx"),
 })
-public class Company implements Serializable {
+public class Company extends AtomicEntity<Long> {
 	@Transient
 	private static final long serialVersionUID = -2527932623058215441L;
-	@Id
-	private long id;
 	private String name;
 
 	public Company() {
@@ -36,18 +31,9 @@ public class Company implements Serializable {
 	}
 	
 	public Company(long id, String name) {
-		this();
+		super(id);
 		
-		this.id = id;
 		this.name = name;
-	}
-
-	/**
-	 * The companys id obtained from discogs <id> tag.
-	 * @return the id
-	 */
-	public long getId() {
-		return id;
 	}
 
 	/**
@@ -58,16 +44,12 @@ public class Company implements Serializable {
 		return name;
 	}
 
-	public void setId(long id) {
-		this.id = id;
-	}
-
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	@Override
 	public String toString() {
-		return "Company [id=" + String.format("%,d", id) + ", name=" + name + "]";
+		return "Company [id=" + String.format("%,d", getId()) + ", name=" + name + "]";
 	}
 }

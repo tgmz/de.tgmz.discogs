@@ -9,36 +9,22 @@
 **********************************************************************/
 package de.tgmz.discogs.domain;
 
-import java.io.Serializable;
-
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
 
 /**
  * Role entity. It describes the kind of contribution of an artist in a release/track/subtrack e.g. "Written-By".
  */
 @Entity
-public class Role implements Serializable {
+public class Role extends AtomicEntity<String> {
 	@Transient
 	private static final long serialVersionUID = -5492233327108668138L;
-	@Id
-	private String id;
 
 	public Role() {
 		super();
 	}
 
 	public Role(String id) {
-		this.id = id;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	@Override
-	public String toString() {
-		return "Role [id=" + id + "]";
+		super(id);
 	}
 }

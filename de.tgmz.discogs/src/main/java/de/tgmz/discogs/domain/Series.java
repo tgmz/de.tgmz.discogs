@@ -9,21 +9,16 @@
 **********************************************************************/
 package de.tgmz.discogs.domain;
 
-import java.io.Serializable;
-
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
 
 /**
  * Series entity.
  */
 @Entity
-public class Series implements Serializable {
+public class Series extends AtomicEntity<Long> {
 	@Transient
 	private static final long serialVersionUID = -9147451633557425171L;
-	@Id
-	private long id;
 	private String name;
 	private String catno;
 
@@ -32,18 +27,10 @@ public class Series implements Serializable {
 	}
 	
 	public Series(long id, String catno, String name) {
-		this();
-		this.id = id;
+		super(id);
+
 		this.catno = catno;
 		this.name = name;
-	}
-
-	/**
-	 * The series id obtained from discogs <id> tag.
-	 * @return the id
-	 */
-	public long getId() {
-		return id;
 	}
 
 	/**
@@ -60,6 +47,6 @@ public class Series implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Series [id=" + String.format("%,d", id) + ", catno=" + catno + ", name=" + name + "]";
+		return "Series [id=" + String.format("%,d", getId()) + ", catno=" + catno + ", name=" + name + "]";
 	}
 }

@@ -9,38 +9,27 @@
 **********************************************************************/
 package de.tgmz.discogs.domain;
 
-import java.io.Serializable;
-
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
 
 /**
  * The entity describes the companys kind of contribution to a release e.g. "Distributed By".   
  */
 @Entity
-public class EntityType implements Serializable {
+public class EntityType extends AtomicEntity<Byte> {
 	@Transient
 	private static final long serialVersionUID = -4122244830701398362L;
 
-	@Id
-	private byte id;
 	private String name;
 	
-	public byte getId() {
-		return id;
-	}
 	public String getName() {
 		return name;
-	}
-	public void setId(byte id) {
-		this.id = id;
 	}
 	public void setName(String name) {
 		this.name = name;
 	}
 	@Override
 	public String toString() {
-		return "EntityType [id=" + id + ", name=" + name + "]";
+		return "EntityType [id=" + getId() + ", name=" + name + "]";
 	}
 }
