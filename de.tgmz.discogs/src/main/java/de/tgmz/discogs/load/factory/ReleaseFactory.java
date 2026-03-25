@@ -15,6 +15,7 @@ import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
 import de.tgmz.discogs.domain.ReleaseCompany;
+import de.tgmz.discogs.domain.ReleaseExtraArtist;
 import de.tgmz.discogs.domain.Series;
 import de.tgmz.discogs.domain.SubTrack;
 import de.tgmz.discogs.domain.Track;
@@ -43,7 +44,7 @@ public class ReleaseFactory implements IFactory<Release> {
 		IFactory<Label> lf = (EntityManager x, Label l) -> x.find(Label.class, l.getId());
 		MapFactory<Label, String> mfls = new MapFactory<>(em, lf);
 		
-		MapFactory<ExtraArtist, String> mfeas = new MapFactory<>(em, new ExtraArtistFactory());
+		SetFactory<ReleaseExtraArtist> sfrea = new SetFactory<>(em, new ReleaseExtraArtistFactory());
 
 		if (draft.getMaster() !=  null) {
 			draft.setMaster(em.find(Master.class, draft.getMaster().getId()));
@@ -53,7 +54,7 @@ public class ReleaseFactory implements IFactory<Release> {
 
 		draft.setArtists(sfa.replaceAll(draft.getArtists()));
 		
-		draft.setExtraArtists(mfeas.replaceAll(draft.getExtraArtists()));
+		draft.setExtraArtists(sfrea.replaceAll(draft.getReleaseExtraArtists()));
 		
 		for (Track t : draft.getUnfilteredTracklist()) {
 			t.setArtists(sfa.replaceAll(t.getArtists()));

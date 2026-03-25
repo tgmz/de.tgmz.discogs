@@ -29,6 +29,7 @@ import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
 import de.tgmz.discogs.domain.ReleaseCompany;
+import de.tgmz.discogs.domain.ReleaseExtraArtist;
 import de.tgmz.discogs.domain.Role;
 import de.tgmz.discogs.domain.Series;
 import de.tgmz.discogs.domain.Style;
@@ -44,8 +45,8 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	private short trackNumber;
 	private short subTrackNumber;
 	private Artist artist;
+	private ReleaseExtraArtist releaseExtraArtist;
 	private ExtraArtist extraArtist;
-	private String eaTracks;
 	private Track track;
 	private SubTrack subTrack;
 	private ReleaseCompany releaseCompany;
@@ -89,11 +90,16 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			artist = new Artist();
 			
 			break;
-		case "[releases, release, extraartists, artist]"
-			, "[releases, release, tracklist, track, extraartists, artist]"
+		case "[releases, release, extraartists, artist]":
+			releaseExtraArtist = new ReleaseExtraArtist();
+			releaseExtraArtist.setRelease(r);
+			releaseExtraArtist.setArtist(new Artist());
+			releaseExtraArtist.setRole(new Role());
+
+		break;
+		case "[releases, release, tracklist, track, extraartists, artist]"
 			, "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist]":
 			extraArtist = new ExtraArtist();
-			eaTracks = "";
 
 			break;
 		case "[releases, release, tracklist]":
@@ -220,34 +226,50 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		// extraartists
-		case "[releases, release, extraartists, artist, id]"
-			, "[releases, release, tracklist, track, extraartists, artist, id]"
-			, "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist, id]":
-			extraArtist.getArtist().setId(Long.parseLong(getChars()));
+			
+		case "[releases, release, extraartists, artist, id]":
+			releaseExtraArtist.getArtist().setId(Long.parseLong(getChars()));
 				
 			break;
-		case "[releases, release, extraartists, artist, name]"
-			, "[releases, release, tracklist, track, extraartists, artist, name]"
-			, "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist, name]":
-			extraArtist.getArtist().setName(getChars(MAX_LENGTH_DEFAULT, true));
+		case "[releases, release, extraartists, artist, name]":
+			releaseExtraArtist.getArtist().setName(getChars(MAX_LENGTH_DEFAULT, true));
 			
 			break;
-		case "[releases, release, extraartists, artist, role]"
-			, "[releases, release, tracklist, track, extraartists, artist, role]"
-			, "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist, role]":
-			extraArtist.setRole(new Role(getChars()));
+		case "[releases, release, extraartists, artist, role]":
+			releaseExtraArtist.getRole().setId(getChars());
 			
 			break;
 		case "[releases, release, extraartists, artist, tracks]":
-			eaTracks = getChars();
+			releaseExtraArtist.setApplicableTracks(getChars());
 				
 			break;
+		case "[releases, release, tracklist, track, extraartists, artist, id]"
+			, "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist, id]":
+			extraArtist.getArtist().setId(Long.parseLong(getChars()));
+			
+			break;
+		case "[releases, release, tracklist, track, extraartists, artist, name]"
+			, "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist, name]":
+			extraArtist.getArtist().setName(getChars(MAX_LENGTH_DEFAULT, true));
+		
+			break;
+		case "[releases, release, tracklist, track, extraartists, artist, role]"
+			, "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist, role]":
+			extraArtist.setRole(new Role(getChars()));
+		
+			break;
+			
 		case "[releases, release, extraartists, artist]":
 			// Don't add extraArtist with empty artist.id
-			if (extraArtist.getArtist().getId() == 0L) {
-				LOG.debug("Empty id on {}. Removing it", extraArtist);
+			if (releaseExtraArtist.getArtist().getId() == 0L) {
+				LOG.debug("Empty id on {}. Removing it", releaseExtraArtist);
 			} else {
-				r.getExtraArtists().put(extraArtist, eaTracks);
+				// Synchronize key and contents
+				releaseExtraArtist.setRelease(r);
+				releaseExtraArtist.setArtist(releaseExtraArtist.getArtist());
+				releaseExtraArtist.setRole(releaseExtraArtist.getRole());
+				
+				r.getReleaseExtraArtists().add(releaseExtraArtist);
 			}
 				
 			break;

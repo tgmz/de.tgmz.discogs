@@ -24,7 +24,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -44,6 +43,7 @@ import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
 import de.tgmz.discogs.domain.ReleaseCompany;
+import de.tgmz.discogs.domain.ReleaseExtraArtist;
 import de.tgmz.discogs.domain.Role;
 import de.tgmz.discogs.domain.Series;
 import de.tgmz.discogs.domain.Style;
@@ -360,14 +360,14 @@ public class DiscogsTest {
 		assertEquals(190, r.sizeOf());
 		
 		// Performer Andrew Fletcher
-		Entry<ExtraArtist, String> paf = getExtraArtist(r, 132774, "Performer");
+		ReleaseExtraArtist paf = getExtraArtist(r, 132774, "Performer");
 
-		assertEquals("Andrew Fletcher", paf.getKey().getArtist().getName());
-		assertEquals("Performer", paf.getKey().getRole().getId());
+		assertEquals("Andrew Fletcher", paf.getArtist().getName());
+		assertEquals("Performer", paf.getRole().getId());
 		
 		// Mixed By François Kevorkian
-		Entry<ExtraArtist, String> embfk = getExtraArtist(r, 20662, "Mixed By");
-		String tracks = embfk.getValue();
+		ReleaseExtraArtist mbfk = getExtraArtist(r, 20662, "Mixed By");
+		String tracks = mbfk.getApplicableTracks();
 		
 		assertEquals("1 to 5, 7 to 9", tracks);
 		assertTrue(r.getTracklist().getFirst().isApplicable(tracks));
@@ -396,10 +396,11 @@ public class DiscogsTest {
 		assertEquals("9 26081-2", r.getLabels().get(l));
 	}
 	
-	private Entry<ExtraArtist, String> getExtraArtist(Release r, long id, String role) {
-		return r.getExtraArtists()
-				.entrySet()
-				.stream()
-				.filter(e -> id == e.getKey().getArtist().getId() && role.equals(e.getKey().getRole().getId())).findAny().orElseThrow();
+	private ReleaseExtraArtist getExtraArtist(Release r, long artistId, String role) {
+		return r.getReleaseExtraArtists()
+			.stream()
+			.filter(rea -> rea.getArtist().getId() == artistId && role.equals(rea.getRole().getId()))
+			.findFirst()
+			.orElseThrow();
 	}
 }

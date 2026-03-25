@@ -53,8 +53,8 @@ public class Release extends Discogs {
 	private Master master;
 	private String country;
 	private String released;
-	@ElementCollection(fetch = FetchType.LAZY)
-	private Map<ExtraArtist, String> extraArtists;
+	@OneToMany(mappedBy = "release", cascade = CascadeType.ALL)
+	private Set<ReleaseExtraArtist> releaseExtraArtists;
 	@ElementCollection(fetch = FetchType.LAZY)
 	@Column(name = "catno")
 	private Map<Label, String> labels;
@@ -69,7 +69,7 @@ public class Release extends Discogs {
 		super();
 		
 		tracklist = new LinkedList<>();
-		extraArtists = new HashMap<>();
+		releaseExtraArtists = new HashSet<>();
 		labels = new HashMap<>();
 		releaseCompanies = new HashSet<>();
 		formats = new HashSet<>();
@@ -145,8 +145,8 @@ public class Release extends Discogs {
 		this.master = master;
 	}
 
-	public Map<ExtraArtist, String> getExtraArtists() {
-		return extraArtists;
+	public Set<ReleaseExtraArtist> getReleaseExtraArtists() {
+		return releaseExtraArtists;
 	}
 
 	/**
@@ -156,8 +156,8 @@ public class Release extends Discogs {
 		this.labels = labels;
 	}
 
-	public void setExtraArtists(Map<ExtraArtist, String> extraArtists) {
-		this.extraArtists = extraArtists;
+	public void setExtraArtists(Set<ReleaseExtraArtist> releaseExtraArtists) {
+		this.releaseExtraArtists = releaseExtraArtists;
 	}
 	
 	public void setSeries(Series series) {
@@ -176,8 +176,8 @@ public class Release extends Discogs {
 		int i = 0;
 		
 		for (Track t : tracklist) {
-			for (Map.Entry<ExtraArtist, String> e : extraArtists.entrySet()) {
-				i += t.isApplicable(e.getValue()) ? 1 : 0;
+			for (ReleaseExtraArtist rea : releaseExtraArtists) {
+				i += t.isApplicable(rea.getApplicableTracks()) ? 1 : 0;
 			}
 			
 			i += t.sizeOf();
