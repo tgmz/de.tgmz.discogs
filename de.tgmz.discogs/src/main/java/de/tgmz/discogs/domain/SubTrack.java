@@ -19,6 +19,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Transient;
 
@@ -35,6 +37,13 @@ public class SubTrack implements Serializable {
 	@Column(length = 32)
 	private String position;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	@JoinTable(
+		name = "SUBTRACK_EXTRAARTIST",
+		inverseJoinColumns = {
+				@JoinColumn(name = "artist_id")
+				, @JoinColumn(name = "role_id")
+		}
+	)
 	private Set<ExtraArtist> extraArtists;
 	@Column(length = 16)
 	private String duration;

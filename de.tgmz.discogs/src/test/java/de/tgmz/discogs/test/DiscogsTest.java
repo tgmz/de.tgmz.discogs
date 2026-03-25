@@ -35,6 +35,7 @@ import org.junit.Test;
 
 import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Artist;
+import de.tgmz.discogs.domain.Company;
 import de.tgmz.discogs.domain.DataQuality;
 import de.tgmz.discogs.domain.ExtraArtist;
 import de.tgmz.discogs.domain.Format;
@@ -59,6 +60,7 @@ import de.tgmz.mp3.discogs.load.predicate.DataQualityFilter;
 import de.tgmz.mp3.discogs.load.predicate.IgnoreUpToFilter;
 import de.tgmz.mp3.discogs.load.predicate.MainFilter;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.metamodel.EntityType;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 
@@ -247,8 +249,11 @@ public class DiscogsTest {
 		assertTrue(em.createQuery("FROM Genre", Genre.class).getResultStream().anyMatch(x -> "Rock".equals(x.getId())));
 		
 		assertTrue(em.createQuery("FROM Style", Style.class).getResultStream().anyMatch(x -> "Synth-pop".equals(x.getId())));
-		
-		for (Class<?> clz : List.of(Genre.class, Style.class)) {
+	}
+
+	@Test
+	public void testEqualsHashcode() {
+		for (Class<?> clz : List.of(Genre.class, Style.class, Company.class, EntityType.class, Role.class, Series.class)) {
 			EqualsVerifier.forClass(clz)
 			.suppress(Warning.SURROGATE_KEY)
 			.verify();

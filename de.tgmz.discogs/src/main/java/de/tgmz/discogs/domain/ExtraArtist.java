@@ -12,70 +12,56 @@ package de.tgmz.discogs.domain;
 import java.io.Serializable;
 import java.util.Objects;
 
-import jakarta.persistence.CascadeType;
+import de.tgmz.discogs.domain.id.ExtraArtistId;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Index;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.NamedQuery;
-import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
 @Entity
-@Table(indexes = {
-	@Index(name = "artistRole_idx", columnList = "artist,role")
-})
-@NamedQuery(name = "ExtraArtist.byArtistIdAndRole"
-, query = "FROM ExtraArtist ea WHERE ea.artist.id = ?1 AND ea.role.id = ?2") 
 public class ExtraArtist implements Serializable { 
 	@Transient
 	private static final long serialVersionUID = 2296552658329482485L;
-	@Id
-	@GeneratedValue
-	private long id;
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-	private Artist artist;
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-	private Role role;
+	@EmbeddedId
+	private ExtraArtistId id;
 	
 	public ExtraArtist() {
-		artist = new Artist();
+		id = new ExtraArtistId();
 	}
 
 	public ExtraArtist(Artist artist, Role role) {
-		this.artist = artist;
-		this.role = role;
+		this();
+		
+		this.id.setArtist(artist);
+		this.id.setRole(role);
 	}
 
-	public long getId() {
+	public ExtraArtistId getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(ExtraArtistId id) {
 		this.id = id;
 	}
 
 	public Artist getArtist() {
-		return artist;
+		return id.getArtist();
 	}
 
 	public void setArtist(Artist artist) {
-		this.artist = artist;
+		this.id.setArtist(artist);
 	}
 
 	public Role getRole() {
-		return role;
+		return id.getRole();
 	}
 
 	public void setRole(Role role) {
-		this.role = role;
+		this.id.setRole(role);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(artist.getId(), role);
+		return Objects.hash(id);
 	}
 
 	@Override
@@ -87,12 +73,12 @@ public class ExtraArtist implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		ExtraArtist other = (ExtraArtist) obj;
-		return artist.getId() == other.artist.getId() && Objects.equals(role, other.role);
+		return Objects.equals(id, other.id);
 	}
 
 	@Override
 	public String toString() {
-		return "ExtraArtist [id=" + id + ", role=" + role + ", artist=" + artist + "]";
+		return "ExtraArtist [id=" + id + "]";
 	}
 	
 }
