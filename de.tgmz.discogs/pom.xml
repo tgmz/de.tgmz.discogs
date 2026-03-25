@@ -283,6 +283,7 @@
 							<skipTestScope>true</skipTestScope>
 							<failOnError>true</failOnError>
 							<nvdApiKey>${nvdApiKey}</nvdApiKey>
+							<ossIndexServerId>ossindex</ossIndexServerId>
 							<formats>
 								<format>HTML</format>
 							</formats>
