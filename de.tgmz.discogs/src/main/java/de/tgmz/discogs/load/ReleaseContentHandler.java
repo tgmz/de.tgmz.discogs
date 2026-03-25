@@ -185,7 +185,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 		case "[releases, release, artists, artist]":
 			// Don't add artist with empty id
 			if (artist.getId() == 0L) {
-				LOG.debug("Empty id on {}. Removing it", extraArtist);
+				LOG.debug("Empty id on {}. Removing it", artist);
 			} else {
 				r.getArtists().add(artist);
 			}
