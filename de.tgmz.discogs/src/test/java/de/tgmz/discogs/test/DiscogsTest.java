@@ -44,8 +44,11 @@ import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
 import de.tgmz.discogs.domain.ReleaseCompany;
+<<<<<<< Upstream, based on temp/rea
 import de.tgmz.discogs.domain.ReleaseExtraArtist;
 import de.tgmz.discogs.domain.Role;
+=======
+>>>>>>> 887db86 Remove Role
 import de.tgmz.discogs.domain.Series;
 import de.tgmz.discogs.domain.Style;
 import de.tgmz.discogs.domain.SubTrack;
@@ -171,7 +174,7 @@ public class DiscogsTest {
 		ExtraArtist ea = st.getExtraArtists().stream().filter(ea0 -> ea0.getArtist().getId() == 754974).findFirst().orElseThrow();
 		
 		assertEquals("Wiener Philharmoniker", ea.getArtist().getName());
-		assertEquals("Orchestra", ea.getRole().getId());
+		assertEquals("Orchestra", ea.getRole());
 		
 		Set<Format> formats = r.getFormats();
 		
@@ -236,7 +239,7 @@ public class DiscogsTest {
 		Artist a1 = new Artist(1);
 		a1.setName("B");
 		
-		Role mixedBy = em.find(Role.class, "Mixed By");
+		String mixedBy = "Mixed By";
 		
 		ExtraArtist ea0 = new ExtraArtist(a0, mixedBy);
 		ExtraArtist ea1 = new ExtraArtist(a1, mixedBy);
@@ -253,7 +256,7 @@ public class DiscogsTest {
 
 	@Test
 	public void testEqualsHashcode() {
-		for (Class<?> clz : List.of(Genre.class, Style.class, Company.class, EntityType.class, Role.class, Series.class)) {
+		for (Class<?> clz : List.of(Genre.class, Style.class, Company.class, EntityType.class, Series.class)) {
 			EqualsVerifier.forClass(clz)
 			.suppress(Warning.SURROGATE_KEY)
 			.verify();
@@ -368,7 +371,7 @@ public class DiscogsTest {
 		ReleaseExtraArtist paf = getExtraArtist(r, 132774, "Performer");
 
 		assertEquals("Andrew Fletcher", paf.getArtist().getName());
-		assertEquals("Performer", paf.getRole().getId());
+		assertEquals("Performer", paf.getRole());
 		
 		// Mixed By François Kevorkian
 		ReleaseExtraArtist mbfk = getExtraArtist(r, 20662, "Mixed By");
@@ -394,7 +397,7 @@ public class DiscogsTest {
 		
 		ExtraArtist flood = eas.stream().filter(x -> x.getArtist() != null && 20661 == x.getArtist().getId()).findAny().orElseThrow();
 		
-		assertEquals("Mixed By", flood.getRole().getId());
+		assertEquals("Mixed By", flood.getRole());
 		assertEquals("Flood", flood.getArtist().getName());
 		assertEquals("Mark Ellis", flood.getArtist().getRealName());
 		
@@ -404,7 +407,7 @@ public class DiscogsTest {
 	private ReleaseExtraArtist getExtraArtist(Release r, long artistId, String role) {
 		return r.getReleaseExtraArtists()
 			.stream()
-			.filter(rea -> rea.getArtist().getId() == artistId && role.equals(rea.getRole().getId()))
+			.filter(rea -> rea.getArtist().getId() == artistId && role.equals(rea.getRole()))
 			.findFirst()
 			.orElseThrow();
 	}

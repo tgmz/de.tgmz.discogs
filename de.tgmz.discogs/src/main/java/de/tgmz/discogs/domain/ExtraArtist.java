@@ -28,7 +28,7 @@ public class ExtraArtist implements Serializable {
 		id = new ExtraArtistId();
 	}
 
-	public ExtraArtist(Artist artist, Role role) {
+	public ExtraArtist(Artist artist, String role) {
 		this();
 		
 		this.id.setArtist(artist);
@@ -51,11 +51,11 @@ public class ExtraArtist implements Serializable {
 		this.id.setArtist(artist);
 	}
 
-	public Role getRole() {
+	public String getRole() {
 		return id.getRole();
 	}
 
-	public void setRole(Role role) {
+	public void setRole(String role) {
 		this.id.setRole(role);
 	}
 

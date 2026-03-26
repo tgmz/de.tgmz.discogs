@@ -32,7 +32,6 @@
 		<class>de.tgmz.discogs.domain.ReleaseCompany</class>
 		<class>de.tgmz.discogs.domain.Format</class>
 		<class>de.tgmz.discogs.domain.Series</class>
-		<class>de.tgmz.discogs.domain.Role</class>
 		<class>de.tgmz.discogs.domain.EntityType</class>
 		<class>de.tgmz.discogs.domain.ReleaseExtraArtist</class>
 
