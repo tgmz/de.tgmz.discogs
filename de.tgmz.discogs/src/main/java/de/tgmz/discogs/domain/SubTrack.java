@@ -34,7 +34,7 @@ public class SubTrack implements Serializable {
 	@EmbeddedId
 	private SubTrackId id;
 	private String title;
-	@Column(length = 32)
+	@Column(length = 31)
 	private String position;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	@JoinTable(
@@ -45,7 +45,7 @@ public class SubTrack implements Serializable {
 		}
 	)
 	private Set<ExtraArtist> extraArtists;
-	@Column(length = 16)
+	@Column(length = 15)
 	private String duration;
 
 	public SubTrack() {

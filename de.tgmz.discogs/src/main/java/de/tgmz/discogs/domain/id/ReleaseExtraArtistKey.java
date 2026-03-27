@@ -17,7 +17,7 @@ import jakarta.persistence.Embeddable;
 import jakarta.persistence.Transient;
 
 @Embeddable
-public class ReleaseExtraArtistId implements Serializable {
+public final class ReleaseExtraArtistKey implements Serializable {
 	@Transient
 	private static final long serialVersionUID = 5444222193660844182L;
 	
@@ -39,17 +39,15 @@ public class ReleaseExtraArtistId implements Serializable {
 	}
 	@Override
 	public int hashCode() {
-		return Objects.hash(artistId, roleId, releaseId);
+		return Objects.hash(artistId, releaseId, roleId);
 	}
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null)
+		if (!(obj instanceof ReleaseExtraArtistKey))
 			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ReleaseExtraArtistId other = (ReleaseExtraArtistId) obj;
-		return artistId == other.artistId && roleId == other.roleId && releaseId == other.releaseId;
+		ReleaseExtraArtistKey other = (ReleaseExtraArtistKey) obj;
+		return artistId == other.artistId && releaseId == other.releaseId && Objects.equals(roleId, other.roleId);
 	}
 }

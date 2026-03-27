@@ -14,10 +14,12 @@ import java.util.Objects;
 
 import de.tgmz.discogs.domain.Track;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Embeddable;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Transient;
 
+@Embeddable
 public class SubTrackId implements Serializable {
 	@Transient
 	private static final long serialVersionUID = 8460138400268050387L;

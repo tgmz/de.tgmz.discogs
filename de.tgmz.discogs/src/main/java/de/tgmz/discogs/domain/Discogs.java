@@ -32,7 +32,7 @@ public abstract class Discogs implements Serializable {
 	private String title;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private Set<Artist> artists;
-	@Column(length = 512)
+	@Column(length = 511)
 	private String albumArtist;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private Set<Genre> genres;

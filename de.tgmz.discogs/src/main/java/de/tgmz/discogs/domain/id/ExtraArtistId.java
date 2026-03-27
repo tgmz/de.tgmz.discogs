@@ -13,12 +13,15 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import de.tgmz.discogs.domain.Artist;
+import de.tgmz.discogs.domain.Role;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Embeddable;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Transient;
 
+@Embeddable
 public class ExtraArtistId implements Serializable {
 	@Transient
 	private static final long serialVersionUID = 9128908612765815149L;
@@ -26,13 +29,15 @@ public class ExtraArtistId implements Serializable {
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	@JoinColumn(name = "artist_id")
 	private Artist artist;
-	private String role;
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	@JoinColumn(name = "role_id")
+	private Role role;
 	
 	public ExtraArtistId() {
-		this(new Artist(), "");
+		this(new Artist(), new Role());
 	}
 
-	public ExtraArtistId(Artist artist, String role) {
+	public ExtraArtistId(Artist artist, Role role) {
 		super();
 		
 		this.artist = artist;
@@ -43,7 +48,7 @@ public class ExtraArtistId implements Serializable {
 		return artist;
 	}
 
-	public String getRole() {
+	public Role getRole() {
 		return role;
 	}
 
@@ -51,7 +56,7 @@ public class ExtraArtistId implements Serializable {
 		this.artist = artist;
 	}
 
-	public void setRole(String role) {
+	public void setRole(Role role) {
 		this.role = role;
 	}
 

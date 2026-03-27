@@ -48,8 +48,8 @@ public class DiscogsContentHandler extends DefaultHandler {
 	private StringBuilder chars;
 	private DBDefrag defrag;
 	private BiPredicate<Integer, Integer> defragThreshold = (c,s) -> false;
-	protected static final int MAX_LENGTH_DEFAULT = 254;
-	protected static final int MAX_LENGTH_LONG = 510;
+	protected static final int MAX_LENGTH_DEFAULT = 255;
+	protected static final int MAX_LENGTH_LONG = 511;
 	protected String path;
 	@SuppressWarnings("rawtypes")
 	protected IPersistable persister;

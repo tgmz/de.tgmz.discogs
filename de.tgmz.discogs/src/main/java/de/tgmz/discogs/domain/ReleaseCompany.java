@@ -12,7 +12,7 @@ package de.tgmz.discogs.domain;
 import java.io.Serializable;
 import java.util.Objects;
 
-import de.tgmz.discogs.domain.id.ReleaseCompanyId;
+import de.tgmz.discogs.domain.id.ReleaseCompanyKey;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -24,7 +24,7 @@ public class ReleaseCompany implements Serializable {
 	private static final long serialVersionUID = 1087312827584224994L;
 	
 	@EmbeddedId
-	private ReleaseCompanyId id;
+	private ReleaseCompanyKey id;
 	
 	@ManyToOne
 	@MapsId("releaseId")
@@ -42,7 +42,7 @@ public class ReleaseCompany implements Serializable {
 	private EntityType entityType;
 	
 	public ReleaseCompany() {
-		id = new ReleaseCompanyId();
+		id = new ReleaseCompanyKey();
 	}
 	
 	public Release getRelease() {

@@ -17,7 +17,7 @@ import jakarta.persistence.Embeddable;
 import jakarta.persistence.Transient;
 
 @Embeddable
-public class ReleaseCompanyId implements Serializable {
+public final class ReleaseCompanyKey implements Serializable {
 	@Transient
 	private static final long serialVersionUID = 8460138400268050387L;
 
@@ -49,7 +49,7 @@ public class ReleaseCompanyId implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		ReleaseCompanyId other = (ReleaseCompanyId) obj;
+		ReleaseCompanyKey other = (ReleaseCompanyKey) obj;
 		return companyId == other.companyId && entityTypeId == other.entityTypeId && releaseId == other.releaseId;
 	}
 }

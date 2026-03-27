@@ -12,7 +12,7 @@ package de.tgmz.discogs.domain;
 import java.io.Serializable;
 import java.util.Objects;
 
-import de.tgmz.discogs.domain.id.ReleaseExtraArtistId;
+import de.tgmz.discogs.domain.id.ReleaseExtraArtistKey;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -24,7 +24,7 @@ public class ReleaseExtraArtist implements Serializable {
 	private static final long serialVersionUID = 1087312827584224994L;
 	
 	@EmbeddedId
-	private ReleaseExtraArtistId id;
+	private ReleaseExtraArtistKey id;
 	
 	@ManyToOne
 	@MapsId("releaseId")
@@ -39,12 +39,12 @@ public class ReleaseExtraArtist implements Serializable {
 	@ManyToOne
 	@MapsId("roleId")
 	@JoinColumn(name = "role_id")
-	private Role role;
+	private Role role;		// Only a String but we must use an @€ntity here
 	
 	private String applicableTracks;
 	
 	public ReleaseExtraArtist() {
-		id = new ReleaseExtraArtistId();
+		id = new ReleaseExtraArtistKey();
 	}
 	
 	public Release getRelease() {

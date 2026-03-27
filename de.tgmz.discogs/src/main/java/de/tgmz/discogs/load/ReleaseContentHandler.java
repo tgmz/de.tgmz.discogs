@@ -29,11 +29,8 @@ import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
 import de.tgmz.discogs.domain.ReleaseCompany;
-<<<<<<< Upstream, based on temp/rea
 import de.tgmz.discogs.domain.ReleaseExtraArtist;
 import de.tgmz.discogs.domain.Role;
-=======
->>>>>>> 887db86 Remove Role
 import de.tgmz.discogs.domain.Series;
 import de.tgmz.discogs.domain.Style;
 import de.tgmz.discogs.domain.SubTrack;
@@ -239,7 +236,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, extraartists, artist, role]":
-			releaseExtraArtist.getRole().setId(getChars());
+			releaseExtraArtist.setRole(computeRole(getChars()));
 			
 			break;
 		case "[releases, release, extraartists, artist, tracks]":
@@ -258,7 +255,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			break;
 		case "[releases, release, tracklist, track, extraartists, artist, role]"
 			, "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist, role]":
-			extraArtist.setRole(getChars());
+			extraArtist.setRole(computeRole(getChars()));
 		
 			break;
 			
@@ -383,5 +380,12 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 		}
 		
 		super.endElement(uri, localName, qName);
+	}
+	private Role computeRole(String s) {
+		Role r = new Role(s);
+		
+		r.setPrimaryRole(StringUtils.substringBefore(s, " [").strip());
+		
+		return r;
 	}
 }

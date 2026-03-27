@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.ExtraArtist;
+import de.tgmz.discogs.domain.Role;
 import de.tgmz.discogs.domain.id.ExtraArtistId;
 import jakarta.persistence.EntityManager;
 
@@ -38,7 +39,19 @@ public class ExtraArtistFactory implements IFactory<ExtraArtist> {
 		
 		draft.setArtist(a);
 		
-		ExtraArtist ea = em.find(ExtraArtist.class, new ExtraArtistId(a, draft.getRole()));
+		Role r = em.find(Role.class, draft.getRole().getId());
+		
+		if (r == null) {
+			r = draft.getRole();
+
+			LOG.trace("{} not present, creating...", r);
+			
+			em.persist(r);
+		}
+		
+		draft.setRole(r);
+		
+		ExtraArtist ea = em.find(ExtraArtist.class, new ExtraArtistId(a, r));
 		
 		if (ea == null) {
 			LOG.trace("ExtraArtist {} not present, creating...", draft);
