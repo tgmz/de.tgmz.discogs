@@ -36,10 +36,7 @@ public class ReleaseExtraArtist implements Serializable {
 	@JoinColumn(name = "artist_id")
 	private Artist artist;
 	
-	@ManyToOne
-	@MapsId("roleId")
-	@JoinColumn(name = "role_id")
-	private Role role;		// Only a String but we must use an @€ntity here
+	private String role;		// Only a String but we must use an @€ntity here
 	
 	private String applicableTracks;
 	
@@ -53,7 +50,7 @@ public class ReleaseExtraArtist implements Serializable {
 	public Artist getArtist() {
 		return artist;
 	}
-	public Role getRole() {
+	public String getRole() {
 		return role;
 	}
 	public String getApplicableTracks() {
@@ -67,9 +64,9 @@ public class ReleaseExtraArtist implements Serializable {
 		this.artist = artist;
 		this.id.setArtistId(artist.getId());
 	}
-	public void setRole(Role role) {
+	public void setRole(String role) {
 		this.role = role;
-		this.id.setRoleId(role.getId());
+		this.id.setRoleId(role);
 	}
 	public void setApplicableTracks(String applicableTracks) {
 		this.applicableTracks = applicableTracks;

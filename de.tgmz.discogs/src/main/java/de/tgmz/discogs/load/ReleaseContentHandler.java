@@ -30,7 +30,6 @@ import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
 import de.tgmz.discogs.domain.ReleaseCompany;
 import de.tgmz.discogs.domain.ReleaseExtraArtist;
-import de.tgmz.discogs.domain.Role;
 import de.tgmz.discogs.domain.Series;
 import de.tgmz.discogs.domain.Style;
 import de.tgmz.discogs.domain.SubTrack;
@@ -94,7 +93,6 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			releaseExtraArtist = new ReleaseExtraArtist();
 			releaseExtraArtist.setRelease(r);
 			releaseExtraArtist.setArtist(new Artist());
-			releaseExtraArtist.setRole(new Role());
 
 		break;
 		case "[releases, release, tracklist, track, extraartists, artist]"
@@ -236,7 +234,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, extraartists, artist, role]":
-			releaseExtraArtist.setRole(computeRole(getChars()));
+			releaseExtraArtist.setRole(getChars());
 			
 			break;
 		case "[releases, release, extraartists, artist, tracks]":
@@ -255,7 +253,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			break;
 		case "[releases, release, tracklist, track, extraartists, artist, role]"
 			, "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist, role]":
-			extraArtist.setRole(computeRole(getChars()));
+			extraArtist.setRole(getChars());
 		
 			break;
 			
@@ -380,12 +378,5 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 		}
 		
 		super.endElement(uri, localName, qName);
-	}
-	private Role computeRole(String s) {
-		Role r = new Role(s);
-		
-		r.setPrimaryRole(StringUtils.substringBefore(s, " [").strip());
-		
-		return r;
 	}
 }

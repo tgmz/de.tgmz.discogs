@@ -13,7 +13,6 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import de.tgmz.discogs.domain.Artist;
-import de.tgmz.discogs.domain.Role;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.FetchType;
@@ -29,15 +28,13 @@ public class ExtraArtistId implements Serializable {
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	@JoinColumn(name = "artist_id")
 	private Artist artist;
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-	@JoinColumn(name = "role_id")
-	private Role role;
+	private String role;
 	
 	public ExtraArtistId() {
-		this(new Artist(), new Role());
+		this(new Artist(), null);
 	}
 
-	public ExtraArtistId(Artist artist, Role role) {
+	public ExtraArtistId(Artist artist, String role) {
 		super();
 		
 		this.artist = artist;
@@ -48,7 +45,7 @@ public class ExtraArtistId implements Serializable {
 		return artist;
 	}
 
-	public Role getRole() {
+	public String getRole() {
 		return role;
 	}
 
@@ -56,7 +53,7 @@ public class ExtraArtistId implements Serializable {
 		this.artist = artist;
 	}
 
-	public void setRole(Role role) {
+	public void setRole(String role) {
 		this.role = role;
 	}
 
