@@ -28,6 +28,17 @@ public final class ReleaseExtraArtistKey implements Serializable {
 	@Column(name = "role_id")
 	private String roleId;
 	
+	public ReleaseExtraArtistKey() {
+		this(0L, 0L, null);
+	}
+	
+	public ReleaseExtraArtistKey(long releaseId, long artistId, String roleId) {
+		super();
+		this.releaseId = releaseId;
+		this.artistId = artistId;
+		this.roleId = roleId;
+	}
+	
 	public void setReleaseId(long releaseId) {
 		this.releaseId = releaseId;
 	}

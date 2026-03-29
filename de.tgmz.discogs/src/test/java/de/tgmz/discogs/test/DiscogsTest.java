@@ -163,6 +163,18 @@ public class DiscogsTest {
 		assertEquals(4, t.getExtraArtists().size());
 	}
 	@Test
+	public void testApplicableTracks() {
+		Release r = em.find(Release.class, 2324L);
+		
+		// Mixed by GusGus
+		ReleaseExtraArtist mbgg = em.find(ReleaseExtraArtist.class, new ReleaseExtraArtistKey(r.getId(), 231513L, "Mixed By"));
+		
+		// "1 to 4, 6 to 11"
+		String applicableTracks = mbgg.getApplicableTracks();
+		
+		assertTrue("ExtraArtist applies to tracks 6 to 11 but isApplicable returned false for track 8", r.getTracklist().get(7).isApplicable(applicableTracks));
+	}
+	@Test
 	public void testDecca() {
 		Release r = em.find(Release.class, 10850325L);
 		

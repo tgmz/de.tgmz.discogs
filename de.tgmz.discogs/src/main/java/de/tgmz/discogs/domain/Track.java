@@ -19,6 +19,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import de.tgmz.discogs.domain.id.TrackId;
 import jakarta.persistence.CascadeType;
@@ -175,11 +176,23 @@ public class Track implements Serializable {
 			String[] range = it.next().split("\\sto\\s*");	// e.g. "A1 to A3"
 			
 			if (range.length == 2) {
-				applicable = range[0].compareTo(this.position) <= 0 && range[1].compareTo(this.position) >= 0;  
+				applicable = isApplicable(range[0], range[1], this.position);
 			}
 		}
 		
 		return applicable;
+	}
+
+	private boolean isApplicable(String lowerBound, String upperBound, String position) {
+		if (NumberUtils.isCreatable(lowerBound) && NumberUtils.isCreatable(upperBound) && NumberUtils.isCreatable(position)) {
+			// Handle positions like "1.1"
+			float numericPosition = NumberUtils.createFloat(position);
+			
+			return NumberUtils.createFloat(lowerBound) <= numericPosition
+					&& NumberUtils.createFloat(upperBound) >= numericPosition;
+		} else {
+			return lowerBound.compareTo(this.position) <= 0 && upperBound.compareTo(position) >= 0;
+		}
 	}
 	
 	@Override
