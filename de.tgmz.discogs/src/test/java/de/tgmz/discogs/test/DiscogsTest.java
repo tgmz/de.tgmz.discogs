@@ -82,7 +82,11 @@ public class DiscogsTest {
 	
 	@BeforeClass
 	public static void setupOnce() throws IOException {
-		FileUtils.forceDelete(new File(JDBC_DATA_DIR));
+		File dataDirFile = new File(JDBC_DATA_DIR);
+		
+		if (dataDirFile.exists()) {
+			FileUtils.forceDelete(dataDirFile);
+		}
 		
 		System.setProperty("jakarta.persistence.jdbc.url", JDBC_URL);
 		System.setProperty("jakarta.persistence.jdbc.user", "sa");

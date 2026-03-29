@@ -18,8 +18,10 @@ import org.slf4j.LoggerFactory;
 
 import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Discogs;
+import de.tgmz.discogs.domain.Release;
 import de.tgmz.discogs.load.factory.IFactory;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.PersistenceException;
 
 public abstract class AbstractDefaultPersistable<T> implements IPersistable<T> {
@@ -53,7 +55,9 @@ public abstract class AbstractDefaultPersistable<T> implements IPersistable<T> {
 	@Override
 	public int flush() {
 		try (EntityManager em =  DatabaseService.getInstance().getEntityManagerFactory().createEntityManager()) {
-			em.getTransaction().begin();
+			EntityTransaction transaction = em.getTransaction();
+			
+			transaction.begin();
 
 			for (T t : cache) {
 				LOG.debug("Save {}", t);
@@ -61,30 +65,32 @@ public abstract class AbstractDefaultPersistable<T> implements IPersistable<T> {
 				try {
 					em.merge(getFactory().get(em, t));
 				} catch (PersistenceException e) {
-					if ("Duplicate row was found and `ASSERT` was specified".equals(e.getMessage())) {
-						// Existing release with subTracks yields "Duplicate row was found and `ASSERT` was specified"
-						// so we must remove it first
-						LOG.warn("Unable to merge entity {}, removing and inserting it", t);
+					// Existing releases with subTracks yield "Duplicate row was found and `ASSERT` was specified".
+					// We remove the release and persist it again
+					if ("Duplicate row was found and `ASSERT` was specified".equals(e.getMessage()) && t instanceof Release r) {
+						LOG.warn("Unable to merge {}. Removing it", t);
 				
-						// Happens only for releases
-						@SuppressWarnings("unchecked")
-						T r0 = (T) em.find(t.getClass(), ((Discogs) t).getId());
-						em.remove(r0);
+						em.remove(em.find(Release.class, r.getId()));
 					
 						LOG.debug("Save {}", t);
 						
 						em.persist(t);
+
+						// Yields weird DuplicateKeyException for artist.aliases if 
+						// "Duplicate row ..." happens twice in one transaction
+						transaction.commit();
+						transaction.begin();
 					} else {
 						LOG.error("Unable to merge release {}", ((Discogs) t).getId(), e);
 						
-						em.getTransaction().rollback();
+						transaction.rollback();
 						
 						throw e;
 					}
 				}
 			}
 			
-			em.getTransaction().commit();
+			transaction.commit();
 		}
 		
 		return cache.size();
