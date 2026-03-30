@@ -70,11 +70,11 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[artists, artist, name]":
-			artist.setName(getChars(MAX_LENGTH_DEFAULT, true));
+			artist.setName(getChars(true));
 			
 			break;
 		case "[artists, artist, realname]":
-			artist.setRealname(getChars(MAX_LENGTH_DEFAULT));
+			artist.setRealname(getChars());
 			
 			break;
 		case "[artists, artist, namevariations, name]":
@@ -82,17 +82,17 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 				
 			break;
 		case "[artists, artist, members, name]":
-			member.setName(getChars(MAX_LENGTH_DEFAULT, true));
+			member.setName(getChars(true));
 			artist.getMembers().add(member);
 			
 			break;
 		case "[artists, artist, aliases, name]":
-			alias.setName(getChars(MAX_LENGTH_DEFAULT, true));
+			alias.setName(getChars(true));
 			artist.getAliases().add(alias);
 			
 			break;
 		case "[artists, artist, groups, name]":
-			group.setName(getChars(MAX_LENGTH_DEFAULT, true));
+			group.setName(getChars(true));
 			artist.getGroups().add(group);
 			
 			break;
