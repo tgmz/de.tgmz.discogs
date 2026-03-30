@@ -429,7 +429,7 @@ public class DiscogsTest {
 		
 		assertEquals("Mixed By", mbf.getRole());
 		assertEquals("Flood", mbf.getArtist().getName());
-		assertEquals("Mark Ellis", mbf.getArtist().getRealName());
+		assertEquals("Mark Ellis", mbf.getArtist().getRealname());
 		
 		assertEquals("9 26081-2", r.getLabels().get(l));
 	}

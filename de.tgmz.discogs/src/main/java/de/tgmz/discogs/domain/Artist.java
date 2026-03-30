@@ -43,7 +43,7 @@ public class Artist implements Serializable {
 	@Id
 	private long id;
 	private String name;
-	private String realName;
+	private String realname;
 	@ElementCollection
 	private Set<String> variations;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
@@ -85,8 +85,8 @@ public class Artist implements Serializable {
 		return name;
 	}
 
-	public String getRealName() {
-		return realName;
+	public String getRealname() {
+		return realname;
 	}
 	
 	/**
@@ -121,8 +121,8 @@ public class Artist implements Serializable {
 		this.name = name;
 	}
 
-	public void setRealName(String realName) {
-		this.realName = realName;
+	public void setRealname(String realName) {
+		this.realname = realName;
 	}
 
 	public void setDataQuality(DataQuality dataQuality) {

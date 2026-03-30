@@ -48,8 +48,8 @@ public class ArtistFactory implements IFactory<Artist> {
 			a0.setName(draft.getName());
 		}
 		
-		if (a0.getRealName() == null) {
-			a0.setRealName(draft.getRealName());
+		if (a0.getRealname() == null) {
+			a0.setRealname(draft.getRealname());
 		}
 		
 		if (a0.getVariations().isEmpty()) {

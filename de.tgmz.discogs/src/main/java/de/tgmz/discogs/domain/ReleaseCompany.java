@@ -18,8 +18,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "release_company")
 public class ReleaseCompany implements Serializable {
 	private static final long serialVersionUID = 1087312827584224994L;
 	
