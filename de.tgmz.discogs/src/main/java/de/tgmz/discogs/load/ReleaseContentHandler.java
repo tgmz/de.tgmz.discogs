@@ -166,7 +166,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 
 			break;
 		case "[releases, release, title]":
-			r.setTitle(getChars(MAX_LENGTH_DEFAULT));
+			r.setTitle(getChars());
 			
 			break;
 		case "[releases, release, released]":
@@ -201,7 +201,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, artists, artist, name]":
-			String s = getChars(MAX_LENGTH_DEFAULT, true);
+			String s = getChars(true);
 			
 			bandArtists.add(s);
 			artist.setName(s);
@@ -230,7 +230,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 				
 			break;
 		case "[releases, release, extraartists, artist, name]":
-			releaseExtraArtist.getArtist().setName(getChars(MAX_LENGTH_DEFAULT, true));
+			releaseExtraArtist.getArtist().setName(getChars(true));
 			
 			break;
 		case "[releases, release, extraartists, artist, role]":
@@ -248,7 +248,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			break;
 		case "[releases, release, tracklist, track, extraartists, artist, name]"
 			, "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist, name]":
-			extraArtist.getArtist().setName(getChars(MAX_LENGTH_DEFAULT, true));
+			extraArtist.getArtist().setName(getChars(true));
 		
 			break;
 		case "[releases, release, tracklist, track, extraartists, artist, role]"
@@ -290,7 +290,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, tracklist, track, title]":
-			track.setTitle(getChars(MAX_LENGTH_DEFAULT));
+			track.setTitle(getChars());
 				
 			break;
 		case "[releases, release, tracklist, track, artists, artist]":
@@ -301,7 +301,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 
 			break;
 		case "[releases, release, tracklist, track, artists, artist, name]":
-			artist.setName(getChars(MAX_LENGTH_DEFAULT, true));
+			artist.setName(getChars(true));
 			
 			break;
 		case "[releases, release, tracklist, track, extraartists, artist]":
@@ -320,7 +320,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, tracklist, track, sub_tracks, track, title]":
-			subTrack.setTitle(getChars(MAX_LENGTH_DEFAULT));
+			subTrack.setTitle(getChars());
 			
 			break;
 		case "[releases, release, tracklist, track, sub_tracks, track, duration]":

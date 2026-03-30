@@ -58,7 +58,7 @@ public class LabelContentHandler extends DiscogsContentHandler {
 			label.setId(Long.parseLong(getChars()));
 			break;
 		case "[labels, label, name]":
-			label.setName(getChars(MAX_LENGTH_DEFAULT, true));
+			label.setName(getChars(true));
 			
 			break;
 		case "[labels, label, data_quality]":
@@ -66,7 +66,7 @@ public class LabelContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[labels, label, parentLabel]":
-			label.getParentLabel().setName(getChars(MAX_LENGTH_DEFAULT, true));
+			label.getParentLabel().setName(getChars(true));
 			
 			break;
 		case "[labels, label]":

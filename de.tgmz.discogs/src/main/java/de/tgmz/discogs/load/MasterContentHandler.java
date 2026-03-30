@@ -76,7 +76,7 @@ public class MasterContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[masters, master, title]":
-			master.setTitle(getChars(MAX_LENGTH_DEFAULT));
+			master.setTitle(getChars());
 			
 			break;
 		case "[masters, master, year]":
@@ -100,7 +100,7 @@ public class MasterContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[masters, master, artists, artist, name]":
-			artistName = getChars(MAX_LENGTH_DEFAULT, true);
+			artistName = getChars(true);
 			
 			artistNames.add(artistName);
 			
