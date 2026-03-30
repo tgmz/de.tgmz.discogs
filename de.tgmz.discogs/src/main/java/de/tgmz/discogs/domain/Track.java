@@ -42,9 +42,9 @@ public class Track implements Serializable {
 	@EmbeddedId
 	private TrackId id;
 	private short trackNumber;
+	@Column(length = 511)
 	private String title;
 	private String position;
-	@Column(length = 127)
 	private String duration;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private Set<Artist> artists;

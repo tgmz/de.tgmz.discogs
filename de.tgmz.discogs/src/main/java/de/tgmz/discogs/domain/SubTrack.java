@@ -31,12 +31,11 @@ public class SubTrack implements Serializable {
 	private static final long serialVersionUID = 5772183040087284559L;
 	@EmbeddedId
 	private SubTrackId id;
+	@Column(length = 511)
 	private String title;
-	@Column(length = 31)
 	private String position;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private Set<ExtraArtist> extraArtists;
-	@Column(length = 15)
 	private String duration;
 
 	public SubTrack() {

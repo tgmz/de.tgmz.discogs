@@ -29,6 +29,7 @@ public abstract class Discogs implements Serializable {
 	private static final long serialVersionUID = -8920772069254927533L;
 	@Enumerated(EnumType.ORDINAL)
 	private DataQuality dataQuality;
+	@Column(length = 511)
 	private String title;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private Set<Artist> artists;

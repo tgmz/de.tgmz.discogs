@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -42,9 +43,12 @@ public class Artist implements Serializable {
 	private static final long serialVersionUID = -5230886354906404806L;
 	@Id
 	private long id;
+	@Column(length = 511)
 	private String name;
+	@Column(length = 511)
 	private String realname;
 	@ElementCollection
+	@Column(length = 511)
 	private Set<String> variations;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	@JoinTable(name = "artist_members")
