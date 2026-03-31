@@ -13,5 +13,5 @@ import jakarta.persistence.EntityManager;
 
 @FunctionalInterface
 public interface IFactory<T> {
-	T get(EntityManager em, T o);
+	T get(EntityManager em, T t);
 }

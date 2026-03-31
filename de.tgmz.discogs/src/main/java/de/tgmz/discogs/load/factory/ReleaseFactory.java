@@ -26,25 +26,34 @@ import jakarta.persistence.EntityManager;
 
 public class ReleaseFactory implements IFactory<Release> {
 	private RelevanceService rs;
+	private IFactory<Artist> af;
+	private IFactory<ExtraArtist> eaf;
+	private IFactory<Label> lf;
+	private IFactory<ReleaseCompany> rcf;
+	private IFactory<ReleaseExtraArtist> reaf;
 	
 	public ReleaseFactory() {
 		rs = RelevanceService.getInstance();
+		
+		af = new ArtistFactory();
+		eaf = new ExtraArtistFactory();
+		
+		// Do not use a real factory here. It will never return null and we want to remove non-existing labels
+		lf = (EntityManager x, Label l) -> x.find(Label.class, l.getId());
+		
+		rcf = new ReleaseCompanyFactory();
+		reaf = new ReleaseExtraArtistFactory();
 	}
 	
 	@Override
 	public Release get(EntityManager em, Release draft) {
-		ArtistFactory af = new ArtistFactory();
-		ExtraArtistFactory eaf = new ExtraArtistFactory();
-		
 		SetFactory<Artist> sfa = new SetFactory<>(em, af);
 		SetFactory<ExtraArtist> sfea = new SetFactory<>(em, eaf);
-		SetFactory<ReleaseCompany> sfrc = new SetFactory<>(em, new ReleaseCompanyFactory());
+		SetFactory<ReleaseCompany> sfrc = new SetFactory<>(em, rcf);
 		
-		// Do not use the LabelFactory here. It will never return null and we want to remove non-existing labels
-		IFactory<Label> lf = (EntityManager x, Label l) -> x.find(Label.class, l.getId());
 		MapFactory<Label, String> mfls = new MapFactory<>(em, lf);
 		
-		SetFactory<ReleaseExtraArtist> sfrea = new SetFactory<>(em, new ReleaseExtraArtistFactory());
+		SetFactory<ReleaseExtraArtist> sfrea = new SetFactory<>(em, reaf);
 
 		if (draft.getMaster() !=  null) {
 			draft.setMaster(em.find(Master.class, draft.getMaster().getId()));
