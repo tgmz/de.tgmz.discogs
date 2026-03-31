@@ -32,6 +32,7 @@ public class LabelPersistable extends AbstractDefaultPersistable<Label> {
 	}
 
 	@Override
+	// Inserting labels in batch mode cause trouble if a label is its own parent label
 	public int save(int threshold, Label label) {
 		if (filter.test(label)) {
 			try (EntityManager em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager()) {
@@ -42,7 +43,7 @@ public class LabelPersistable extends AbstractDefaultPersistable<Label> {
 				Label pl = label.getParentLabel();
 			
 				if (pl != null) {
-					if (pl.getId() != l.getId()) {
+					if (!pl.equals(l)) {
 						l.setParentLabel(lf.get(em, pl));
 					} else {
 						// Crazy, but happens (label.id = 219423, name=RDM Edition)

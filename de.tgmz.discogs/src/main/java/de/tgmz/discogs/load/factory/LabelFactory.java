@@ -9,30 +9,46 @@
 **********************************************************************/
 package de.tgmz.discogs.load.factory;
 
-import com.github.benmanes.caffeine.cache.CacheLoader;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
-
-import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Label;
 import jakarta.persistence.EntityManager;
 
 public class LabelFactory implements IFactory<Label> {
-	private LoadingCache<Label, Label> labelCache;
-	
-	public LabelFactory() {
-		try (EntityManager em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager()) {
-			labelCache = Caffeine.newBuilder().build(new CacheLoader<Label, Label>() {
-				@Override
-				public Label load(Label key) {
-					return em.find(Label.class, key.getId());
-				}
-			});
-		}
-	}
+	private EntityManager em;
 	
 	@Override
 	public Label get(EntityManager em, Label draft) {
-		return labelCache.get(draft, a -> draft);
+		this.em = em;
+		
+		Label l = findOrCreate(draft);
+		
+		if (l.getDataQuality() == null) {
+			l.setDataQuality(draft.getDataQuality());
+		}
+		
+		return l;
+	}
+	
+	private Label findOrCreate(Label draft) {
+		Label a0 = em.find(Label.class, draft.getId());
+		
+		if (a0  == null) {
+			a0 = draft;
+			
+			if (a0.getParentLabel() == null && draft.getParentLabel() != null) {
+				Label pl = draft.getParentLabel();
+				
+				if (!pl.getId().equals(draft.getId())) {
+					a0.setParentLabel(findOrCreate(pl));
+				} else {
+					// Crazy, but happens (label.id = 219423, name=RDM Edition)
+					a0.setParentLabel(a0);
+				}
+			}
+			
+			em.persist(a0);
+		}
+		
+		return a0;
 	}
 }
+

@@ -50,6 +50,7 @@ import jakarta.persistence.metamodel.EntityType;
 public class DiscogsContentHandler extends DefaultHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(DiscogsContentHandler.class);
 	private static final Pattern PA = Pattern.compile("^(.*)(\\s?\\(\\d+\\))$");
+	private static final int DEFAULT_LENGTH = 255;
 	private Map<String, Integer> pathMap = new HashMap<>();
 	private Set<EntityType<?>> entities = new HashSet<>();
 	private Deque<String> stack;
@@ -57,7 +58,7 @@ public class DiscogsContentHandler extends DefaultHandler {
 	private int saved;
 	private int count;
 	private long logThreshold = 10_000L;
-	private int saveThreshold = 1_000;
+	private int saveThreshold = 100;
 	private StringBuilder chars;
 	private DBDefrag defrag;
 	private BiPredicate<Integer, Integer> defragThreshold = (c,s) -> false;
@@ -225,7 +226,7 @@ public class DiscogsContentHandler extends DefaultHandler {
 		int last = p0.length - 1;
 				
 		if (p0.length > 1) {
-			// We consider the last entry as the attributes name 
+			// We consider the last entry as the attributes name and 
 			// iterate over its predecessors, considering them as types
 			for (int i = last - 1; i > -1; i--) {
 				Integer ccl = computeColumnLength(p0[i], p0[last]);
@@ -238,7 +239,7 @@ public class DiscogsContentHandler extends DefaultHandler {
 		
 		LOG.debug("Cannot compute column length for path {}", path);
 		
-		return Integer.MAX_VALUE;
+		return DEFAULT_LENGTH;
 	}
 	
 	private Integer computeColumnLength(String entity, String attribute) {
@@ -254,7 +255,7 @@ public class DiscogsContentHandler extends DefaultHandler {
 					if (a != null) {
 						return a.length();
 					} else {
-						return f.getType() == String.class ? 255 : Integer.MAX_VALUE;
+						return f.getType() == String.class ? DEFAULT_LENGTH : Integer.MAX_VALUE;
 					}
 				}
 			} catch (IllegalArgumentException e) {

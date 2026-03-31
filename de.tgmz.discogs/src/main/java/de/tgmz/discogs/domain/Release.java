@@ -21,7 +21,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
@@ -43,8 +42,6 @@ import jakarta.persistence.Transient;
 public class Release extends Discogs {
 	@Transient
 	private static final long serialVersionUID = -8124211768010344837L;
-	@Id
-	private long id;
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@OrderBy(value = "sequence")
 	private List<Track> tracklist;
@@ -75,11 +72,6 @@ public class Release extends Discogs {
 		formats = new HashSet<>();
 	}
 	
-	@Override
-	public long getId() {
-		return id;
-	}
-
 	/**
 	 * The tracks.
 	 * @return the tracks
@@ -110,11 +102,6 @@ public class Release extends Discogs {
 
 	public Set<Format> getFormats() {
 		return formats;
-	}
-
-	@Override
-	public void setId(long id) {
-		this.id = id;
 	}
 
 	public Master getMaster() {
@@ -188,6 +175,6 @@ public class Release extends Discogs {
 	
 	@Override
 	public String toString() {
-		return "Release [id=" + String.format("%,d", id) + ", Discogs=" + super.toString() + "]";
+		return "Release [id=" + String.format("%,d", getId()) + ", Discogs=" + super.toString() + "]";
 	}
 }

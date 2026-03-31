@@ -17,6 +17,7 @@ import de.tgmz.discogs.load.factory.ReleaseFactory;
 
 public class ReleasePersistable extends AbstractDefaultPersistable<Release> {
 	private Predicate<Release> filter;
+	private IFactory<Release> rf;
 	
 	public ReleasePersistable() {
 		this(x -> true);
@@ -24,11 +25,13 @@ public class ReleasePersistable extends AbstractDefaultPersistable<Release> {
 	
 	public ReleasePersistable(Predicate<Release> filter) {
 		this.filter = filter;
+		
+		rf = new ReleaseFactory();
 	}
 
 	@Override
 	public IFactory<Release> getFactory() {
-		return new ReleaseFactory();
+		return rf;
 	}
 
 	@Override
