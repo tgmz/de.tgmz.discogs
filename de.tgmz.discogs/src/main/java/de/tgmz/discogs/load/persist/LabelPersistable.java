@@ -13,13 +13,13 @@ import java.util.function.Predicate;
 
 import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Label;
+import de.tgmz.discogs.load.factory.AtomicEntityFactory;
 import de.tgmz.discogs.load.factory.IFactory;
-import de.tgmz.discogs.load.factory.LabelFactory;
 import jakarta.persistence.EntityManager;
 
 public class LabelPersistable extends AbstractDefaultPersistable<Label> {
 	private Predicate<Label> filter;
-	private LabelFactory lf;
+	private IFactory<Label> lf;
 	
 	public LabelPersistable() {
 		this(x -> true);
@@ -28,7 +28,7 @@ public class LabelPersistable extends AbstractDefaultPersistable<Label> {
 	public LabelPersistable(Predicate<Label> filter) {
 		this.filter = filter;
 		
-		lf = new LabelFactory();
+		lf = new AtomicEntityFactory<>();
 	}
 
 	@Override
@@ -39,15 +39,19 @@ public class LabelPersistable extends AbstractDefaultPersistable<Label> {
 				em.getTransaction().begin();
 				
 				Label l = lf.get(em, label);
+				
+				if (l.getDataQuality() == null) {
+					l.setDataQuality(label.getDataQuality());
+				}
 			
 				Label pl = label.getParentLabel();
 			
 				if (pl != null) {
-					if (!pl.equals(l)) {
-						l.setParentLabel(lf.get(em, pl));
-					} else {
+					if (pl.equals(l)) {
 						// Crazy, but happens (label.id = 219423, name=RDM Edition)
 						l.setParentLabel(l);
+					} else {
+						l.setParentLabel(lf.get(em, pl));
 					}
 				}
 			

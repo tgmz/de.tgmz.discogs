@@ -9,12 +9,19 @@
 **********************************************************************/
 package de.tgmz.discogs.load.factory;
 
+import de.tgmz.discogs.domain.Company;
+import de.tgmz.discogs.domain.EntityType;
 import de.tgmz.discogs.domain.ReleaseCompany;
 import jakarta.persistence.EntityManager;
 
 public class ReleaseCompanyFactory implements IFactory<ReleaseCompany> {
-	private static CompanyFactory cf = new CompanyFactory();
-	private static EntityTypeFactory etf = new EntityTypeFactory();
+	private IFactory<Company> cf;
+	private IFactory<EntityType> etf;
+	
+	public ReleaseCompanyFactory() {
+		cf = new AtomicEntityFactory<>();
+		etf = new AtomicEntityFactory<>();
+	}
 	
 	@Override
 	public ReleaseCompany get(EntityManager em, ReleaseCompany draft) {
