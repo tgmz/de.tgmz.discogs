@@ -10,7 +10,6 @@
 package de.tgmz.discogs.domain;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
@@ -26,19 +25,7 @@ import jakarta.persistence.Transient;
 public class Master extends Discogs {
 	@Transient
 	private static final long serialVersionUID = -5230886354906404806L;
-	@Id
-	private long id;
 	private Integer published;
-
-	@Override
-	public long getId() {
-		return id;
-	}
-
-	@Override
-	public void setId(long id) {
-		this.id = id;
-	}
 
 	/**
 	 * The year the master was published. Obtained from discogs &lt;year&gt; tag. Renamed from year because
@@ -55,6 +42,6 @@ public class Master extends Discogs {
 
 	@Override
 	public String toString() {
-		return "Master [id=" + String.format("%,d", id) + ", Discogs=" + super.toString() + "]";
+		return "Master [id=" + String.format("%,d", getId()) + ", Discogs=" + super.toString() + "]";
 	}
 }

@@ -9,14 +9,11 @@
 **********************************************************************/
 package de.tgmz.discogs.domain;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.MappedSuperclass;
@@ -25,10 +22,8 @@ import jakarta.persistence.MappedSuperclass;
  * Common attributes of master/releases entities.
  */
 @MappedSuperclass
-public abstract class Discogs implements Serializable {
+public abstract class Discogs extends PrimaryEntity {
 	private static final long serialVersionUID = -8920772069254927533L;
-	@Enumerated(EnumType.ORDINAL)
-	private DataQuality dataQuality;
 	@Column(length = 511)
 	private String title;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
@@ -46,9 +41,6 @@ public abstract class Discogs implements Serializable {
 		styles = new HashSet<>();
 	}
 
-	public abstract long getId();
-	public abstract void setId(long id);
-	
 	/**
 	 * The masters title obtained from discogs &lt;title&gt; tag.
 	 * @return the title
@@ -91,14 +83,6 @@ public abstract class Discogs implements Serializable {
 		return styles;
 	}
 
-	/**
-	 * The data quality e.g. &apos;Correct&apos;, &apos;Needs vote&apos
-	 * @return the styles
-	 */
-	public DataQuality getDataQuality() {
-		return dataQuality;
-	}
-
 	public void setGenres(Set<Genre> genres) {
 		this.genres = genres;
 	}
@@ -109,10 +93,6 @@ public abstract class Discogs implements Serializable {
 
 	public void setAlbumArtist(String band) {
 		this.albumArtist = band;
-	}
-
-	public void setDataQuality(DataQuality dataQuality) {
-		this.dataQuality = dataQuality;
 	}
 
 	public void setArtists(Set<Artist> artists) {

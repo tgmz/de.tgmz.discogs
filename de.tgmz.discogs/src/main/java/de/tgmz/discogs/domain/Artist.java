@@ -9,7 +9,6 @@
 **********************************************************************/
 package de.tgmz.discogs.domain;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
@@ -18,10 +17,7 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
@@ -38,11 +34,9 @@ import jakarta.persistence.Transient;
 })
 @NamedQuery(name = "Artist.byName"
 , query = "FROM Artist a WHERE a.name = ?1") 
-public class Artist implements Serializable {
+public class Artist extends PrimaryEntity {
 	@Transient
 	private static final long serialVersionUID = -5230886354906404806L;
-	@Id
-	private long id;
 	@Column(length = 511)
 	private String name;
 	@Column(length = 511)
@@ -59,26 +53,18 @@ public class Artist implements Serializable {
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	@JoinTable(name = "artist_groups")
 	private Set<Artist> groups;
-	@Enumerated(EnumType.ORDINAL)
-	private DataQuality dataQuality;
+
+	public Artist() {
+		this(0L);
+	}
 
 	public Artist(long id) {
-		this();
-		this.id= id;
-	}
-	
-	public Artist() {
+		super(id);
+		
 		variations = new TreeSet<>();
 		aliases = new HashSet<>();
 		groups = new HashSet<>();
 		members = new HashSet<>();
-	}
-	/**
-	 * The artists id obtained from discogs <id> tag.
-	 * @return the id
-	 */
-	public long getId() {
-		return id;
 	}
 
 	/**
@@ -105,10 +91,6 @@ public class Artist implements Serializable {
 		return members;
 	}
 
-	public DataQuality getDataQuality() {
-		return dataQuality;
-	}
-	
 	public Set<Artist> getAliases() {
 		return aliases;
 	}
@@ -117,10 +99,6 @@ public class Artist implements Serializable {
 		return groups;
 	}
 	
-	public void setId(long id) {
-		this.id = id;
-	}
-
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -129,10 +107,6 @@ public class Artist implements Serializable {
 		this.realname = realName;
 	}
 
-	public void setDataQuality(DataQuality dataQuality) {
-		this.dataQuality = dataQuality;
-	}
-	
 	public void setVariations(Set<String> variations) {
 		this.variations = variations;
 	}
@@ -151,6 +125,6 @@ public class Artist implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "Artist [id=" + String.format("%,d", id) + ", name=" + name + "]";
+		return "Artist [id=" + String.format("%,d", getId()) + ", name=" + name + "]";
 	}
 }

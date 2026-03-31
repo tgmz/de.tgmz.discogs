@@ -17,6 +17,7 @@ import de.tgmz.discogs.load.factory.MasterFactory;
 
 public class MasterPersistable extends AbstractDefaultPersistable<Master> {
 	private Predicate<Master> filter;
+	private IFactory<Master> mf;
 	
 	public MasterPersistable() {
 		this(x -> true);
@@ -24,11 +25,13 @@ public class MasterPersistable extends AbstractDefaultPersistable<Master> {
 
 	public MasterPersistable(Predicate<Master> filter) {
 		this.filter = filter;
+		
+		mf = new MasterFactory();
 	}
 	
 	@Override
 	public IFactory<Master> getFactory() {
-		return new MasterFactory();
+		return mf;
 	}
 
 	@Override

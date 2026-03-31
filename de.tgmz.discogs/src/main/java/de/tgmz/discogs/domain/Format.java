@@ -18,6 +18,7 @@ import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
 
@@ -26,7 +27,7 @@ public class Format implements Serializable {
 	@Transient
 	private static final long serialVersionUID = 1820280634515019733L;
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private long id;
 	private String name;
 	private String qty;
