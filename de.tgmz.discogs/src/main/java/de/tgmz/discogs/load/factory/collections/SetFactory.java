@@ -21,23 +21,21 @@ import jakarta.persistence.EntityManager;
  * @param <T> the type of the sets element
  */
 public class SetFactory<T> {
-	private EntityManager em;
 	private IFactory<T> factory;
 	
-	public SetFactory(EntityManager em, IFactory<T> factory) {
-		this.em = em;
+	public SetFactory(IFactory<T> factory) {
 		this.factory = factory;
 	}
 
-	public Set<T> replaceAll(Set<T> param) {
+	public Set<T> replaceAll(EntityManager em, Set<T> param) {
 		Set<T> s = new HashSet<>();
 		
-		param.forEach(t -> addIfNotNull(s, t));
+		param.forEach(t -> addIfNotNull(em, s, t));
 		
 		return s;
 	}
 	
-	private void addIfNotNull(Set<T> s, T t) {
+	private void addIfNotNull(EntityManager em, Set<T> s, T t) {
 		if (RelevanceService.getInstance().isRelevant(t)) {
 			T t0 = factory.get(em, t);
 		

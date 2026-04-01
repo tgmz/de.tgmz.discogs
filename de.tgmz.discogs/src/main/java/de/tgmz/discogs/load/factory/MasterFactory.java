@@ -15,12 +15,14 @@ import de.tgmz.discogs.load.factory.collections.SetFactory;
 import jakarta.persistence.EntityManager;
 
 public class MasterFactory implements IFactory<Master> {
+	private SetFactory<Artist> sra;
+	
+	public MasterFactory() {
+		sra = new SetFactory<>(new ArtistFactory());	}
 	
 	@Override
 	public Master get(EntityManager em, Master draft) {
-		SetFactory<Artist> sra = new SetFactory<>(em, new ArtistFactory());
-		
-		draft.setArtists(sra.replaceAll(draft.getArtists()));
+		draft.setArtists(sra.replaceAll(em, draft.getArtists()));
 		
 		return draft;
 	}

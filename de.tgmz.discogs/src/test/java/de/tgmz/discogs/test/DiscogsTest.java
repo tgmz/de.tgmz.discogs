@@ -150,7 +150,7 @@ public class DiscogsTest {
 		
 		assertEquals("Copyright (c)", fmpc.getEntityType().getName());
 		
-		// Four Music Productions GmbH Phnographic Copyright
+		// Four Music Productions GmbH Phonographic Copyright
 		ReleaseCompany fmpp = fmp.stream().filter(rc -> rc.getEntityType().getId() == 13).findAny().orElseThrow();
 		
 		assertEquals(lilaWolken, fmpp.getRelease());

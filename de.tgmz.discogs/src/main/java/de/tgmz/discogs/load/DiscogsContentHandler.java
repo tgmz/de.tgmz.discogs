@@ -67,12 +67,6 @@ public class DiscogsContentHandler extends DefaultHandler {
 	protected IPersistable persister;
 
 	public DiscogsContentHandler() {
-		defrag = new DBDefrag();
-
-		try (EntityManager em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager()) {
-			entities = em.getMetamodel().getEntities();
-		}
-		
 		try {
 			SAXParserFactory spf = SAXParserFactory.newInstance();
 			spf.setNamespaceAware(false);
@@ -100,6 +94,12 @@ public class DiscogsContentHandler extends DefaultHandler {
 	public void startDocument() throws SAXException {
 		stack = new LinkedList<>();
 		path = "";
+		
+		defrag = new DBDefrag();
+
+		try (EntityManager em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager()) {
+			entities = em.getMetamodel().getEntities();
+		}
 	}
 	
 	@Override
