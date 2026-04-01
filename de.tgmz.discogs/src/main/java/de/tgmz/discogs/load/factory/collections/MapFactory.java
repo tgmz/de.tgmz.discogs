@@ -23,33 +23,31 @@ import jakarta.persistence.EntityManager;
  * @param <V> the type of the value
  */
 public class MapFactory<K,V> {
-	private EntityManager em;
 	private IFactory<K> kFactory;
 	private IFactory<V> vFactory;
 	
-	public MapFactory(EntityManager em, IFactory<K> kFactory) {
-		this(em, kFactory, (x,v) -> v);	// Simply return the value 
+	public MapFactory(IFactory<K> kFactory) {
+		this(kFactory, (x,v) -> v);	// Simply return the value 
 	}
 
-	public MapFactory(EntityManager em, IFactory<K> kFactory, IFactory<V> vFactory) {
-		this.em = em;
+	public MapFactory(IFactory<K> kFactory, IFactory<V> vFactory) {
 		this.kFactory = kFactory;
 		this.vFactory = vFactory;
 	}
 
-	public Map<K,V> replaceAll(Map<K,V> param) {
+	public Map<K,V> replaceAll(EntityManager em, Map<K,V> param) {
 		Map<K,V> m = new HashMap<>();
 		
-		param.entrySet().forEach(e -> addIfNotNull(m, e));
+		param.entrySet().forEach(e -> addIfNotNull(em, m, e));
 		
 		return m;
 	}
 	
-	private void addIfNotNull(Map<K,V> m, Entry<K, V> e) {
+	private void addIfNotNull(EntityManager em, Map<K,V> m, Entry<K, V> e) {
 		K k = e.getKey();
 		
-		if (RelevanceService.getInstance().isRelevant(k)) {
-			K k0 = kFactory.get(em, e.getKey());
+		if (RelevanceService.getInstance().isRelevant(k, e.getValue())) {
+			K k0 = kFactory.get(em, k);
 		
 			if (k0 != null) { 
 				m.put(k0, vFactory.get(em, e.getValue()));

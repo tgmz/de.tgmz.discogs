@@ -26,56 +26,49 @@ import jakarta.persistence.EntityManager;
 
 public class ReleaseFactory implements IFactory<Release> {
 	private RelevanceService rs;
-	private IFactory<Artist> af;
-	private IFactory<ExtraArtist> eaf;
-	private IFactory<Label> lf;
-	private IFactory<ReleaseCompany> rcf;
-	private IFactory<ReleaseExtraArtist> reaf;
+	
+	private SetFactory<Artist> asf;					// ArtistSetFactory
+	private SetFactory<ExtraArtist> easf;			// ExtraArtistSetFactory
+	private SetFactory<ReleaseCompany> rcsf;		// ReleaseCompanySetFactory
+	private MapFactory<Label, String> lmf;			// LabelMapFactory
+	private SetFactory<ReleaseExtraArtist> reasf;	// ReleaseExtraArtistSetFactory
 	
 	public ReleaseFactory() {
 		rs = RelevanceService.getInstance();
 		
-		af = new ArtistFactory();
-		eaf = new ExtraArtistFactory();
+		asf = new SetFactory<>(new ArtistFactory());
+		easf = new SetFactory<>(new ExtraArtistFactory());
+		rcsf = new SetFactory<>(new ReleaseCompanyFactory());
 		
 		// Do not use a real factory here. It will never return null and we want to remove non-existing labels
-		lf = (EntityManager x, Label l) -> x.find(Label.class, l.getId());
+		lmf = new MapFactory<>((EntityManager x, Label l) -> x.find(Label.class, l.getId()));
 		
-		rcf = new ReleaseCompanyFactory();
-		reaf = new ReleaseExtraArtistFactory();
+		reasf = new SetFactory<>(new ReleaseExtraArtistFactory());
 	}
 	
 	@Override
 	public Release get(EntityManager em, Release draft) {
-		SetFactory<Artist> sfa = new SetFactory<>(em, af);
-		SetFactory<ExtraArtist> sfea = new SetFactory<>(em, eaf);
-		SetFactory<ReleaseCompany> sfrc = new SetFactory<>(em, rcf);
-		
-		MapFactory<Label, String> mfls = new MapFactory<>(em, lf);
-		
-		SetFactory<ReleaseExtraArtist> sfrea = new SetFactory<>(em, reaf);
-
 		if (draft.getMaster() !=  null) {
 			draft.setMaster(em.find(Master.class, draft.getMaster().getId()));
 		}
 		
-		draft.setLabels(mfls.replaceAll(draft.getLabels()));
+		draft.setLabels(lmf.replaceAll(em, draft.getLabels()));
 
-		draft.setArtists(sfa.replaceAll(draft.getArtists()));
+		draft.setArtists(asf.replaceAll(em, draft.getArtists()));
 		
-		draft.setExtraArtists(sfrea.replaceAll(draft.getReleaseExtraArtists()));
+		draft.setExtraArtists(reasf.replaceAll(em, draft.getReleaseExtraArtists()));
 		
 		for (Track t : draft.getUnfilteredTracklist()) {
-			t.setArtists(sfa.replaceAll(t.getArtists()));
+			t.setArtists(asf.replaceAll(em, t.getArtists()));
 			
 			for (SubTrack st : t.getSubTracklist()) {
-				st.setExtraArtists(sfea.replaceAll(st.getExtraArtists()));
+				st.setExtraArtists(easf.replaceAll(em, st.getExtraArtists()));
 			}
 			
-			t.setExtraArtists(sfea.replaceAll(t.getExtraArtists()));
+			t.setExtraArtists(easf.replaceAll(em, t.getExtraArtists()));
 		}
 		
-		draft.setReleaseCompanies(sfrc.replaceAll(draft.getReleaseCompanies()));
+		draft.setReleaseCompanies(rcsf.replaceAll(em, draft.getReleaseCompanies()));
 		
 		if (!rs.isRelevant(Series.class)) {
 			draft.setSeries(null);

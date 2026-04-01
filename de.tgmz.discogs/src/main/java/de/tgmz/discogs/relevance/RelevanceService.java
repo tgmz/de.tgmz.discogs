@@ -47,11 +47,11 @@ public class RelevanceService {
 		this.entities.removeIf(c -> Arrays.asList(entities).contains(c));
 	}
 	
-	public boolean isRelevant(Object o) {
-		return isRelevant(o.getClass());
+	public boolean isRelevant(Object... o) {
+		return Arrays.stream(o).allMatch(v -> isRelevant(v.getClass()));
 	}
 
 	public boolean isRelevant(Class<?> entity) {
-		return entities.contains(entity);
+		return entities.contains(entity) || entity.getPackage().getName().equals("java.lang");
 	}
 }

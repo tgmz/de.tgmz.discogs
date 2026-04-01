@@ -17,7 +17,6 @@ import jakarta.persistence.Transient;
 /**
  * An entity that coresponds to a data dump file e.g. labels_<>.gz 
  *  
- * @param <T>: the ids type
  */
 @MappedSuperclass
 public abstract class PrimaryEntity extends AtomicEntity<Long> {
