@@ -30,7 +30,7 @@ import jakarta.persistence.Transient;
  */
 @Entity
 @Table(indexes = {
-	@Index(columnList = "name", name = "name_idx"),
+	@Index(columnList = "name", name = "Artist_name_idx"),
 })
 @NamedQuery(name = "Artist.byName"
 , query = "FROM Artist a WHERE a.name = ?1") 

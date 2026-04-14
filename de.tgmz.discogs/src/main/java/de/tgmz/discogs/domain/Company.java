@@ -19,7 +19,7 @@ import jakarta.persistence.Transient;
  */
 @Entity
 @Table(indexes = {
-	@Index(columnList = "name", name = "name_idx"),
+	@Index(columnList = "name", name = "Company_name_idx"),
 })
 public class Company extends AtomicEntity<Long> {
 	@Transient
