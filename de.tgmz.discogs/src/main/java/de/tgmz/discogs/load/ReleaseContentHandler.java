@@ -140,10 +140,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, formats, format]":
-			format = new Format(
-					StringUtils.left(attributes.getValue("name"), DEFAULT_LENGTH)
-					, StringUtils.left(attributes.getValue("qty"), DEFAULT_LENGTH)
-					, StringUtils.left(attributes.getValue("text"), DEFAULT_LENGTH));
+			format = new Format(attributes.getValue("name"), attributes.getValue("qty"), attributes.getValue("text"));
 			
 			break;
 		case "[releases, release, series, series]":
@@ -345,7 +342,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, companies, company, entity_type]":
-			entityType.setId(Byte.parseByte(getChars()));
+			entityType.setId(Short.parseShort(getChars()));
 			
 			break;
 		case "[releases, release, companies, company, entity_type_name]":

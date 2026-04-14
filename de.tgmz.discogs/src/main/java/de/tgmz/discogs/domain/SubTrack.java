@@ -13,6 +13,8 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+
 import de.tgmz.discogs.domain.id.SubTrackId;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -31,7 +33,7 @@ public class SubTrack implements Serializable {
 	private static final long serialVersionUID = 5772183040087284559L;
 	@EmbeddedId
 	private SubTrackId id;
-	@Column(length = 511)
+	@Column(length = 512)
 	private String title;
 	private String position;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
@@ -79,7 +81,7 @@ public class SubTrack implements Serializable {
 	}
 
 	public void setTitle(String name) {
-		this.title = name;
+		this.title = StringUtils.left(name, 512);
 	}
 
 	public void setPosition(String position) {

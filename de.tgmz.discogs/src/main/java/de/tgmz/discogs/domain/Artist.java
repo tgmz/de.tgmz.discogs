@@ -37,12 +37,12 @@ import jakarta.persistence.Transient;
 public class Artist extends PrimaryEntity {
 	@Transient
 	private static final long serialVersionUID = -5230886354906404806L;
-	@Column(length = 511)
+	@Column(length = 512)
 	private String name;
-	@Column(length = 511)
+	@Column(length = 512)
 	private String realname;
 	@ElementCollection
-	@Column(length = 511)
+	@Column(length = 256)
 	private Set<String> variations;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	@JoinTable(name = "artist_members")

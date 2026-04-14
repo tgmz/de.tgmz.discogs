@@ -26,7 +26,7 @@ public final class ReleaseCompanyKey implements Serializable {
 	@Column(name = "company_id")
 	private long companyId;
 	@Column(name = "entityType_id")
-	private byte entityTypeId;
+	private short entityTypeId;
 	
 	public void setReleaseId(long releaseId) {
 		this.releaseId = releaseId;
@@ -34,7 +34,7 @@ public final class ReleaseCompanyKey implements Serializable {
 	public void setCompanyId(long companyId) {
 		this.companyId = companyId;
 	}
-	public void setEntityTypeId(byte entityTypeId) {
+	public void setEntityTypeId(short entityTypeId) {
 		this.entityTypeId = entityTypeId;
 	}
 	@Override

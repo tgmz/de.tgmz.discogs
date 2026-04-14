@@ -16,7 +16,7 @@ import jakarta.persistence.Transient;
  * The entity describes the companys kind of contribution to a release e.g. "Distributed By".   
  */
 @Entity
-public class EntityType extends AtomicEntity<Byte> {
+public class EntityType extends AtomicEntity<Short> {
 	@Transient
 	private static final long serialVersionUID = -4122244830701398362L;
 

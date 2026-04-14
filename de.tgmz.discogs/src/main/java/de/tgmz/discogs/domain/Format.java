@@ -14,6 +14,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.lang3.StringUtils;
+
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -46,7 +48,7 @@ public class Format implements Serializable {
 		
 		this.name = name;
 		this.qty = qty;
-		this.text = text;
+		this.text = StringUtils.left(text, 255);
 	}
 
 	public long getId() {

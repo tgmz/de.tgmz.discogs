@@ -12,6 +12,8 @@ package de.tgmz.discogs.domain;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.FetchType;
@@ -24,11 +26,11 @@ import jakarta.persistence.MappedSuperclass;
 @MappedSuperclass
 public abstract class Discogs extends PrimaryEntity {
 	private static final long serialVersionUID = -8920772069254927533L;
-	@Column(length = 511)
+	@Column(length = 512)
 	private String title;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private Set<Artist> artists;
-	@Column(length = 511)
+	@Column(length = 512)
 	private String albumArtist;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private Set<Genre> genres;
@@ -88,11 +90,11 @@ public abstract class Discogs extends PrimaryEntity {
 	}
 	
 	public void setTitle(String title) {
-		this.title = title;
+		this.title = StringUtils.left(title, 512);
 	}
 
-	public void setAlbumArtist(String band) {
-		this.albumArtist = band;
+	public void setAlbumArtist(String albumArtist) {
+		this.albumArtist = StringUtils.left(albumArtist, 512);
 	}
 
 	public void setArtists(Set<Artist> artists) {

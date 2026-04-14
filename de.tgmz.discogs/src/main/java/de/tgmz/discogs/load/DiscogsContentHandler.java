@@ -12,17 +12,10 @@ package de.tgmz.discogs.load;
 import java.awt.Toolkit;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.Member;
 import java.util.Arrays;
 import java.util.Deque;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,7 +24,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,19 +33,13 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
-import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.PrimaryEntity;
 import de.tgmz.discogs.load.persist.IPersistable;
-import jakarta.persistence.Column;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.metamodel.EntityType;
 
 public class DiscogsContentHandler extends DefaultHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(DiscogsContentHandler.class);
 	private static final Pattern PA = Pattern.compile("^(.*)(\\s?\\(\\d+\\))$");
 	protected static final int DEFAULT_LENGTH = 255;
-	private Map<String, Integer> pathMap = new HashMap<>();
-	private Set<EntityType<?>> entities = new HashSet<>();
 	private Deque<String> stack;
 	private XMLReader xmlReader;
 	private int saved;
@@ -97,10 +83,6 @@ public class DiscogsContentHandler extends DefaultHandler {
 		path = "";
 		
 		defrag = new DBDefrag();
-
-		try (EntityManager em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager()) {
-			entities = em.getMetamodel().getEntities();
-		}
 	}
 	
 	@Override
@@ -167,9 +149,7 @@ public class DiscogsContentHandler extends DefaultHandler {
 			}
 		}
 		
-		String band = Strings.CS.removeEnd(sb.toString(), ", ").trim().replace(" , ", ", ");
-		
-		return StringUtils.left(band, 511);
+		return Strings.CS.removeEnd(sb.toString(), ", ").trim().replace(" , ", ", ");
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -197,7 +177,7 @@ public class DiscogsContentHandler extends DefaultHandler {
 			}
 		}
 		
-		return StringUtils.left(s.strip(), pathMap.computeIfAbsent(path, i -> computeColumnLength(path)));
+		return s.strip();
 	}
 	
 	public String getChars() {
@@ -221,54 +201,6 @@ public class DiscogsContentHandler extends DefaultHandler {
 		this.saveThreshold = saveThreshold;
 	}
 	
-	//TODO: Remove and shorten strings in entities. 
-	//TODO: Remove references to StringUtils in package load
-	private int computeColumnLength(String path) {
-		String[] p0 =  StringUtils.split(StringUtils.substringBetween(path, "[", "]"), ", ");
-		
-		int last = p0.length - 1;
-				
-		if (p0.length > 1) {
-			// We consider the last entry as the attributes name and 
-			// iterate over its predecessors, considering them as types
-			for (int i = last - 1; i > -1; i--) {
-				Integer ccl = computeColumnLength(p0[i], p0[last]);
-				
-				if (ccl != null) {
-					return ccl.intValue();
-				}
-			}
-		}
-		
-		LOG.debug("Cannot compute column length for path {}", path);
-		
-		return DEFAULT_LENGTH;
-	}
-	
-	private Integer computeColumnLength(String entity, String attribute) {
-		Optional<EntityType<?>> oet = entities.stream().filter(et -> et.getName().equalsIgnoreCase(entity)).findFirst();
-			
-		if (oet.isPresent()) {
-			try {
-				Member m = oet.get().getAttribute(attribute).getJavaMember();
-				
-				if (m instanceof Field f) {
-					Column a = f.getAnnotation(Column.class);
-					
-					if (a != null) {
-						return a.length();
-					} else {
-						return f.getType() == String.class ? DEFAULT_LENGTH : Integer.MAX_VALUE;
-					}
-				}
-			} catch (IllegalArgumentException e) {
-				// If not found, ignore
-			}
-		}
-		
-		return null;
-	}
-
 	public void setPersister(IPersistable<? extends PrimaryEntity> persister) {
 		this.persister = persister;
 	}
