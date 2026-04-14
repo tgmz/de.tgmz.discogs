@@ -16,17 +16,13 @@ import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
 import de.tgmz.discogs.domain.ReleaseCompany;
 import de.tgmz.discogs.domain.ReleaseExtraArtist;
-import de.tgmz.discogs.domain.Series;
 import de.tgmz.discogs.domain.SubTrack;
 import de.tgmz.discogs.domain.Track;
 import de.tgmz.discogs.load.factory.collections.MapFactory;
 import de.tgmz.discogs.load.factory.collections.SetFactory;
-import de.tgmz.discogs.relevance.RelevanceService;
 import jakarta.persistence.EntityManager;
 
 public class ReleaseFactory implements IFactory<Release> {
-	private RelevanceService rs;
-	
 	private SetFactory<Artist> asf;					// ArtistSetFactory
 	private SetFactory<ExtraArtist> easf;			// ExtraArtistSetFactory
 	private SetFactory<ReleaseCompany> rcsf;		// ReleaseCompanySetFactory
@@ -34,8 +30,6 @@ public class ReleaseFactory implements IFactory<Release> {
 	private SetFactory<ReleaseExtraArtist> reasf;	// ReleaseExtraArtistSetFactory
 	
 	public ReleaseFactory() {
-		rs = RelevanceService.getInstance();
-		
 		asf = new SetFactory<>(new ArtistFactory());
 		easf = new SetFactory<>(new ExtraArtistFactory());
 		rcsf = new SetFactory<>(new ReleaseCompanyFactory());
@@ -69,10 +63,6 @@ public class ReleaseFactory implements IFactory<Release> {
 		}
 		
 		draft.setReleaseCompanies(rcsf.replaceAll(em, draft.getReleaseCompanies()));
-		
-		if (!rs.isRelevant(Series.class)) {
-			draft.setSeries(null);
-		}
 		
 		return draft;
 	}
