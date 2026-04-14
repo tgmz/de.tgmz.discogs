@@ -29,7 +29,7 @@ public class LabelContentHandler extends DiscogsContentHandler {
 	}
 
 	public LabelContentHandler(Predicate<Label> filter) {
-		persister = new LabelPersistable(filter);
+		setPersister(new LabelPersistable(filter));
 	}
 
 	@Override

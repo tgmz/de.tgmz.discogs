@@ -45,7 +45,7 @@ public class MasterContentHandler extends DiscogsContentHandler {
 			artistsBefore = (long) em.createNativeQuery("SELECT COALESCE(COUNT(*), 0) FROM Artist").getSingleResult();
 		}
 		
-		persister = new MasterPersistable(filter);
+		setPersister(new MasterPersistable(filter));
 	}
 
 	@Override
