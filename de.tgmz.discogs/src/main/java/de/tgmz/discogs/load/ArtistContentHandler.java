@@ -34,7 +34,7 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 	public ArtistContentHandler(Predicate<Artist> filter) {
 		super();
 		
-		persister = new ArtistPersistable(filter);
+		setPersister(new ArtistPersistable(filter));
 	}
 
 	@Override

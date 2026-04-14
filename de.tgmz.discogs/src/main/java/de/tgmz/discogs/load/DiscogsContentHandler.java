@@ -42,6 +42,7 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
 import de.tgmz.discogs.database.DatabaseService;
+import de.tgmz.discogs.domain.PrimaryEntity;
 import de.tgmz.discogs.load.persist.IPersistable;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityManager;
@@ -50,7 +51,7 @@ import jakarta.persistence.metamodel.EntityType;
 public class DiscogsContentHandler extends DefaultHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(DiscogsContentHandler.class);
 	private static final Pattern PA = Pattern.compile("^(.*)(\\s?\\(\\d+\\))$");
-	private static final int DEFAULT_LENGTH = 255;
+	protected static final int DEFAULT_LENGTH = 255;
 	private Map<String, Integer> pathMap = new HashMap<>();
 	private Set<EntityType<?>> entities = new HashSet<>();
 	private Deque<String> stack;
@@ -64,7 +65,7 @@ public class DiscogsContentHandler extends DefaultHandler {
 	private BiPredicate<Integer, Integer> defragThreshold = (c,s) -> false;
 	protected String path;
 	@SuppressWarnings("rawtypes")
-	protected IPersistable persister;
+	private IPersistable persister;
 
 	public DiscogsContentHandler() {
 		try {
@@ -220,6 +221,8 @@ public class DiscogsContentHandler extends DefaultHandler {
 		this.saveThreshold = saveThreshold;
 	}
 	
+	//TODO: Remove and shorten strings in entities. 
+	//TODO: Remove references to StringUtils in package load
 	private int computeColumnLength(String path) {
 		String[] p0 =  StringUtils.split(StringUtils.substringBetween(path, "[", "]"), ", ");
 		
@@ -264,5 +267,9 @@ public class DiscogsContentHandler extends DefaultHandler {
 		}
 		
 		return null;
+	}
+
+	public void setPersister(IPersistable<? extends PrimaryEntity> persister) {
+		this.persister = persister;
 	}
 }

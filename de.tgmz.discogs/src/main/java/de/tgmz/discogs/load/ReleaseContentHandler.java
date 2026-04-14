@@ -61,7 +61,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	public ReleaseContentHandler(Predicate<Release> filter) {
 		super();
 		
-		persister = new ReleasePersistable(filter);
+		setPersister(new ReleasePersistable(filter));
 	}
 	
 	@Override
@@ -140,7 +140,10 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, formats, format]":
-			format = new Format(attributes.getValue("name"), attributes.getValue("qty"), attributes.getValue("text"));
+			format = new Format(
+					StringUtils.left(attributes.getValue("name"), DEFAULT_LENGTH)
+					, StringUtils.left(attributes.getValue("qty"), DEFAULT_LENGTH)
+					, StringUtils.left(attributes.getValue("text"), DEFAULT_LENGTH));
 			
 			break;
 		case "[releases, release, series, series]":
