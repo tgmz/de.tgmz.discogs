@@ -12,6 +12,8 @@ package de.tgmz.discogs.domain;
 import java.io.Serializable;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
+
 import de.tgmz.discogs.domain.id.ReleaseExtraArtistKey;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
@@ -67,7 +69,7 @@ public class ReleaseExtraArtist implements Serializable {
 		this.id.setArtistId(artist.getId());
 	}
 	public void setRole(String role) {
-		this.role = role;
+		this.role = StringUtils.left(role, 255);
 		this.id.setRoleId(role);
 	}
 	public void setApplicableTracks(String applicableTracks) {

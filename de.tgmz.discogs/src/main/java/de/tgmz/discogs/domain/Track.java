@@ -42,7 +42,7 @@ public class Track implements Serializable {
 	@EmbeddedId
 	private TrackId id;
 	private short trackNumber;
-	@Column(length = 511)
+	@Column(length = 512)
 	private String title;
 	private String position;
 	private String duration;
@@ -113,7 +113,7 @@ public class Track implements Serializable {
 	}
 
 	public void setTitle(String name) {
-		this.title = name;
+		this.title = StringUtils.left(name, 512);
 	}
 
 	public void setPosition(String position) {

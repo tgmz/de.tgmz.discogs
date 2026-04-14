@@ -1,25 +1,34 @@
+--*********************************************************************
+--* Copyright (c) 14.03.2026 Thomas Zierer
+--*
+--* This program and the accompanying materials are made
+--* available under the terms of the Eclipse Public License 2.0
+--* which is available at https://www.eclipse.org/legal/epl-2.0/
+--*
+--* SPDX-License-Identifier: EPL-2.0
+--**********************************************************************/
 create global temporary table HTE_Format(rn_ integer not null, id bigint, name varchar(255), qty varchar(255), text varchar(255), primary key (rn_)) transactional
 create sequence Format_SEQ start with 1 increment by 50
-create table Artist (data_quality tinyint check ((data_quality between 0 and 5)), id bigint not null, name varchar(511), realname varchar(511), primary key (id))
+create table Artist (data_quality tinyint check ((data_quality between 0 and 5)), id bigint not null, name varchar(512), realname varchar(512), primary key (id))
 create table artist_aliases (Artist_id bigint not null, aliases_id bigint not null, primary key (Artist_id, aliases_id))
 create table artist_groups (Artist_id bigint not null, groups_id bigint not null, primary key (Artist_id, groups_id))
 create table artist_members (Artist_id bigint not null, members_id bigint not null, primary key (Artist_id, members_id))
-create table Artist_variations (Artist_id bigint not null, variations varchar(511))
+create table Artist_variations (Artist_id bigint not null, variations varchar(256))
 create table Company (id bigint not null, name varchar(255), primary key (id))
-create table EntityType (id tinyint not null, name varchar(255), primary key (id))
+create table EntityType (id smallint not null, name varchar(255), primary key (id))
 create table ExtraArtist (artist_id bigint not null, role varchar(255) not null, primary key (artist_id, role))
 create table Format (id bigint not null, name varchar(255), qty varchar(255), text varchar(255), primary key (id))
 create table Format_descriptions (Format_id bigint not null, descriptions varchar(255))
 create table Genre (id varchar(255) not null, primary key (id))
 create table Label (data_quality tinyint check ((data_quality between 0 and 5)), id bigint not null, parentLabel_id bigint, name varchar(255), primary key (id))
-create table Master (data_quality tinyint check ((data_quality between 0 and 5)), published integer, id bigint not null, albumArtist varchar(511), title varchar(511), primary key (id))
+create table Master (data_quality tinyint check ((data_quality between 0 and 5)), published integer, id bigint not null, title varchar(512), albumArtist varchar(512), primary key (id))
 create table Master_Artist (Master_id bigint not null, artists_id bigint not null, primary key (Master_id, artists_id))
 create table Master_Genre (Master_id bigint not null, genres_id varchar(255) not null, primary key (Master_id, genres_id))
 create table Master_Style (Master_id bigint not null, styles_id varchar(255) not null, primary key (Master_id, styles_id))
-create table Release (_main boolean not null, data_quality tinyint check ((data_quality between 0 and 5)), id bigint not null, master_id bigint, series_id bigint, albumArtist varchar(511), title varchar(511), country varchar(255), released varchar(255), primary key (id))
+create table Release (_main boolean not null, data_quality tinyint check ((data_quality between 0 and 5)), id bigint not null, master_id bigint, series_id bigint, title varchar(512), albumArtist varchar(512), country varchar(255), released varchar(255), primary key (id))
 create table Release_Artist (Release_id bigint not null, artists_id bigint not null, primary key (Release_id, artists_id))
-create table release_company (entityType_id tinyint not null, company_id bigint not null, release_id bigint not null, primary key (entityType_id, company_id, release_id))
-create table release_extraartist (artist_id bigint not null, release_id bigint not null, applicableTracks varchar(255), role varchar(255), role_id varchar(255) not null, primary key (artist_id, release_id, role_id))
+create table release_company (entityType_id smallint not null, company_id bigint not null, release_id bigint not null, primary key (entityType_id, company_id, release_id))
+create table release_extraartist (artist_id bigint not null, release_id bigint not null, applicableTracks varchar(255), role_id varchar(255) not null, primary key (artist_id, release_id, role_id))
 create table Release_Format (Release_id bigint not null, formats_id bigint not null, primary key (Release_id, formats_id))
 create table Release_Genre (Release_id bigint not null, genres_id varchar(255) not null, primary key (Release_id, genres_id))
 create table Release_labels (Release_id bigint not null, labels_KEY bigint not null, catno varchar(255), primary key (Release_id, labels_KEY))
@@ -27,9 +36,9 @@ create table Release_Style (Release_id bigint not null, styles_id varchar(255) n
 create table Release_Track (tracklist_sequence smallint not null, Release_id bigint not null, tracklist_release_id bigint not null, unique (tracklist_release_id, tracklist_sequence))
 create table Series (id bigint not null, catno varchar(255), name varchar(255), primary key (id))
 create table Style (id varchar(255) not null, primary key (id))
-create table SubTrack (subTrackNumber smallint not null, track_sequence smallint not null, track_release_id bigint not null, title varchar(511), duration varchar(255), position varchar(255), primary key (subTrackNumber, track_sequence, track_release_id))
+create table SubTrack (subTrackNumber smallint not null, track_sequence smallint not null, track_release_id bigint not null, title varchar(512), duration varchar(255), position varchar(255), primary key (subTrackNumber, track_sequence, track_release_id))
 create table SubTrack_ExtraArtist (SubTrack_subTrackNumber smallint not null, SubTrack_track_sequence smallint not null, SubTrack_track_release_id bigint not null, extraArtists_artist_id bigint not null, extraArtists_role varchar(255) not null, primary key (SubTrack_subTrackNumber, SubTrack_track_sequence, SubTrack_track_release_id, extraArtists_artist_id, extraArtists_role))
-create table Track (sequence smallint not null, trackNumber smallint not null, release_id bigint not null, title varchar(511), duration varchar(255), position varchar(255), primary key (sequence, release_id))
+create table Track (sequence smallint not null, trackNumber smallint not null, release_id bigint not null, title varchar(512), duration varchar(255), position varchar(255), primary key (sequence, release_id))
 create table Track_Artist (Track_sequence smallint not null, Track_release_id bigint not null, artists_id bigint not null, primary key (Track_sequence, Track_release_id, artists_id))
 create table Track_ExtraArtist (Track_sequence smallint not null, Track_release_id bigint not null, extraArtists_artist_id bigint not null, extraArtists_role varchar(255) not null, primary key (Track_sequence, Track_release_id, extraArtists_artist_id, extraArtists_role))
 create table Track_SubTrack (Track_sequence smallint not null, subTracklist_subTrackNumber smallint not null, subTracklist_track_sequence smallint not null, Track_release_id bigint not null, subTracklist_track_release_id bigint not null, unique (subTracklist_subTrackNumber, subTracklist_track_release_id, subTracklist_track_sequence))
