@@ -22,7 +22,7 @@ import jakarta.persistence.Transient;
  */
 @Entity
 @Table(indexes = {
-	@Index(columnList = "name", name = "name_idx"),
+	@Index(columnList = "name", name = "Label_name_idx"),
 })
 public class Label extends PrimaryEntity {
 	@Transient

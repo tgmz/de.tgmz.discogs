@@ -35,9 +35,9 @@ import jakarta.persistence.Transient;
 
 @Entity
 @Table(indexes = {
-		@Index(columnList = "albumArtist,title", name = "albumArtist_title_idx"), 
-		@Index(columnList = "albumArtist", name = "albumArtist_idx"), 
-		@Index(columnList = "title", name = "title_idx"), 
+		@Index(columnList = "albumArtist,title", name = "Release_albumArtist_title_idx"), 
+		@Index(columnList = "albumArtist", name = "Release_albumArtist_idx"), 
+		@Index(columnList = "title", name = "Release_title_idx"), 
 	})
 public class Release extends Discogs {
 	@Transient
