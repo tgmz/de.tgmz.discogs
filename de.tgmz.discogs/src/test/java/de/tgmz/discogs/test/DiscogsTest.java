@@ -174,7 +174,7 @@ public class DiscogsTest {
 		ReleaseExtraArtist mbgg = em.find(ReleaseExtraArtist.class, new ReleaseExtraArtistKey(r.getId(), 231513L, "Mixed By"));
 		
 		// "1 to 4, 6 to 11"
-		String applicableTracks = mbgg.getApplicableTracks();
+		Set<String> applicableTracks = mbgg.getApplicableTracks();
 		
 		assertTrue("ExtraArtist applies to tracks 6 to 11 but isApplicable returned false for track 8", r.getTracklist().get(7).isApplicable(applicableTracks));
 	}
@@ -404,9 +404,9 @@ public class DiscogsTest {
 		
 		// Mixed By François Kevorkian
 		ReleaseExtraArtist mbfk = getExtraArtist(r, 20662, "Mixed By");
-		String tracks = mbfk.getApplicableTracks();
+		Set<String> tracks = mbfk.getApplicableTracks();
 		
-		assertEquals("1 to 5, 7 to 9", tracks);
+		assertEquals(Set.of("1 to 5", "7 to 9"), tracks);
 		assertTrue(r.getTracklist().getFirst().isApplicable(tracks));
 		assertFalse(r.getTracklist().get(5).isApplicable(tracks));
 

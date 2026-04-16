@@ -234,11 +234,12 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, extraartists, artist, role]":
-			releaseExtraArtist.setRole(getChars());
+			releaseExtraArtist.setRole(computeRole(getChars()));
 			
 			break;
 		case "[releases, release, extraartists, artist, tracks]":
-			releaseExtraArtist.setApplicableTracks(getChars());
+			// Beware of duplicats
+			releaseExtraArtist.getApplicableTracks().addAll(List.of(getChars().split("\\s*[,;]\\s*")));
 				
 			break;
 		case "[releases, release, tracklist, track, extraartists, artist, id]"
@@ -253,7 +254,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			break;
 		case "[releases, release, tracklist, track, extraartists, artist, role]"
 			, "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist, role]":
-			extraArtist.setRole(getChars());
+			extraArtist.setRole(computeRole(getChars()));
 		
 			break;
 			
@@ -265,7 +266,6 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 				// Synchronize key and contents
 				releaseExtraArtist.setRelease(r);
 				releaseExtraArtist.setArtist(releaseExtraArtist.getArtist());
-				releaseExtraArtist.setRole(releaseExtraArtist.getRole());
 				
 				r.getReleaseExtraArtists().add(releaseExtraArtist);
 			}
@@ -378,5 +378,8 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 		}
 		
 		super.endElement(uri, localName, qName);
+	}
+	private String computeRole(String s) {
+		return s.replaceAll("\\[.+\\]", "").strip();
 	}
 }

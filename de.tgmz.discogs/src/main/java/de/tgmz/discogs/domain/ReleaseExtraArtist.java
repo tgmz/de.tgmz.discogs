@@ -10,11 +10,12 @@
 package de.tgmz.discogs.domain;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Objects;
-
-import org.apache.commons.lang3.StringUtils;
+import java.util.Set;
 
 import de.tgmz.discogs.domain.id.ReleaseExtraArtistKey;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -40,12 +41,13 @@ public class ReleaseExtraArtist implements Serializable {
 	@JoinColumn(name = "artist_id")
 	private Artist artist;
 	
-	private String role;		// Only a String but we must use an @€ntity here
-	
-	private String applicableTracks;
+	@ElementCollection
+	private Set<String> applicableTracks;
 	
 	public ReleaseExtraArtist() {
 		id = new ReleaseExtraArtistKey();
+		
+		applicableTracks = new HashSet<>();
 	}
 	
 	public Release getRelease() {
@@ -55,9 +57,9 @@ public class ReleaseExtraArtist implements Serializable {
 		return artist;
 	}
 	public String getRole() {
-		return role;
+		return id.getRoleId();
 	}
-	public String getApplicableTracks() {
+	public Set<String> getApplicableTracks() {
 		return applicableTracks;
 	}
 	public void setRelease(Release release) {
@@ -69,11 +71,7 @@ public class ReleaseExtraArtist implements Serializable {
 		this.id.setArtistId(artist.getId());
 	}
 	public void setRole(String role) {
-		this.role = StringUtils.left(role, 255);
 		this.id.setRoleId(role);
-	}
-	public void setApplicableTracks(String applicableTracks) {
-		this.applicableTracks = applicableTracks;
 	}
 
 	@Override
@@ -93,7 +91,6 @@ public class ReleaseExtraArtist implements Serializable {
 
 	@Override
 	public String toString() {
-		return "ReleaseExtraArtist [release=" + release + ", artist=" + artist + ", role=" + role
-				+ ", applicableTracks=" + applicableTracks + "]";
+		return "ReleaseExtraArtist [id=" + id + ", applicableTracks=" + applicableTracks + "]";
 	}
 }
