@@ -10,7 +10,6 @@
 package de.tgmz.discogs.domain;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -154,8 +153,8 @@ public class Track implements Serializable {
 	 * Computes if the ExatraArtist applies to this track.
 	 * @param ea the ExatraArtist
 	 */
-	public boolean isApplicable(String tracks) {
-		if (StringUtils.isEmpty(tracks)) {
+	public boolean isApplicable(Set<String> tracks) {
+		if (tracks == null || tracks.isEmpty()) {
 			return true;
 		}
 		
@@ -163,14 +162,12 @@ public class Track implements Serializable {
 			return false;
 		}
 		
-		String[] split = tracks.split("\\s*,\\s*");		// e.g. "A1 to A5, B2 to B9"
-
-		if (Strings.CS.containsAny(this.position, split)) {	// Obvious
+		if (Strings.CS.containsAny(this.position, tracks.toArray(new String[tracks.size()]))) {	// Obvious
 			return true;
 		}
 		
 		boolean applicable = false;
-		Iterator<String> it = Arrays.asList(split).iterator();
+		Iterator<String> it = tracks.iterator();
 		
 		while (it.hasNext() && !applicable) {
 			String[] range = it.next().split("\\sto\\s*");	// e.g. "A1 to A3"

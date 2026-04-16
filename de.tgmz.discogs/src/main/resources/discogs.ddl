@@ -21,19 +21,20 @@ create table Format (id bigint not null, name varchar(255), qty varchar(255), te
 create table Format_descriptions (Format_id bigint not null, descriptions varchar(255))
 create table Genre (id varchar(255) not null, primary key (id))
 create table Label (data_quality tinyint check ((data_quality between 0 and 5)), id bigint not null, parentLabel_id bigint, name varchar(255), primary key (id))
-create table Master (data_quality tinyint check ((data_quality between 0 and 5)), published integer, id bigint not null, title varchar(512), albumArtist varchar(512), primary key (id))
+create table Master (data_quality tinyint check ((data_quality between 0 and 5)), published integer, id bigint not null, albumArtist varchar(512), title varchar(512), primary key (id))
 create table Master_Artist (Master_id bigint not null, artists_id bigint not null, primary key (Master_id, artists_id))
 create table Master_Genre (Master_id bigint not null, genres_id varchar(255) not null, primary key (Master_id, genres_id))
 create table Master_Style (Master_id bigint not null, styles_id varchar(255) not null, primary key (Master_id, styles_id))
-create table Release (_main boolean not null, data_quality tinyint check ((data_quality between 0 and 5)), id bigint not null, master_id bigint, series_id bigint, title varchar(512), albumArtist varchar(512), country varchar(255), released varchar(255), primary key (id))
+create table Release (_main boolean not null, data_quality tinyint check ((data_quality between 0 and 5)), id bigint not null, master_id bigint, series_id bigint, albumArtist varchar(512), title varchar(512), country varchar(255), released varchar(255), primary key (id))
 create table Release_Artist (Release_id bigint not null, artists_id bigint not null, primary key (Release_id, artists_id))
 create table release_company (entityType_id smallint not null, company_id bigint not null, release_id bigint not null, primary key (entityType_id, company_id, release_id))
-create table release_extraartist (artist_id bigint not null, release_id bigint not null, applicableTracks varchar(255), role_id varchar(255) not null, primary key (artist_id, release_id, role_id))
+create table release_extraartist (artist_id bigint not null, release_id bigint not null, role_id varchar(255) not null, primary key (artist_id, release_id, role_id))
 create table Release_Format (Release_id bigint not null, formats_id bigint not null, primary key (Release_id, formats_id))
 create table Release_Genre (Release_id bigint not null, genres_id varchar(255) not null, primary key (Release_id, genres_id))
 create table Release_labels (Release_id bigint not null, labels_KEY bigint not null, catno varchar(255), primary key (Release_id, labels_KEY))
 create table Release_Style (Release_id bigint not null, styles_id varchar(255) not null, primary key (Release_id, styles_id))
 create table Release_Track (tracklist_sequence smallint not null, Release_id bigint not null, tracklist_release_id bigint not null, unique (tracklist_release_id, tracklist_sequence))
+create table ReleaseExtraArtist_applicableTracks (ReleaseExtraArtist_artist_id bigint not null, ReleaseExtraArtist_release_id bigint not null, ReleaseExtraArtist_role_id varchar(255) not null, applicableTracks varchar(255))
 create table Series (id bigint not null, catno varchar(255), name varchar(255), primary key (id))
 create table Style (id varchar(255) not null, primary key (id))
 create table SubTrack (subTrackNumber smallint not null, track_sequence smallint not null, track_release_id bigint not null, title varchar(512), duration varchar(255), position varchar(255), primary key (subTrackNumber, track_sequence, track_release_id))
@@ -85,6 +86,7 @@ alter table if exists Release_Style add constraint FKkfpgqf0qfpjub3px2h8w05rlf f
 alter table if exists Release_Style add constraint FKvwwi9puhw46ahpjpm6uwho6v foreign key (Release_id) references Release
 alter table if exists Release_Track add constraint FKln5kw8ndcxd48ele1bgnc38un foreign key (tracklist_sequence, tracklist_release_id) references Track
 alter table if exists Release_Track add constraint FKbdrgn76mq2leno9i4rtsnj3io foreign key (Release_id) references Release
+alter table if exists ReleaseExtraArtist_applicableTracks add constraint FKpudemcxynsvkgqrtt8wlalnsv foreign key (ReleaseExtraArtist_artist_id, ReleaseExtraArtist_release_id, ReleaseExtraArtist_role_id) references release_extraartist
 alter table if exists SubTrack add constraint FK37x3j7dpttbgr1vdupcupws7m foreign key (track_sequence, track_release_id) references Track
 alter table if exists SubTrack_ExtraArtist add constraint FK4qevs97g0hgmvpcteswu413wk foreign key (extraArtists_artist_id, extraArtists_role) references ExtraArtist
 alter table if exists SubTrack_ExtraArtist add constraint FKf8dfg74wmcsquqmi4lv1cddvh foreign key (SubTrack_subTrackNumber, SubTrack_track_sequence, SubTrack_track_release_id) references SubTrack
