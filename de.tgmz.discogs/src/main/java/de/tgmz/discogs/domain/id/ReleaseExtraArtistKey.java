@@ -12,8 +12,6 @@ package de.tgmz.discogs.domain.id;
 import java.io.Serializable;
 import java.util.Objects;
 
-import org.apache.commons.lang3.StringUtils;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Transient;
@@ -51,7 +49,7 @@ public final class ReleaseExtraArtistKey implements Serializable {
 		this.artistId = artistId;
 	}
 	public void setRoleId(String roleId) {
-		this.roleId = StringUtils.left(roleId, 255);
+		this.roleId = roleId;
 	}
 	@Override
 	public int hashCode() {

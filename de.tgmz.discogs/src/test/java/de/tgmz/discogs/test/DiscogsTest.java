@@ -26,6 +26,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
 import org.jline.utils.Log;
@@ -96,8 +97,8 @@ public class DiscogsTest {
 		em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager();
 		
 		dataDir = Files.createTempDirectory("discogsdata");
-		
-		load();
+
+		loadByJakarta();
 	}
 	
 	@AfterClass
@@ -157,6 +158,18 @@ public class DiscogsTest {
 		assertEquals("Phonographic Copyright (p)", fmpp.getEntityType().getName());
 		
 		assertTrue(fmpp.toString().contains(band));
+	}
+	@Test
+	public void testBeautifulMaladies() {
+		Release r = em.find(Release.class, 9293064L);
+		
+		assertEquals("Beautiful Maladies (The Island Years)", r.getTitle());
+		assertEquals("Tom Waits", r.getAlbumArtist());
+		
+		// Mixed By Biff Dawes
+		ReleaseExtraArtist mbbd = getExtraArtist(r, 281036, "Mixed By");
+		
+		assertEquals(Set.of("22", "4", "17", "21", "1", "2", "8", "9", "14", "5", "12", "10", "13", "19"), mbbd.getApplicableTracks());
 	}
 	@Test
 	public void test3DoorsDown() {
@@ -303,17 +316,17 @@ public class DiscogsTest {
 		assertEquals("16", s.getCatno());
 	}
 	
-	private static void load() throws IOException {
+	private static void loadByJakarta() throws IOException {
 		DiscogsContentHandler dch;
 		
 		dch = new ArtistContentHandler();
-		extractAndLoad("discogs_artists.xml.gz", dch);
+		extractAndProcess("discogs_artists.xml.gz", dch);
 		
 		dch = new LabelContentHandler();
-		extractAndLoad("discogs_labels.xml.gz", dch);
+		extractAndProcess("discogs_labels.xml.gz", dch);
 		
 		dch = new MasterContentHandler(x -> x.getId() != IGNORED);
-		extractAndLoad("discogs_masters.xml.gz", dch);
+		extractAndProcess("discogs_masters.xml.gz", dch);
 		
 		Predicate<Release> p0 = new IgnoreUpToFilter();
 		Predicate<Release> p1 = new MainFilter();
@@ -324,14 +337,14 @@ public class DiscogsTest {
 		
 		dch = new ReleaseContentHandler(p);
 		dch.setSaveThreshold(2);
-		extractAndLoad("discogs_releases.xml.gz", dch);
+		extractAndProcess("discogs_releases.xml.gz", dch);
 
 		// Force second load to check if updates work
 		dch = new ReleaseContentHandler();
-		extractAndLoad("discogs_releases.xml.gz", dch);
+		extractAndProcess("discogs_releases.xml.gz", dch);
 	}
-	
-	private static void extractAndLoad(String resource, DiscogsContentHandler dch) throws IOException {
+
+	private static void extractAndProcess(String resource, DiscogsContentHandler dch) throws IOException {
 		URL aUrl = null;
 		
 		try (DiscogsFileHandler dfh = new DiscogsFileHandler()) {
@@ -389,18 +402,25 @@ public class DiscogsTest {
 		assertEquals("World In My Eyes", r.getUnfilteredTracklist().getFirst().getTitle());
 		assertTrue(r.getGenres().stream().anyMatch(x -> "Electronic".equals(x.getId())));
 		assertTrue(r.getStyles().stream().anyMatch(x -> "Synth-pop".equals(x.getId())));
+
+		// Ensure that "Performer, Lead Vocals Dave Gahan" is split into 2 separate ExtraArtists
+		ReleaseExtraArtist pdg = getExtraArtist(r, 27158, "Performer");
+		ReleaseExtraArtist lvdg = getExtraArtist(r, 27158, "Lead Vocals");
 		
-		// 20 ExtraArtists apply to all 9 Tracks: => 180
-		// One ExtraArtist (Mixed By François Kevorkian) applies to tracks 1 to 5, 7 to 9 i.e. it does NOT apply to track 6: => 188
-		// Track 6 has two ExtraArtist: => 190
-		// No Track has SubTracks: => 190
-		assertEquals(190, r.sizeOf());
+		Stream.of(pdg, lvdg).forEach(rea -> assertEquals("Dave Gahan", rea.getExtraArtist().getArtist().getName()));
+		
+		// 21 ExtraArtists (remember that "Performer, Lead Vocals Dave Gahan" is split into 2 ExtraArtists) 
+		// apply to all 9 Tracks: => 21 * 9 == 189
+		// One ExtraArtist (Mixed By François Kevorkian) applies to tracks 1 to 5, 7 to 9 i.e. it does NOT apply to track 6: => 189 + 8 == 197
+		// Track 6 has two ExtraArtist: => 197 + 2 == 199
+		// No Track has SubTracks: => 199
+		assertEquals(199, r.sizeOf());
 		
 		// Performer Andrew Fletcher
 		ReleaseExtraArtist paf = getExtraArtist(r, 132774, "Performer");
 
 		assertEquals("Andrew Fletcher", paf.getExtraArtist().getArtist().getName());
-		assertEquals("Performer", paf.getExtraArtist().getRole());
+		assertTrue(paf.getApplicableTracks().isEmpty());
 		
 		// Mixed By François Kevorkian
 		ReleaseExtraArtist mbfk = getExtraArtist(r, 20662, "Mixed By");

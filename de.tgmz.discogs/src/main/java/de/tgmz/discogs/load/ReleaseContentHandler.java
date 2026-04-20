@@ -10,8 +10,11 @@
 package de.tgmz.discogs.load;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -37,6 +40,7 @@ import de.tgmz.discogs.domain.Track;
 import de.tgmz.discogs.load.persist.ReleasePersistable;
 
 public class ReleaseContentHandler extends DiscogsContentHandler {
+	private static final String EA_ROLE_SPLIT = ",\\s+";
 	protected static final Logger LOG = LoggerFactory.getLogger(ReleaseContentHandler.class);
 	private List<String> bandArtists;
 	private List<String> bandJoins;
@@ -234,7 +238,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, extraartists, artist, role]":
-			releaseExtraArtist.getExtraArtist().setRole(computeRole(getChars()));
+			releaseExtraArtist.getExtraArtist().setRole(getChars());
 			
 			break;
 		case "[releases, release, extraartists, artist, tracks]":
@@ -254,7 +258,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			break;
 		case "[releases, release, tracklist, track, extraartists, artist, role]"
 			, "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist, role]":
-			extraArtist.setRole(computeRole(getChars()));
+			extraArtist.setRole(getChars());
 		
 			break;
 			
@@ -267,7 +271,10 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 				releaseExtraArtist.setRelease(r);
 				releaseExtraArtist.setExtraArtist(releaseExtraArtist.getExtraArtist());
 				
-				r.getReleaseExtraArtists().add(releaseExtraArtist);
+				Set<ReleaseExtraArtist> reas0 = r.getReleaseExtraArtists(); 
+				Set<ReleaseExtraArtist> reas1 = splitExtraArtists(releaseExtraArtist);
+				
+				r.setReleaseExtraArtists(mergeReleaseExtraArtists(reas0, reas1));
 			}
 				
 			break;
@@ -306,7 +313,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			break;
 		case "[releases, release, tracklist, track, extraartists, artist]":
 			if (extraArtist.getArtist().getId() != 0L) {
-				track.getExtraArtists().add(extraArtist);
+				track.getExtraArtists().addAll(splitExtraArtists(extraArtist));
 			}
 			
 			break;
@@ -329,7 +336,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			break;
 		case "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist]":
 			if (extraArtist.getArtist().getId() != 0L) {
-				subTrack.getExtraArtists().add(extraArtist);
+				subTrack.getExtraArtists().addAll(splitExtraArtists(extraArtist));
 			}
 			
 			break;
@@ -379,8 +386,74 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 		
 		super.endElement(uri, localName, qName);
 	}
-	private String computeRole(String s) {
-		// Remove text between square brackets and the preceding whitespace
-		return s.replaceAll("\\s*\\[[\\w\\s]+\\]", "").strip();
+	
+	private Set<ExtraArtist> splitExtraArtists(ExtraArtist draft) {
+		// Let the Set handle duplicats
+		Set<ExtraArtist> result = new HashSet<>();
+		
+		String allRoles = draft.getRole();
+		
+		if (allRoles == null) {
+			LOG.warn("Empty role for {}", draft);
+			return result;
+		}
+		
+		Stream.of(allRoles.split(EA_ROLE_SPLIT)).forEach(singleRole -> result.add(new ExtraArtist(draft.getArtist(), singleRole)));
+		
+		return result;
+	}
+	
+	private Set<ReleaseExtraArtist> splitExtraArtists(ReleaseExtraArtist draft) {
+		Set<ReleaseExtraArtist> result = new HashSet<>();
+		
+		String allRoles = draft.getExtraArtist().getRole();
+		
+		if (allRoles == null) {
+			LOG.warn("Empty role for {}", draft);
+			return result;
+		}
+		
+		for (String singleRole : allRoles.split(EA_ROLE_SPLIT)) {
+			ReleaseExtraArtist rea = new ReleaseExtraArtist();
+			
+			rea.setExtraArtist(new ExtraArtist(draft.getExtraArtist().getArtist(), singleRole));
+			rea.setRelease(draft.getRelease());
+			rea.getApplicableTracks().addAll(draft.getApplicableTracks());
+			
+			result.add(rea);
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * Merges 2 sets of ReleaseExtraArtists.
+	 * 
+	 * Here's the situation: Release 9293064 Tom Waits - Beautiful Maladies carries among others the following ExtraArtists:
+	 * Mixed By – Biff Dawes (tracks: 4, 17)
+	 * Engineer [Additional], Mixed By – Biff Dawes (tracks: 22), Tchad Blake (tracks: 7)
+	 * The second entry is splitted and overwrites the first one and the applicable tracks 4 and 17 are lost. 
+	 */
+	private Set<ReleaseExtraArtist> mergeReleaseExtraArtists(Set<ReleaseExtraArtist> reas0, Set<ReleaseExtraArtist> reas1) {
+		Set<ReleaseExtraArtist> result = new HashSet<>();
+
+		for (ReleaseExtraArtist rea0 : reas0) {
+			ReleaseExtraArtist rea = rea0;
+			
+			for (ReleaseExtraArtist rea1 : reas1) {
+				// reas1 contains the same ExtraArtist ...
+				if (rea.equals(rea1)) {
+					// ... we add its applicable tracks
+					rea.getApplicableTracks().addAll(rea1.getApplicableTracks());
+				}
+			}
+			
+			result.add(rea);
+		}
+		
+		// Finally we add the new ExgtraArtists
+		result.addAll(reas1.stream().filter(x -> !reas0.contains(x)).toList());
+		
+		return result;
 	}
 }

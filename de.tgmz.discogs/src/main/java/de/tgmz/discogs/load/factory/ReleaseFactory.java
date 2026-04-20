@@ -50,7 +50,7 @@ public class ReleaseFactory implements IFactory<Release> {
 
 		draft.setArtists(asf.replaceAll(em, draft.getArtists()));
 		
-		draft.setExtraArtists(reasf.replaceAll(em, draft.getReleaseExtraArtists()));
+		draft.setReleaseExtraArtists(reasf.replaceAll(em, draft.getReleaseExtraArtists()));
 		
 		for (Track t : draft.getUnfilteredTracklist()) {
 			t.setArtists(asf.replaceAll(em, t.getArtists()));

@@ -143,7 +143,7 @@ public class Release extends Discogs {
 		this.labels = labels;
 	}
 
-	public void setExtraArtists(Set<ReleaseExtraArtist> releaseExtraArtists) {
+	public void setReleaseExtraArtists(Set<ReleaseExtraArtist> releaseExtraArtists) {
 		this.releaseExtraArtists = releaseExtraArtists;
 	}
 	
