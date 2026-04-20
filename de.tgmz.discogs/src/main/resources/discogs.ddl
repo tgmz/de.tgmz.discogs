@@ -74,7 +74,7 @@ alter table if exists Release_Artist add constraint FKgqgy8p1cuooxlyu04229f7u3c 
 alter table if exists release_company add constraint FKk6wp52ra2vpoe1jnjpcrj6xk4 foreign key (company_id) references Company
 alter table if exists release_company add constraint FKfv3a65ahflhg1yawuic29xep2 foreign key (entityType_id) references EntityType
 alter table if exists release_company add constraint FKk98bga9nq6hg4993smgrg7k0b foreign key (release_id) references Release
-alter table if exists release_extraartist add constraint FK1a5wcw6oexpmffbpqe0ujcj78 foreign key (artist_id) references Artist
+alter table if exists release_extraartist add constraint FKjffyepfgws7c89dr06w3x62rm foreign key (artist_id, role_id) references ExtraArtist
 alter table if exists release_extraartist add constraint FKdd4opcokani01m9acirod2hqx foreign key (release_id) references Release
 alter table if exists Release_Format add constraint FK7xusesury62xvm0sb24xw66y8 foreign key (formats_id) references Format
 alter table if exists Release_Format add constraint FKmqmurqv4284ssyx79dofa8oln foreign key (Release_id) references Release

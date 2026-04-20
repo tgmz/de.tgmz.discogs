@@ -37,9 +37,10 @@ public class ReleaseExtraArtist implements Serializable {
 	private Release release;
 	
 	@ManyToOne
-	@MapsId("artistId")
-	@JoinColumn(name = "artist_id")
-	private Artist artist;
+	@MapsId("extraArtistId")
+	@JoinColumn(name = "artist_id", referencedColumnName = "artist_id")
+	@JoinColumn(name = "role_id", referencedColumnName = "role")
+	private ExtraArtist extraArtist;
 	
 	@ElementCollection
 	private Set<String> applicableTracks;
@@ -53,11 +54,8 @@ public class ReleaseExtraArtist implements Serializable {
 	public Release getRelease() {
 		return release;
 	}
-	public Artist getArtist() {
-		return artist;
-	}
-	public String getRole() {
-		return id.getRoleId();
+	public ExtraArtist getExtraArtist() {
+		return extraArtist;
 	}
 	public Set<String> getApplicableTracks() {
 		return applicableTracks;
@@ -66,12 +64,10 @@ public class ReleaseExtraArtist implements Serializable {
 		this.release = release;
 		this.id.setReleaseId(release.getId());
 	}
-	public void setArtist(Artist artist) {
-		this.artist = artist;
-		this.id.setArtistId(artist.getId());
-	}
-	public void setRole(String role) {
-		this.id.setRoleId(role);
+	public void setExtraArtist(ExtraArtist extraArtist) {
+		this.extraArtist = extraArtist;
+		this.id.setArtistId(extraArtist.getArtist().getId());
+		this.id.setRoleId(extraArtist.getRole());
 	}
 
 	@Override

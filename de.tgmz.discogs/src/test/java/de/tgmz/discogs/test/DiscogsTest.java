@@ -399,8 +399,8 @@ public class DiscogsTest {
 		// Performer Andrew Fletcher
 		ReleaseExtraArtist paf = getExtraArtist(r, 132774, "Performer");
 
-		assertEquals("Andrew Fletcher", paf.getArtist().getName());
-		assertEquals("Performer", paf.getRole());
+		assertEquals("Andrew Fletcher", paf.getExtraArtist().getArtist().getName());
+		assertEquals("Performer", paf.getExtraArtist().getRole());
 		
 		// Mixed By François Kevorkian
 		ReleaseExtraArtist mbfk = getExtraArtist(r, 20662, "Mixed By");
@@ -437,7 +437,7 @@ public class DiscogsTest {
 	private ReleaseExtraArtist getExtraArtist(Release r, long artistId, String role) {
 		return r.getReleaseExtraArtists()
 			.stream()
-			.filter(rea -> rea.getArtist().getId() == artistId && role.equals(rea.getRole()))
+			.filter(rea -> rea.getExtraArtist().getArtist().getId() == artistId && role.equals(rea.getExtraArtist().getRole()))
 			.findFirst()
 			.orElseThrow();
 	}

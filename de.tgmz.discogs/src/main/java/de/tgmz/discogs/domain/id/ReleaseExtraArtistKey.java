@@ -66,4 +66,9 @@ public final class ReleaseExtraArtistKey implements Serializable {
 		ReleaseExtraArtistKey other = (ReleaseExtraArtistKey) obj;
 		return artistId == other.artistId && releaseId == other.releaseId && Objects.equals(roleId, other.roleId);
 	}
+
+	@Override
+	public String toString() {
+		return "ReleaseExtraArtistKey [releaseId=" + releaseId + ", artistId=" + artistId + ", roleId=" + roleId + "]";
+	}
 }
