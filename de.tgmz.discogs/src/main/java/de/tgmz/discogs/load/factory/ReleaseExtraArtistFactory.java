@@ -9,16 +9,16 @@
 **********************************************************************/
 package de.tgmz.discogs.load.factory;
 
-import de.tgmz.discogs.domain.Artist;
+import de.tgmz.discogs.domain.ExtraArtist;
 import de.tgmz.discogs.domain.ReleaseExtraArtist;
 import jakarta.persistence.EntityManager;
 
 public class ReleaseExtraArtistFactory implements IFactory<ReleaseExtraArtist> {
-	private static IFactory<Artist> af = new ArtistFactory();
+	private static IFactory<ExtraArtist> af = new ExtraArtistFactory();
 	
 	@Override
 	public ReleaseExtraArtist get(EntityManager em, ReleaseExtraArtist draft) {
-		draft.setArtist(af.get(em, draft.getArtist()));
+		draft.setExtraArtist(af.get(em, draft.getExtraArtist()));
 		
 		return draft;
 	}

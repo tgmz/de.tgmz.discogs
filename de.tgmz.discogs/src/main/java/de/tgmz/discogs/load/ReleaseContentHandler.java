@@ -92,7 +92,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 		case "[releases, release, extraartists, artist]":
 			releaseExtraArtist = new ReleaseExtraArtist();
 			releaseExtraArtist.setRelease(r);
-			releaseExtraArtist.setArtist(new Artist());
+			releaseExtraArtist.setExtraArtist(new ExtraArtist());
 
 		break;
 		case "[releases, release, tracklist, track, extraartists, artist]"
@@ -226,15 +226,15 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 		// extraartists
 			
 		case "[releases, release, extraartists, artist, id]":
-			releaseExtraArtist.getArtist().setId(Long.parseLong(getChars()));
+			releaseExtraArtist.getExtraArtist().getArtist().setId(Long.parseLong(getChars()));
 				
 			break;
 		case "[releases, release, extraartists, artist, name]":
-			releaseExtraArtist.getArtist().setName(getChars(true));
+			releaseExtraArtist.getExtraArtist().getArtist().setName(getChars(true));
 			
 			break;
 		case "[releases, release, extraartists, artist, role]":
-			releaseExtraArtist.setRole(computeRole(getChars()));
+			releaseExtraArtist.getExtraArtist().setRole(computeRole(getChars()));
 			
 			break;
 		case "[releases, release, extraartists, artist, tracks]":
@@ -260,12 +260,12 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 		case "[releases, release, extraartists, artist]":
 			// Don't add extraArtist with empty artist.id
-			if (releaseExtraArtist.getArtist().getId() == 0L) {
+			if (releaseExtraArtist.getExtraArtist().getArtist().getId() == 0L) {
 				LOG.debug("Empty id on {}. Removing it", releaseExtraArtist);
 			} else {
 				// Synchronize key and contents
 				releaseExtraArtist.setRelease(r);
-				releaseExtraArtist.setArtist(releaseExtraArtist.getArtist());
+				releaseExtraArtist.setExtraArtist(releaseExtraArtist.getExtraArtist());
 				
 				r.getReleaseExtraArtists().add(releaseExtraArtist);
 			}
@@ -380,6 +380,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 		super.endElement(uri, localName, qName);
 	}
 	private String computeRole(String s) {
-		return s.replaceAll("\\[.+\\]", "").strip();
+		// Remove text between square brackets and the preceding whitespace
+		return s.replaceAll("\\s*\\[[\\w\\s]+\\]", "").strip();
 	}
 }
