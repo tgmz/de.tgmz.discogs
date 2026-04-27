@@ -23,15 +23,12 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import org.apache.commons.io.FileUtils;
 import org.jline.utils.Log;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.tgmz.discogs.database.DatabaseService;
@@ -53,61 +50,43 @@ import de.tgmz.discogs.domain.Track;
 import de.tgmz.discogs.domain.id.ReleaseCompanyKey;
 import de.tgmz.discogs.domain.id.ReleaseExtraArtistKey;
 import de.tgmz.discogs.domain.id.SubTrackId;
-import de.tgmz.discogs.load.ArtistContentHandler;
 import de.tgmz.discogs.load.DiscogsContentHandler;
-import de.tgmz.discogs.load.LabelContentHandler;
-import de.tgmz.discogs.load.MasterContentHandler;
-import de.tgmz.discogs.load.ReleaseContentHandler;
-import de.tgmz.mp3.discogs.load.predicate.DataQualityFilter;
-import de.tgmz.mp3.discogs.load.predicate.IgnoreUpToFilter;
-import de.tgmz.mp3.discogs.load.predicate.MainFilter;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.metamodel.EntityType;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 
-public class DiscogsTest {
-	public static final String JDBC_DATA_DIR = System.getProperty("java.io.tmpdir") + File.separatorChar + "discogs_test";
+public abstract class DiscogsTest {
+	protected static Path dataDir;
 	
-	private static final String JDBC_DATA_FILE = JDBC_DATA_DIR + File.separatorChar + "discogs";
-	private static final String JDBC_PROTOCOL = "jdbc:h2:file:";
-	private static final String JDBC_PROPERTIES = ";MODE=DB2;DEFAULT_NULL_ORDERING=HIGH;AUTO_SERVER=TRUE";
-	
-	public static final String JDBC_URL = JDBC_PROTOCOL + JDBC_DATA_FILE + JDBC_PROPERTIES;
-	
-	private static final long IGNORED = 115L;
-	
-	private static Path dataDir;
-
 	private static EntityManager em;
 	
-	@BeforeClass
-	public static void setupOnce() throws IOException {
-		File dataDirFile = new File(JDBC_DATA_DIR);
+	protected static void setupOnce() throws IOException {
+		dataDir = Files.createTempDirectory("discogs_test");
+
+		String jdbcDataFile = System.getProperty("java.io.tmpdir") + File.separatorChar + "db" + File.separatorChar + "discogs";
+		String jdbcProtocol = "jdbc:h2:file:";
+		String jdbcProperties = ";MODE=DB2;DEFAULT_NULL_ORDERING=HIGH;AUTO_SERVER=TRUE";
 		
-		if (dataDirFile.exists()) {
-			FileUtils.forceDelete(dataDirFile);
-		}
-		
-		System.setProperty("jakarta.persistence.jdbc.url", JDBC_URL);
+		String jdbcUrl = jdbcProtocol + jdbcDataFile + jdbcProperties;
+
+		System.setProperty("jakarta.persistence.jdbc.url", jdbcUrl);
 		System.setProperty("jakarta.persistence.jdbc.user", "sa");
 		System.setProperty("jakarta.persistence.jdbc.password", "sa");
 		System.setProperty("DISCOGS_TEST", "true");
 		
 		em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager();
-		
-		dataDir = Files.createTempDirectory("discogsdata");
-
-		loadByJakarta();
 	}
 	
-	@AfterClass
-	public static void teardownOnce() throws IOException {
+	protected static void teardownOnce() throws IOException {
 		em.close();
 		
-		FileUtils.forceDelete(dataDir.toFile());
+		try (Stream<Path> walk = Files.walk(dataDir)) {
+		    walk.sorted(Comparator.reverseOrder())
+		        .map(Path::toFile)
+		        .forEach(File::delete);
+		}
 	}
-	
 	@Test
 	public void testViolator() {
 		Artist a = em.find(Artist.class, 2725L);
@@ -315,36 +294,8 @@ public class DiscogsTest {
 		assertEquals("World Network", s.getName());
 		assertEquals("16", s.getCatno());
 	}
-	
-	private static void loadByJakarta() throws IOException {
-		DiscogsContentHandler dch;
-		
-		dch = new ArtistContentHandler();
-		extractAndProcess("discogs_artists.xml.gz", dch);
-		
-		dch = new LabelContentHandler();
-		extractAndProcess("discogs_labels.xml.gz", dch);
-		
-		dch = new MasterContentHandler(x -> x.getId() != IGNORED);
-		extractAndProcess("discogs_masters.xml.gz", dch);
-		
-		Predicate<Release> p0 = new IgnoreUpToFilter();
-		Predicate<Release> p1 = new MainFilter();
-		Predicate<Release> p2 = new DataQualityFilter(DataQuality.values());
-		Predicate<Release> p3 = new IgnoreUpToFilter(1);
-		
-		Predicate<Release> p = p0.or(p1).or(p2).or(p3);
-		
-		dch = new ReleaseContentHandler(p);
-		dch.setSaveThreshold(2);
-		extractAndProcess("discogs_releases.xml.gz", dch);
 
-		// Force second load to check if updates work
-		dch = new ReleaseContentHandler();
-		extractAndProcess("discogs_releases.xml.gz", dch);
-	}
-
-	private static void extractAndProcess(String resource, DiscogsContentHandler dch) throws IOException {
+	protected static void extractAndProcess(String resource, DiscogsContentHandler dch) throws IOException {
 		URL aUrl = null;
 		
 		try (DiscogsFileHandler dfh = new DiscogsFileHandler()) {
@@ -409,8 +360,8 @@ public class DiscogsTest {
 		
 		Stream.of(pdg, lvdg).forEach(rea -> assertEquals("Dave Gahan", rea.getExtraArtist().getArtist().getName()));
 		
-		// 21 ExtraArtists (remember that "Performer, Lead Vocals Dave Gahan" is split into 2 ExtraArtists) 
-		// apply to all 9 Tracks: => 21 * 9 == 189
+		// 21 ExtraArtists apply to all 9 Tracks: => 21 * 9 == 189
+		// (remember that "Performer, Lead Vocals Dave Gahan" is split into 2 ExtraArtists)
 		// One ExtraArtist (Mixed By François Kevorkian) applies to tracks 1 to 5, 7 to 9 i.e. it does NOT apply to track 6: => 189 + 8 == 197
 		// Track 6 has two ExtraArtist: => 197 + 2 == 199
 		// No Track has SubTracks: => 199
