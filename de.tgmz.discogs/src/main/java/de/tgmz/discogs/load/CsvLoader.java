@@ -16,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -28,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.logging.LogUtil;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceException;
 
 public class CsvLoader {
 	private static final Logger LOG = LoggerFactory.getLogger(CsvLoader.class);
@@ -96,6 +98,12 @@ public class CsvLoader {
 	}
 	
 	public void loadTable(String table) {
+		if (!isEmpty(table)) {
+			LOG.warn("{} contains data. No action taken", table);
+			
+			return;
+		}
+		
 		List<String> stmts = new LinkedList<>();
 		
 		stmts.add(String.format("DROP TABLE IF EXISTS %s CASCADE", table));
@@ -106,6 +114,7 @@ public class CsvLoader {
 				.getProperties()
 				.get("jakarta.persistence.jdbc.url")
 				.toString()
+				.toLowerCase(Locale.getDefault())
 				.startsWith("jdbc:postgresql")) {
 			stmts.add(getCreate(table));
 			
@@ -175,6 +184,17 @@ public class CsvLoader {
 					LOG.info("{} rows were affected in {}", String.format("%,d", i), LogUtil.formatDuration(start, System.currentTimeMillis()));
     			}
 			});
+		}
+	}
+	private boolean isEmpty(String table) {
+		try (EntityManager em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager()) {
+			return em.createNativeQuery(String.format("SELECT * FROM %s", table)).setMaxResults(1).getSingleResultOrNull() == null;
+		} catch (PersistenceException e) {
+			if (!table.endsWith("_all")) {
+				LOG.warn("Error getting data from {}, reason: {}", table, e.getMessage());
+			}
+			
+			return true;
 		}
 	}
 	private Properties getProperties() {

@@ -18,13 +18,17 @@ import de.tgmz.discogs.domain.id.ReleaseExtraArtistKey;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "release_extraartist")
+@Table(name = "release_extraartist"
+	, indexes = {
+		@Index(columnList = "release_id,artist_id,role_id", name = "ReleaseExtraArtist_pk_idx", unique = true),
+})
 public class ReleaseExtraArtist implements Serializable {
 	private static final long serialVersionUID = 1087312827584224994L;
 	

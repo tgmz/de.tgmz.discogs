@@ -26,15 +26,21 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
+import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
 /**
  * Track entity
  */
 @Entity
+@Table(indexes = {
+	@Index(columnList = "release_id,sequence", name = "Track_pk_idx", unique = true),
+})
 public class Track implements Serializable {
 	@Transient
 	private static final long serialVersionUID = 5684918391708831387L;
@@ -46,10 +52,22 @@ public class Track implements Serializable {
 	private String position;
 	private String duration;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	@JoinTable(name = "Track_Artist"
+	, indexes = {
+		@Index(columnList = "Track_release_id,Track_sequence,artists_id", name = "Track_Artist_pk_idx", unique = true),
+	})
 	private Set<Artist> artists;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	@JoinTable(name = "Track_ExtraArtist"
+	, indexes = {
+		@Index(columnList = "Track_release_id,Track_sequence,extraArtists_artist_id,extraArtists_role", name = "Track_ExtraArtist_pk_idx", unique = true),
+	})
 	private Set<ExtraArtist> extraArtists;
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinTable(name = "Track_SubTrack"
+	, indexes = {
+		@Index(columnList = "subTracklist_track_release_id,subTracklist_track_sequence,subTracklist_subTrackNumber", name = "Track_SubTrack_pk_idx", unique = true),
+	})
 	@OrderBy(value = "subTrackNumber")
 	private List<SubTrack> subTracklist;
 

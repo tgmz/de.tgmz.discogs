@@ -64,11 +64,10 @@ public abstract class DiscogsTest {
 	protected static void setupOnce() throws IOException {
 		dataDir = Files.createTempDirectory("discogs_test");
 
-		String jdbcDataFile = System.getProperty("java.io.tmpdir") + File.separatorChar + "db" + File.separatorChar + "discogs";
-		String jdbcProtocol = "jdbc:h2:file:";
-		String jdbcProperties = ";MODE=DB2;DEFAULT_NULL_ORDERING=HIGH;AUTO_SERVER=TRUE";
+		String jdbcProtocol = "jdbc:h2:mem:discogs";
+		String jdbcProperties = ";MODE=DB2;DEFAULT_NULL_ORDERING=HIGH";
 		
-		String jdbcUrl = jdbcProtocol + jdbcDataFile + jdbcProperties;
+		String jdbcUrl = jdbcProtocol + jdbcProperties;
 
 		System.setProperty("jakarta.persistence.jdbc.url", jdbcUrl);
 		System.setProperty("jakarta.persistence.jdbc.user", "sa");

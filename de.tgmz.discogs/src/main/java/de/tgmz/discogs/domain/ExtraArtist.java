@@ -15,9 +15,14 @@ import java.util.Objects;
 import de.tgmz.discogs.domain.id.ExtraArtistId;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
 @Entity
+@Table(indexes = {
+	@Index(columnList = "artist_id,role", name = "ExtraArtist_pk_idx", unique = true),
+})
 public class ExtraArtist implements Serializable { 
 	@Transient
 	private static final long serialVersionUID = 2296552658329482485L;

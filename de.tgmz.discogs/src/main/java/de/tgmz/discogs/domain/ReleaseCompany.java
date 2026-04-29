@@ -15,13 +15,17 @@ import java.util.Objects;
 import de.tgmz.discogs.domain.id.ReleaseCompanyKey;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "release_company")
+@Table(name = "release_company"
+, indexes = {
+		@Index(columnList = "release_id,company_id,entityType_id", name = "ReleaseCompany_pk_idx", unique = true),
+})
 public class ReleaseCompany implements Serializable {
 	private static final long serialVersionUID = 1087312827584224994L;
 	
