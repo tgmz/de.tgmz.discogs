@@ -10,6 +10,7 @@
 package de.tgmz.discogs.load;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -243,7 +244,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			break;
 		case "[releases, release, extraartists, artist, tracks]":
 			// Beware of duplicats
-			releaseExtraArtist.getApplicableTracks().addAll(List.of(getChars().split("\\s*[,;]\\s*")));
+			Arrays.stream(getChars().split("\\s*[,;]\\s*")).forEach(x -> releaseExtraArtist.getApplicableTracks().add(StringUtils.left(x, 255)));
 				
 			break;
 		case "[releases, release, tracklist, track, extraartists, artist, id]"
@@ -451,7 +452,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			result.add(rea);
 		}
 		
-		// Finally we add the new ExgtraArtists
+		// Finally we add the new ExtraArtists
 		result.addAll(reas1.stream().filter(x -> !reas0.contains(x)).toList());
 		
 		return result;
