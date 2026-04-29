@@ -21,13 +21,19 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
 /**
  * SubTrack entity
  */
 @Entity
+@Table(indexes = {
+	@Index(columnList = "track_release_id,track_sequence,subTrackNumber", name = "SubTrack_pk_idx", unique = true),
+})
 public class SubTrack implements Serializable {
 	@Transient
 	private static final long serialVersionUID = 5772183040087284559L;
@@ -37,6 +43,10 @@ public class SubTrack implements Serializable {
 	private String title;
 	private String position;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	@JoinTable(name = "SubTrack_ExtraArtist"
+	, indexes = {
+		@Index(columnList = "SubTrack_track_release_id,SubTrack_track_sequence,SubTrack_subTrackNumber,extraArtists_artist_id,extraArtists_role", name = "SubTrack_ExtraArtist_pk_idx", unique = true),
+	})
 	private Set<ExtraArtist> extraArtists;
 	private String duration;
 

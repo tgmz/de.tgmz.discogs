@@ -16,9 +16,9 @@ import org.slf4j.LoggerFactory;
 
 public class LogUtil {
 	private static final Logger LOG = LoggerFactory.getLogger(LogUtil.class);
-	private static final String FORM_S = "%s second%s";
-	private static final String FORM_MS = "%s minute%s, " + FORM_S; 
-	private static final String FORM_HMS = "%s hour%s, " + FORM_MS; 
+	private static final String FORM_S = "%d second%s, %d msec%s";
+	private static final String FORM_MS = "%d minute%s, " + FORM_S; 
+	private static final String FORM_HMS = "%d hour%s, " + FORM_MS; 
 	
 	private LogUtil() {
 	}
@@ -32,6 +32,7 @@ public class LogUtil {
 		return formatDuration(ManagementFactory.getRuntimeMXBean().getStartTime(), System.currentTimeMillis());
 	}
 	public static String formatDuration(long start, long end) {
+		long msecs = (end - start) % 1000;
 		long seconds = (end - start) / 1000;
 		long minutes = (seconds / 60) % 60 ;
 		long hours = seconds / (60 * 60);
@@ -41,17 +42,23 @@ public class LogUtil {
 			return String.format(FORM_HMS
 					, hours, getSuffix(hours)
 					, minutes, getSuffix(minutes)
-					, seconds, getSuffix(seconds));
+					, seconds, getSuffix(seconds)
+					, msecs, getSuffix(msecs)
+					);
 		}
 		
 		if (minutes > 0) {
 			return String.format(FORM_MS
 					, minutes, getSuffix(minutes)
-					, seconds, getSuffix(seconds));
+					, seconds, getSuffix(seconds)
+					, msecs, getSuffix(msecs)
+					);
 		}
 		
 		return String.format(FORM_S
-					, seconds, getSuffix(seconds));
+					, seconds, getSuffix(seconds)
+					, msecs, getSuffix(msecs)
+					);
 	}
 	private static String getSuffix(long i) {
 		return i == 1 ? "" : "s";
