@@ -22,7 +22,6 @@ import java.util.Properties;
 import java.util.TreeMap;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.tuple.Triple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,8 +100,6 @@ public class CsvLoader {
 		
 		stmts.add(String.format("DROP TABLE IF EXISTS %s CASCADE", table));
 		
-		File csv = new File(String.format("%s/%s.csv", root, table));
-		
 		if (DatabaseService
 				.getInstance()
 				.getEntityManagerFactory()
@@ -112,10 +109,10 @@ public class CsvLoader {
 				.startsWith("jdbc:postgresql")) {
 			stmts.add(getCreate(table));
 			
-			if (csv.exists()) {
-				stmts.add(String.format("COPY %s FROM '%s' (FORMAT csv, HEADER)", table, csv.toString()));
-			}
+			stmts.add(String.format("COPY %s FROM '%s' (FORMAT csv, HEADER)", table, String.format("%s/%s.csv", root, table)));
 		} else {
+			File csv = new File(String.format("%s/%s.csv", root, table));
+			
 			if (csv.exists()) {
 				stmts.add(String.format("%s AS SELECT * FROM CSVREAD('%s')", getCreate(table), csv.toString()));
 			} else {
@@ -175,9 +172,7 @@ public class CsvLoader {
 				int i = conn.createStatement().executeUpdate(sql);
     			
 				if (i > 0 && LOG.isInfoEnabled()) {
-					Triple<Long, Long, Long> t = LogUtil.computeTime(start, System.currentTimeMillis());
-    				
-					LOG.info("{} rows were affected in {} hours, {} minutes, {} seconds", String.format("%,d", i), t.getLeft(), t.getMiddle(), t.getRight());
+					LOG.info("{} rows were affected in {}", String.format("%,d", i), LogUtil.formatDuration(start, System.currentTimeMillis()));
     			}
 			});
 		}

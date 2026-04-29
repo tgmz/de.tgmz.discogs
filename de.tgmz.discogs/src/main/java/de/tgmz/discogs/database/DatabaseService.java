@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.tgmz.discogs.logging.LogUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
@@ -52,11 +53,13 @@ public final class DatabaseService {
 	 * Private constructor for security reasons
 	 */
 	private DatabaseService() {
-		long start = System.nanoTime();
+		long start = System.currentTimeMillis();
 		
 		entityManagerFactory = Persistence.createEntityManagerFactory("de.tgmz.discogs.domain");
 		
-		LOG.info("Startuptime database service: {} ms", (System.nanoTime() - start) / 1000000.0);
+		if (LOG.isInfoEnabled()) {
+			LOG.info("Startuptime database service: {}", LogUtil.formatDuration(start, System.currentTimeMillis()));
+		}
 	}
 
 	public static DatabaseService getInstance() {

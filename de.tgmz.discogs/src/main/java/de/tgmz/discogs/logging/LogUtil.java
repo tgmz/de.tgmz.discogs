@@ -11,32 +11,49 @@ package de.tgmz.discogs.logging;
 
 import java.lang.management.ManagementFactory;
 
-import org.apache.commons.lang3.tuple.Triple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class LogUtil {
 	private static final Logger LOG = LoggerFactory.getLogger(LogUtil.class);
+	private static final String FORM_S = "%s second%s";
+	private static final String FORM_MS = "%s minute%s, " + FORM_S; 
+	private static final String FORM_HMS = "%s hour%s, " + FORM_MS; 
 	
 	private LogUtil() {
 	}
 	
 	public static void logElapsed() {
-		long start = ManagementFactory.getRuntimeMXBean().getStartTime();
-		
 		if (LOG.isInfoEnabled()) {
-			Triple<Long, Long, Long> t = computeTime(start, System.currentTimeMillis());
-			
-			LOG.info("Elapsed time: {} hours, {} minutes, {} seconds", t.getLeft(), t.getMiddle(), t.getRight());
+			LOG.info("Elapsed time: {}", formatElapsed());
 		}
 	}
-	public static Triple<Long, Long, Long> computeTime(long start, long end) {
+	public static String formatElapsed() {
+		return formatDuration(ManagementFactory.getRuntimeMXBean().getStartTime(), System.currentTimeMillis());
+	}
+	public static String formatDuration(long start, long end) {
 		long seconds = (end - start) / 1000;
 		long minutes = (seconds / 60) % 60 ;
 		long hours = seconds / (60 * 60);
 		seconds %= 60;
 		
-		return Triple.of(hours, minutes, seconds);
+		if (hours > 0) {
+			return String.format(FORM_HMS
+					, hours, getSuffix(hours)
+					, minutes, getSuffix(minutes)
+					, seconds, getSuffix(seconds));
+		}
+		
+		if (minutes > 0) {
+			return String.format(FORM_MS
+					, minutes, getSuffix(minutes)
+					, seconds, getSuffix(seconds));
+		}
+		
+		return String.format(FORM_S
+					, seconds, getSuffix(seconds));
 	}
-
+	private static String getSuffix(long i) {
+		return i == 1 ? "" : "s";
+	}
 }
