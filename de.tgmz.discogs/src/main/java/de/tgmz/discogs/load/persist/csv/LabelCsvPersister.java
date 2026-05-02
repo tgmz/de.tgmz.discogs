@@ -17,7 +17,7 @@ public class LabelCsvPersister extends AbstractCsvPersister<Label> {
 	public LabelCsvPersister(String target) {
 		super(target, "Label");
 	}
-	protected void doSave(Label l) throws IOException {
+	protected int doSave(Label l) throws IOException {
 		Label pl = l.getParentLabel();
 		
 		Long pls = pl != null ? pl.getId() : null;  
@@ -28,5 +28,7 @@ public class LabelCsvPersister extends AbstractCsvPersister<Label> {
 			, pls
 			, l.getName()
 		);
+		
+		return 1;
 	}
 }

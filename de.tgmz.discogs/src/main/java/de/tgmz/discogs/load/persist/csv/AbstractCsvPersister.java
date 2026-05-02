@@ -68,9 +68,7 @@ public abstract class AbstractCsvPersister<T> implements IPersistable<T> {
 	@Override
 	public int save(int threshold, T o) {
 		try {
-			doSave(o);
-			
-			return 1;
+			return doSave(o);
 		} catch (IOException e) {
 			LOG.error("", e);
 		}
@@ -92,5 +90,5 @@ public abstract class AbstractCsvPersister<T> implements IPersistable<T> {
 		return 0;
 	}
 	
-	protected abstract void doSave(T l) throws IOException;
+	protected abstract int doSave(T l) throws IOException;
 }
