@@ -19,7 +19,7 @@ public class ArtistCsvPersister extends AbstractCsvPersister<Artist> {
 			, "Artist", "artist_aliases", "artist_groups", "artist_members", "Artist_variations", "artist_aliases_all", "artist_groups_all", "artist_members_all");
 	}
 	
-	protected void doSave(Artist r) throws IOException {
+	protected int doSave(Artist r) throws IOException {
 		m.get("Artist").printRecord(
 			r.getDataQuality().ordinal()
 			, r.getId()
@@ -69,5 +69,7 @@ public class ArtistCsvPersister extends AbstractCsvPersister<Artist> {
 				, v
 			);
 		}
+		
+		return 1;
 	}
 }

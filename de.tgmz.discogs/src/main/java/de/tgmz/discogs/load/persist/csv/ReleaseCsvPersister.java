@@ -92,8 +92,8 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 		return 0;
 	}
 	
-	protected void doSave(Release r) throws IOException {
-		if (!filter.test(r)) return;
+	protected int doSave(Release r) throws IOException {
+		if (!filter.test(r)) return 0;
 		
 		Series ser = r.getSeries();
 		
@@ -162,6 +162,8 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 		for (Track t : r.getUnfilteredTracklist()) {
 			save(t);
 		}
+		
+		return 1;
 	}
 	private void save(Track t) throws IOException {
 		m.get("Track").printRecord(

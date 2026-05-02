@@ -22,7 +22,7 @@ public class MasterCsvPersister extends AbstractCsvPersister<Master> {
 			, "Master", "Master_Artist", "Genre", "Style", "Master_Genre", "Master_Style", "artist_master_all");
 	}
 	
-	protected void doSave(Master l) throws IOException {
+	protected int doSave(Master l) throws IOException {
 		m.get("Master").printRecord(
 			l.getDataQuality().ordinal()
 			, l.getPublished()
@@ -56,5 +56,7 @@ public class MasterCsvPersister extends AbstractCsvPersister<Master> {
 				, s.getId()
 			);
 		}
+		
+		return 1;
 	}
 }
