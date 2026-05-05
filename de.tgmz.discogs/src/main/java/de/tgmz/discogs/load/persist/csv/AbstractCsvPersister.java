@@ -50,10 +50,6 @@ public abstract class AbstractCsvPersister<T> implements IPersistable<T> {
 							cols[i] = rsmd.getColumnName(i + 1);
 						}
 					} catch (SQLException e) {
-						if (!table.endsWith("_all")) {
-							LOG.warn("Error getting colum list for {}. Using default", table);
-						}
-						
 						cols = new String[] {"ID", "NAME"};
 					}
 					

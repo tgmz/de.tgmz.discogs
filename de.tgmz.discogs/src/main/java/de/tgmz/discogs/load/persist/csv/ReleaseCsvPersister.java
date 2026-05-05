@@ -10,17 +10,13 @@
 package de.tgmz.discogs.load.persist.csv;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.tgmz.discogs.domain.Artist;
-import de.tgmz.discogs.domain.Company;
-import de.tgmz.discogs.domain.EntityType;
 import de.tgmz.discogs.domain.ExtraArtist;
 import de.tgmz.discogs.domain.Format;
 import de.tgmz.discogs.domain.Genre;
@@ -36,9 +32,6 @@ import de.tgmz.discogs.domain.Track;
 public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 	private static final Logger LOG = LoggerFactory.getLogger(ReleaseCsvPersister.class);
 	private Predicate<Release> filter;
-	private Set<Series> serieses = new HashSet<>();
-	private Set<Company> companies = new HashSet<>();
-	private Set<EntityType> entityTypes = new HashSet<>();
 	private long fid = 0;
 
 	public ReleaseCsvPersister(String target) {
@@ -59,50 +52,18 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 		this.filter = filter;
 	}
 	
-	@Override
-	public int flush() {
-		try {
-			for (Series s : serieses) {
-				m.get("Series").printRecord(
-					s.getId()
-					, s.getCatno()
-					, s.getName()
-				);
-			}
-			
-			for (EntityType et : entityTypes) {
-				m.get("EntityType").printRecord(
-					et.getId()
-					, et.getName()
-				);
-			}
-			
-			for (Company c : companies) {
-				m.get("Company").printRecord(
-					c.getId()
-					, c.getName()
-				);
-			}
-
-			super.flush();
-		} catch (IOException e) {
-			LOG.error("", e);
-		}
-		
-		return 0;
-	}
-	
 	protected int doSave(Release r) throws IOException {
 		if (!filter.test(r)) return 0;
 		
 		Series ser = r.getSeries();
 		
 		if (ser != null) {
-			serieses.add(ser);
+			m.get("Series").printRecordUsingCache(
+				ser.getId()
+				, ser.getCatno()
+				, ser.getName()
+			);
 		}
-		
-		entityTypes.addAll(r.getReleaseCompanies().stream().map(rc -> rc.getEntityType()).toList());
-		companies.addAll(r.getReleaseCompanies().stream().map(rc -> rc.getCompany()).toList());
 		
 		m.get("Release").printRecord(
 			String.valueOf(r.isMain()).toUpperCase()
@@ -145,10 +106,20 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 		
 		for (ReleaseCompany rc : r.getReleaseCompanies()) {
 			m.get("release_company").printRecord(
-					rc.getEntityType().getId()
-					, rc.getCompany().getId()
-					, r.getId()
-				);
+				rc.getEntityType().getId()
+				, rc.getCompany().getId()
+				, r.getId()
+			);
+			
+			m.get("Company").printRecordUsingCache(
+				rc.getCompany().getId()
+				, rc.getCompany().getName()
+			);
+				
+			m.get("EntityType").printRecordUsingCache(
+				rc.getEntityType().getId()
+				, rc.getEntityType().getName()	
+			);
 		}
 		
 		for (ReleaseExtraArtist rea : r.getReleaseExtraArtists()) {
@@ -188,7 +159,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 					, a.getId()
 				);
 				
-			m.get("artist_release_track_all").printRecord(
+			m.get("artist_release_track_all").printRecordUsingCache(
 					a.getId()
 					, a.getName()
 			);
@@ -202,7 +173,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 					, ea.getRole()
 				);
 				
-			m.get("artist_release_track_extraartist_all").printRecord(
+			m.get("artist_release_track_extraartist_all").printRecordUsingCache(
 					ea.getArtist().getId()
 					, ea.getArtist().getName()
 			);
@@ -239,7 +210,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 					, ea.getRole()
 			);
 					
-			m.get("artist_release_subtrack_extraartist_all").printRecord(
+			m.get("artist_release_subtrack_extraartist_all").printRecordUsingCache(
 					ea.getArtist().getId()
 					, ea.getArtist().getName()
 			);
@@ -265,7 +236,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 			LOG.error("Role is NULL on {}", rea);
 		}
 		
-		m.get("artist_release_extraartist_all").printRecord(
+		m.get("artist_release_extraartist_all").printRecordUsingCache(
 				rea.getExtraArtist().getArtist().getId()
 				, rea.getExtraArtist().getArtist().getName()
 		);
@@ -277,7 +248,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 				, a.getId()
 			);
 			
-		m.get("artist_release_all").printRecord(
+		m.get("artist_release_all").printRecordUsingCache(
 				a.getId()
 				, a.getName()
 		);

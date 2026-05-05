@@ -37,7 +37,7 @@ public class MasterCsvPersister extends AbstractCsvPersister<Master> {
 				, a.getId()
 			);
 			
-			m.get("artist_master_all").printRecord(
+			m.get("artist_master_all").printRecordUsingCache(
 					a.getId()
 					, a.getName()
 			);
