@@ -19,53 +19,53 @@ public class ArtistCsvPersister extends AbstractCsvPersister<Artist> {
 			, "Artist", "artist_aliases", "artist_groups", "artist_members", "Artist_variations", "artist_aliases_all", "artist_groups_all", "artist_members_all");
 	}
 	
-	protected int doSave(Artist r) throws IOException {
+	protected int doSave(Artist a) throws IOException {
 		m.get("Artist").printRecord(
-			r.getDataQuality().ordinal()
-			, r.getId()
-			, r.getName()
-			, r.getRealname()
+			a.getDataQuality().ordinal()
+			, a.getId()
+			, a.getName()
+			, a.getRealname()
 		);
 		
-		for (Artist a : r.getAliases()) {
+		for (Artist aa : a.getAliases()) {
 			m.get("artist_aliases").printRecord(
-				r.getId()
-				, a.getId()
+				a.getId()
+				, aa.getId()
 			);
-		
-			m.get("artist_aliases_all").printRecord(
-					a.getId()
-					, a.getName()
+			
+			m.get("artist_aliases_all").printRecordUsingCache(
+					aa.getId()
+					, aa.getName()
 			);
 		}
 		
-		for (Artist a : r.getGroups()) {
+		for (Artist ag : a.getGroups()) {
 			m.get("artist_groups").printRecord(
-				r.getId()
-				, a.getId()
+				a.getId()
+				, ag.getId()
 			);
 			
-			m.get("artist_groups_all").printRecord(
-					a.getId()
-					, a.getName()
+			m.get("artist_groups_all").printRecordUsingCache(
+					ag.getId()
+					, ag.getName()
 			);
 		}
 		
-		for (Artist a : r.getMembers()) {
+		for (Artist am : a.getMembers()) {
 			m.get("artist_members").printRecord(
-				r.getId()
-				, a.getId()
+				a.getId()
+				, am.getId()
 			);
 			
-			m.get("artist_members_all").printRecord(
-					a.getId()
-					, a.getName()
+			m.get("artist_members_all").printRecordUsingCache(
+					am.getId()
+					, am.getName()
 			);
 		}
 		
-		for (String v : r.getVariations()) {
+		for (String v : a.getVariations()) {
 			m.get("Artist_variations").printRecord(
-				r.getId()
+				a.getId()
 				, v
 			);
 		}

@@ -22,18 +22,20 @@ public class DBDefrag {
 	private static final Logger LOG = LoggerFactory.getLogger(DBDefrag.class);
 	
 	public void run() {
+		long start = System.currentTimeMillis();
+		
         try (EntityManager em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager()) {
         	em.runWithConnection((Connection conn) -> {
         		if (conn.getMetaData().getURL().startsWith("jdbc:h2:file")) {
         			LOG.info("Begin database defrag");
         			
         			conn.prepareCall("SHUTDOWN DEFRAG").execute();
-        			
-        			LOG.info("End database defrag");
         		}
         	});
         }
         
-        LogUtil.logElapsed();
+        if (LOG.isInfoEnabled()) {
+        	LOG.info("Defrag took {}", LogUtil.formatDuration(start, System.currentTimeMillis()));
+        }
 	}
 }

@@ -15,40 +15,41 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DiscogsCsvPrinter {
-	private Set<Long> cache;
-	private String table;
+	@SuppressWarnings("unused")
+	private static final Logger LOG = LoggerFactory.getLogger(DiscogsCsvPrinter.class);
+	private Set<Number> cache;
 	private CSVPrinter p;
 	
 	public DiscogsCsvPrinter(String target, String table) throws IOException {
 		super();
 		
-		this.table = table;
-		
-		cache = new TreeSet<>();
+		cache = new UnlimitedNumberSet();
 		
 		p = new CSVPrinter(new BufferedWriter(new FileWriter(target + File.separator + table +".csv", StandardCharsets.UTF_8)), CSVFormat.POSTGRESQL_CSV);
 	}
 	
-	public void printRecord(Object... values) throws IOException {
-		if (!table.endsWith("_all") 
-				|| !(values[0] instanceof Long l)	//Failsafe 
-				|| cache.add(l)) {
+	public void printRecordUsingCache(Object... values) throws IOException {
+		if (!(values[0] instanceof Number n)	//Failsafe 
+				|| cache.add(n)) {
 			p.printRecord(values);
-			
-			if (cache.size() > 5_000_000) {
-				cache.clear();
-			}
 		}
 	}
+	
+	public void printRecord(Object... values) throws IOException {
+		p.printRecord(values);
+	}
+	
 	public void flush() throws IOException {
 		p.flush();
 	}
+
 	public void close() throws IOException {
 		p.close();
 	}

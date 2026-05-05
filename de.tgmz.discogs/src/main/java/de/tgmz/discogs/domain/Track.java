@@ -130,11 +130,15 @@ public class Track implements Serializable {
 	}
 
 	public void setTitle(String name) {
-		this.title = StringUtils.left(name, 512);
+		setTitle(name, true);
+	}
+
+	public void setTitle(String name, boolean shorten) {
+		this.title = shorten ? StringUtils.left(name, 512) : name;
 	}
 
 	public void setPosition(String position) {
-		this.position = position;
+		this.position = StringUtils.left(position, 255);
 	}
 
 	public void setDuration(String duration) {
