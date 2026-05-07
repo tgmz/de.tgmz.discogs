@@ -27,12 +27,12 @@ public class DiscogsCsvPrinter {
 	private Set<Number> cache;
 	private CSVPrinter p;
 	
-	public DiscogsCsvPrinter(String target, String table) throws IOException {
+	public DiscogsCsvPrinter(String target, Table table) throws IOException {
 		super();
 		
-		cache = new UnlimitedNumberSet();
+		cache = new UnlimitedSet<>();
 		
-		p = new CSVPrinter(new BufferedWriter(new FileWriter(target + File.separator + table +".csv", StandardCharsets.UTF_8)), CSVFormat.POSTGRESQL_CSV);
+		p = new CSVPrinter(new BufferedWriter(new FileWriter(target + File.separator + table.toString() + ".csv", StandardCharsets.UTF_8)), CSVFormat.POSTGRESQL_CSV);
 	}
 	
 	public void printRecordUsingCache(Object... values) throws IOException {

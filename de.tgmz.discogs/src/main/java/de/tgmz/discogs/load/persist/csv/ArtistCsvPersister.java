@@ -16,11 +16,14 @@ import de.tgmz.discogs.domain.Artist;
 public class ArtistCsvPersister extends AbstractCsvPersister<Artist> {
 	public ArtistCsvPersister(String target) {
 		super(target
-			, "Artist", "artist_aliases", "artist_groups", "artist_members", "Artist_variations", "artist_aliases_all", "artist_groups_all", "artist_members_all");
+			,Table.Artist
+			, Table.artist_aliases, Table.artist_groups, Table.artist_members
+			, Table.Artist_variations, Table.artist_aliases_all, Table.artist_groups_all
+			, Table.artist_members_all);
 	}
 	
 	protected int doSave(Artist a) throws IOException {
-		m.get("Artist").printRecord(
+		m.get(Table.Artist).printRecord(
 			a.getDataQuality().ordinal()
 			, a.getId()
 			, a.getName()
@@ -28,43 +31,43 @@ public class ArtistCsvPersister extends AbstractCsvPersister<Artist> {
 		);
 		
 		for (Artist aa : a.getAliases()) {
-			m.get("artist_aliases").printRecord(
+			m.get(Table.artist_aliases).printRecord(
 				a.getId()
 				, aa.getId()
 			);
 			
-			m.get("artist_aliases_all").printRecordUsingCache(
+			m.get(Table.artist_aliases_all).printRecordUsingCache(
 					aa.getId()
 					, aa.getName()
 			);
 		}
 		
 		for (Artist ag : a.getGroups()) {
-			m.get("artist_groups").printRecord(
+			m.get(Table.artist_groups).printRecord(
 				a.getId()
 				, ag.getId()
 			);
 			
-			m.get("artist_groups_all").printRecordUsingCache(
+			m.get(Table.artist_groups_all).printRecordUsingCache(
 					ag.getId()
 					, ag.getName()
 			);
 		}
 		
 		for (Artist am : a.getMembers()) {
-			m.get("artist_members").printRecord(
+			m.get(Table.artist_members).printRecord(
 				a.getId()
 				, am.getId()
 			);
 			
-			m.get("artist_members_all").printRecordUsingCache(
+			m.get(Table.artist_members_all).printRecordUsingCache(
 					am.getId()
 					, am.getName()
 			);
 		}
 		
 		for (String v : a.getVariations()) {
-			m.get("Artist_variations").printRecord(
+			m.get(Table.Artist_variations).printRecord(
 				a.getId()
 				, v
 			);

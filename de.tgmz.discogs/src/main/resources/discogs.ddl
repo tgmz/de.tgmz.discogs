@@ -8,18 +8,21 @@
 --* SPDX-License-Identifier: EPL-2.0
 --**********************************************************************/
 create global temporary table HTE_Format(rn_ integer not null, id bigint, name varchar(255), qty varchar(255), text varchar(255), primary key (rn_)) transactional
+create global temporary table HTE_Identifier(_type smallint, rn_ integer not null, id bigint, _description varchar(255), _value varchar(255), primary key (rn_)) transactional
 create sequence Format_SEQ start with 1 increment by 50
+create sequence Identifier_SEQ start with 1 increment by 50
 create table Artist (data_quality smallint check ((data_quality between 0 and 5)), id bigint not null, name varchar(512), realname varchar(512), primary key (id))
 create table artist_aliases (Artist_id bigint not null, aliases_id bigint not null, primary key (Artist_id, aliases_id))
 create table artist_groups (Artist_id bigint not null, groups_id bigint not null, primary key (Artist_id, groups_id))
 create table artist_members (Artist_id bigint not null, members_id bigint not null, primary key (Artist_id, members_id))
-create table Artist_variations (Artist_id bigint not null, variations varchar(256))
+create table Artist_variations (Artist_id bigint not null, variations varchar(255))
 create table Company (id bigint not null, name varchar(255), primary key (id))
 create table EntityType (id smallint not null, name varchar(255), primary key (id))
 create table ExtraArtist (artist_id bigint not null, role varchar(255) not null, constraint ExtraArtist_pk_idx primary key (artist_id, role))
 create table Format (id bigint not null, name varchar(255), qty varchar(255), text varchar(255), primary key (id))
 create table Format_descriptions (Format_id bigint not null, descriptions varchar(255))
 create table Genre (id varchar(255) not null, primary key (id))
+create table Identifier (_type smallint check ((_type between 0 and 13)), id bigint not null, _description varchar(255), _value varchar(255), primary key (id))
 create table Label (data_quality smallint check ((data_quality between 0 and 5)), id bigint not null, parentLabel_id bigint, name varchar(255), primary key (id))
 create table Master (data_quality smallint check ((data_quality between 0 and 5)), published integer, id bigint not null, albumArtist varchar(512), title varchar(512), primary key (id))
 create table Master_Artist (Master_id bigint not null, artists_id bigint not null, primary key (Master_id, artists_id))
@@ -31,6 +34,7 @@ create table release_company (entityType_id smallint not null, company_id bigint
 create table release_extraartist (artist_id bigint not null, release_id bigint not null, role_id varchar(255) not null, constraint ReleaseExtraArtist_pk_idx primary key (release_id, artist_id, role_id))
 create table Release_Format (Release_id bigint not null, formats_id bigint not null, primary key (Release_id, formats_id))
 create table Release_Genre (Release_id bigint not null, genres_id varchar(255) not null, primary key (Release_id, genres_id))
+create table Release_Identifier (Release_id bigint not null, identifiers_id bigint not null, primary key (Release_id, identifiers_id))
 create table Release_labels (Release_id bigint not null, labels_KEY bigint not null, catno varchar(255), primary key (Release_id, labels_KEY))
 create table Release_Style (Release_id bigint not null, styles_id varchar(255) not null, primary key (Release_id, styles_id))
 create table Release_Track (tracklist_sequence smallint not null, Release_id bigint not null, tracklist_release_id bigint not null, unique (tracklist_release_id, tracklist_sequence))
@@ -80,6 +84,8 @@ alter table if exists Release_Format add constraint FK7xusesury62xvm0sb24xw66y8 
 alter table if exists Release_Format add constraint FKmqmurqv4284ssyx79dofa8oln foreign key (Release_id) references Release
 alter table if exists Release_Genre add constraint FK4vks82y2nynvveo0kftbgbrnr foreign key (genres_id) references Genre
 alter table if exists Release_Genre add constraint FKm9o9ge8knafrmtmu6k35u8sxd foreign key (Release_id) references Release
+alter table if exists Release_Identifier add constraint FKrnl2qlko71sq2raamr6tgh6tn foreign key (identifiers_id) references Identifier
+alter table if exists Release_Identifier add constraint FKbtl3xr934xbca7wtoa9r3cwru foreign key (Release_id) references Release
 alter table if exists Release_labels add constraint FKa7dyo3m3in0g3hb6gjlvruuga foreign key (labels_KEY) references Label
 alter table if exists Release_labels add constraint FKht4lrxrosuqi1qb0c1j6qijbq foreign key (Release_id) references Release
 alter table if exists Release_Style add constraint FKkfpgqf0qfpjub3px2h8w05rlf foreign key (styles_id) references Style

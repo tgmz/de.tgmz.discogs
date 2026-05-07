@@ -19,11 +19,11 @@ import de.tgmz.discogs.domain.Style;
 public class MasterCsvPersister extends AbstractCsvPersister<Master> {
 	public MasterCsvPersister(String target) {
 		super(target
-			, "Master", "Master_Artist", "Genre", "Style", "Master_Genre", "Master_Style", "artist_master_all");
+			, Table.Master, Table.Master_Artist, Table.Genre, Table.Style, Table.Master_Genre, Table.Master_Style, Table.artist_master_all);
 	}
 	
 	protected int doSave(Master l) throws IOException {
-		m.get("Master").printRecord(
+		m.get(Table.Master).printRecord(
 			l.getDataQuality().ordinal()
 			, l.getPublished()
 			, l.getId()
@@ -32,26 +32,26 @@ public class MasterCsvPersister extends AbstractCsvPersister<Master> {
 		);
 		
 		for (Artist a : l.getArtists()) {
-			m.get("Master_Artist").printRecord(
+			m.get(Table.Master_Artist).printRecord(
 				l.getId()
 				, a.getId()
 			);
 			
-			m.get("artist_master_all").printRecordUsingCache(
+			m.get(Table.artist_master_all).printRecordUsingCache(
 					a.getId()
 					, a.getName()
 			);
 		}
 		
 		for (Genre g : l.getGenres()) {
-			m.get("Master_Genre").printRecord(
+			m.get(Table.Master_Genre).printRecord(
 				l.getId()
 				, g.getId()
 			);
 		}
 
 		for (Style s : l.getStyles()) {
-			m.get("Master_Style").printRecord(
+			m.get(Table.Master_Style).printRecord(
 				l.getId()
 				, s.getId()
 			);

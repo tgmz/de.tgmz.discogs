@@ -20,6 +20,7 @@ import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.ExtraArtist;
 import de.tgmz.discogs.domain.Format;
 import de.tgmz.discogs.domain.Genre;
+import de.tgmz.discogs.domain.Identifier;
 import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Release;
 import de.tgmz.discogs.domain.ReleaseCompany;
@@ -33,6 +34,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 	private static final Logger LOG = LoggerFactory.getLogger(ReleaseCsvPersister.class);
 	private Predicate<Release> filter;
 	private long fid = 0;
+	private long iid = 0;
 
 	public ReleaseCsvPersister(String target) {
 		this (target, c -> true);
@@ -40,14 +42,16 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 	
 	public ReleaseCsvPersister(String target, Predicate<Release> filter) {
 		super(target
-				, "Release", "Track", "SubTrack"
-				, "Release_Track", "Track_SubTrack", "Release_Genre", "Release_Style", "Release_Artist"
-				, "Series", "Track_Artist", "release_extraartist", "ReleaseExtraArtist_applicableTracks"
-				, "Track_ExtraArtist", "SubTrack_ExtraArtist"
-				, "ExtraArtist", "Company", "EntityType"
-				, "Release_labels", "release_company"
-				, "Format", "Format_descriptions", "Release_Format"
-				, "artist_release_all", "artist_release_track_all", "artist_release_extraartist_all", "artist_release_track_extraartist_all", "artist_release_subtrack_extraartist_all");
+				, Table.Release, Table.Track, Table.SubTrack
+				, Table.Release_Track, Table.Track_SubTrack, Table.Release_Genre, Table.Release_Style, Table.Release_Artist
+				, Table.Series, Table.Track_Artist, Table.release_extraartist, Table.ReleaseExtraArtist_applicableTracks
+				, Table.Track_ExtraArtist, Table.SubTrack_ExtraArtist
+				, Table.ExtraArtist, Table.Company, Table.EntityType
+				, Table.Release_labels, Table.release_company
+				, Table.Format, Table.Format_descriptions, Table.Release_Format
+				, Table.artist_release_all, Table.artist_release_track_all, Table.artist_release_extraartist_all, Table.artist_release_track_extraartist_all, Table.artist_release_subtrack_extraartist_all
+				, Table.Identifier, Table.Release_Identifier
+		);
 		
 		this.filter = filter;
 	}
@@ -58,14 +62,14 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 		Series ser = r.getSeries();
 		
 		if (ser != null) {
-			m.get("Series").printRecordUsingCache(
+			m.get(Table.Series).printRecordUsingCache(
 				ser.getId()
 				, ser.getCatno()
 				, ser.getName()
 			);
 		}
 		
-		m.get("Release").printRecord(
+		m.get(Table.Release).printRecord(
 			String.valueOf(r.isMain()).toUpperCase()
 			, r.getDataQuality().ordinal()
 			, r.getId()
@@ -78,14 +82,14 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 		);
 		
 		for (Genre g : r.getGenres()) {
-			m.get("Release_Genre").printRecord(
+			m.get(Table.Release_Genre).printRecord(
 				r.getId()
 				, g.getId()
 			);
 		}
 		
 		for (Style s : r.getStyles()) {
-			m.get("Release_Style").printRecord(
+			m.get(Table.Release_Style).printRecord(
 				r.getId()
 				, s.getId()
 			);
@@ -96,7 +100,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 		}
 		
 		for (Entry<Label, String> e : r.getLabels().entrySet()) {
-			m.get("Release_labels").printRecord(
+			m.get(Table.Release_labels).printRecord(
 				r.getId()
 				, e.getKey().getId()
 				, e.getValue()
@@ -105,18 +109,18 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 		
 		
 		for (ReleaseCompany rc : r.getReleaseCompanies()) {
-			m.get("release_company").printRecord(
+			m.get(Table.release_company).printRecord(
 				rc.getEntityType().getId()
 				, rc.getCompany().getId()
 				, r.getId()
 			);
 			
-			m.get("Company").printRecordUsingCache(
+			m.get(Table.Company).printRecordUsingCache(
 				rc.getCompany().getId()
 				, rc.getCompany().getName()
 			);
 				
-			m.get("EntityType").printRecordUsingCache(
+			m.get(Table.EntityType).printRecordUsingCache(
 				rc.getEntityType().getId()
 				, rc.getEntityType().getName()	
 			);
@@ -130,6 +134,10 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 			save(r, f);
 		}
 		
+		for (Identifier i : r.getIdentifiers()) {
+			save(r, i);
+		}
+		
 		for (Track t : r.getUnfilteredTracklist()) {
 			save(t);
 		}
@@ -137,7 +145,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 		return 1;
 	}
 	private void save(Track t) throws IOException {
-		m.get("Track").printRecord(
+		m.get(Table.Track).printRecord(
 				t.getSequence()
 				, t.getTrackNumber()
 				, t.getId().getRelease().getId()
@@ -146,34 +154,34 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 				, t.getPosition()
 			);
 			
-		m.get("Release_Track").printRecord(
+		m.get(Table.Release_Track).printRecord(
 			t.getSequence()
 			, t.getId().getRelease().getId()
 			, t.getId().getRelease().getId()
 		);
 			
 		for (Artist a : t.getArtists()) {
-			m.get("Track_Artist").printRecord(
+			m.get(Table.Track_Artist).printRecord(
 					t.getSequence()
 					, t.getId().getRelease().getId()
 					, a.getId()
 				);
 				
-			m.get("artist_release_track_all").printRecordUsingCache(
+			m.get(Table.artist_release_track_all).printRecordUsingCache(
 					a.getId()
 					, a.getName()
 			);
 		}
 			
 		for (ExtraArtist ea : t.getExtraArtists()) {
-			m.get("Track_ExtraArtist").printRecord(
+			m.get(Table.Track_ExtraArtist).printRecord(
 					t.getSequence()
 					, t.getId().getRelease().getId()
 					, ea.getArtist().getId()
 					, ea.getRole()
 				);
 				
-			m.get("artist_release_track_extraartist_all").printRecordUsingCache(
+			m.get(Table.artist_release_track_extraartist_all).printRecordUsingCache(
 					ea.getArtist().getId()
 					, ea.getArtist().getName()
 			);
@@ -184,7 +192,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 		}
 	}
 	private void save(Track t, SubTrack st) throws IOException {
-		m.get("SubTrack").printRecord(
+		m.get(Table.SubTrack).printRecord(
 				st.getSubTrackNumber()
 				, t.getSequence()
 				, t.getId().getRelease().getId()
@@ -193,7 +201,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 				, st.getPosition()
 			);
 
-		m.get("Track_SubTrack").printRecord(
+		m.get(Table.Track_SubTrack).printRecord(
 			t.getSequence()
 			, st.getSubTrackNumber()
 			, t.getSequence()
@@ -202,7 +210,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 		);
 				
 		for (ExtraArtist ea : st.getExtraArtists()) {
-			m.get("SubTrack_ExtraArtist").printRecord(
+			m.get(Table.SubTrack_ExtraArtist).printRecord(
 					st.getSubTrackNumber()
 					, t.getSequence()
 					, t.getId().getRelease().getId()
@@ -210,7 +218,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 					, ea.getRole()
 			);
 					
-			m.get("artist_release_subtrack_extraartist_all").printRecordUsingCache(
+			m.get(Table.artist_release_subtrack_extraartist_all).printRecordUsingCache(
 					ea.getArtist().getId()
 					, ea.getArtist().getName()
 			);
@@ -218,14 +226,14 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 	}
 	private void save(ReleaseExtraArtist rea) throws IOException {
 		if (rea.getExtraArtist().getRole() != null) {
-			m.get("release_extraartist").printRecord(
+			m.get(Table.release_extraartist).printRecord(
 					rea.getExtraArtist().getArtist().getId()
 					, rea.getRelease().getId()
 					, rea.getExtraArtist().getRole()
 					);
 			
 			for (String at : rea.getApplicableTracks()) {
-				m.get("ReleaseExtraArtist_applicableTracks").printRecord(
+				m.get(Table.ReleaseExtraArtist_applicableTracks).printRecord(
 					rea.getExtraArtist().getArtist().getId()
 					, rea.getRelease().getId()
 					, rea.getExtraArtist().getRole()
@@ -236,43 +244,60 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 			LOG.error("Role is NULL on {}", rea);
 		}
 		
-		m.get("artist_release_extraartist_all").printRecordUsingCache(
+		m.get(Table.artist_release_extraartist_all).printRecordUsingCache(
 				rea.getExtraArtist().getArtist().getId()
 				, rea.getExtraArtist().getArtist().getName()
 		);
 
 	}
 	private void save(Release r, Artist a) throws IOException {
-		m.get("Release_Artist").printRecord(
+		m.get(Table.Release_Artist).printRecord(
 				r.getId()
 				, a.getId()
 			);
 			
-		m.get("artist_release_all").printRecordUsingCache(
+		m.get(Table.artist_release_all).printRecordUsingCache(
 				a.getId()
 				, a.getName()
 		);
 	}
 	private void save(Release r, Format f) throws IOException {
-		m.get("Format").printRecord(
+		m.get(Table.Format).printRecord(
 				fid
 				, f.getName()
 				, f.getQty()
 				, f.getText()
 			);
 				
-			m.get("Release_Format").printRecord(
+			m.get(Table.Release_Format).printRecord(
 					r.getId()
 					, fid
 				);
 					
 			for (String s : f.getDescriptions()) {
-				m.get("Format_descriptions").printRecord(
+				m.get(Table.Format_descriptions).printRecord(
 						fid
 						, s
 				);
 			}
 			
-			++fid;
+			fid += 50;
+	}
+	
+	private void save(Release r, Identifier i) throws IOException {
+		m.get(Table.Identifier).printRecord(
+				i.getType().ordinal()
+				, iid
+				, i.getDescription()
+				, i.getValue()
+			);
+				
+			m.get(Table.Release_Identifier).printRecord(
+					r.getId()
+					, iid
+				);
+			
+			iid += 50;
 	}
 }
+ 

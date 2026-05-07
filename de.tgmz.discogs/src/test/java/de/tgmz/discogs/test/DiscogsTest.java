@@ -38,6 +38,8 @@ import de.tgmz.discogs.domain.DataQuality;
 import de.tgmz.discogs.domain.ExtraArtist;
 import de.tgmz.discogs.domain.Format;
 import de.tgmz.discogs.domain.Genre;
+import de.tgmz.discogs.domain.IdentType;
+import de.tgmz.discogs.domain.Identifier;
 import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
@@ -402,6 +404,12 @@ public abstract class DiscogsTest {
 		assertEquals("Mark Ellis", mbf.getArtist().getRealname());
 		
 		assertEquals("9 26081-2", r.getLabels().get(l));
+		
+		List<Identifier> lIdent = r.getIdentifiers().stream().filter(i -> "0 7599-26081-2 1".equals(i.getValue())).toList();
+		
+		assertEquals(1, lIdent.size());
+		assertEquals(IdentType.BARCODE, lIdent.getFirst().getType());
+		assertEquals("Text", lIdent.getFirst().getDescription());
 	}
 	
 	private ReleaseExtraArtist getExtraArtist(Release r, long artistId, String role) {

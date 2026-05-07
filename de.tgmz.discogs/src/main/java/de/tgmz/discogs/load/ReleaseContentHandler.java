@@ -29,6 +29,8 @@ import de.tgmz.discogs.domain.EntityType;
 import de.tgmz.discogs.domain.ExtraArtist;
 import de.tgmz.discogs.domain.Format;
 import de.tgmz.discogs.domain.Genre;
+import de.tgmz.discogs.domain.IdentType;
+import de.tgmz.discogs.domain.Identifier;
 import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
@@ -146,6 +148,12 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			break;
 		case "[releases, release, formats, format]":
 			format = new Format(attributes.getValue("name"), attributes.getValue("qty"), attributes.getValue("text"));
+			
+			break;
+		case "[releases, release, identifiers, identifier]":
+			r.getIdentifiers().add(new Identifier(IdentType.byName(attributes.getValue("type"))
+						, attributes.getValue("description")
+						, attributes.getValue("value")));
 			
 			break;
 		case "[releases, release, series, series]":
