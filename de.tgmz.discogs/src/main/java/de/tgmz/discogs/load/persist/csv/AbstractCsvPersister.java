@@ -27,16 +27,16 @@ import jakarta.persistence.EntityManager;
 public abstract class AbstractCsvPersister<T> implements IPersistable<T> {
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractCsvPersister.class);
 	private static final String SQL_COLS = "SELECT * FROM %s";
-	protected Map<String, DiscogsCsvPrinter> m;
+	protected Map<Table, DiscogsCsvPrinter> m;
 
-	protected AbstractCsvPersister(String target, String... tables) {
+	protected AbstractCsvPersister(String target, Table... tables) {
 		m = new TreeMap<>();
 		
 		try (EntityManager em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager()) {
 			em.runWithConnection((Connection con) -> {
 				Statement st = con.createStatement();
 				
-				for (String table : tables) {
+				for (Table table : tables) {
 					DiscogsCsvPrinter csvp = new DiscogsCsvPrinter(target, table);
 					
 					Object[] cols;

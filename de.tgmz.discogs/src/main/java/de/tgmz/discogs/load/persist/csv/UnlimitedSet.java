@@ -26,19 +26,18 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 
 /**
- * Unlimited set of numbers.
- * Performance of a <code>Set</code> decreases dramatically, if it becomes <i>very</i> large. This implematation
+ * Unlimited set. Performance of a <code>Set</code> decreases dramatically, if it becomes <i>very</i> large. This implematation
  * avoids this by backonig the <code>Set</code> with a h2 database and poxying it with a first-level-cache.
  */
-public class UnlimitedNumberSet extends AbstractSet<Number> {
-	private static final Logger LOG = LoggerFactory.getLogger(UnlimitedNumberSet.class);
-	private static final String SQL_CREATE = "CREATE TABLE %s (id DOUBLE PRECISION NOT NULL, UNIQUE (id))";
+public class UnlimitedSet<T> extends AbstractSet<T> {
+	private static final Logger LOG = LoggerFactory.getLogger(UnlimitedSet.class);
+	private static final String SQL_CREATE = "CREATE TABLE %s (id VARCHAR(255) NOT NULL, UNIQUE (id))";
 	private static final String SQL_INSERT = "INSERT INTO %s (id) VALUES (?)";
 	private Connection con;
 	private PreparedStatement pstmt;
-	private LoadingCache<Number, Boolean> lc;
+	private LoadingCache<T, Boolean> lc;
 	
-	public UnlimitedNumberSet() {
+	public UnlimitedSet() {
 		super();
 		
 		try {
@@ -60,21 +59,15 @@ public class UnlimitedNumberSet extends AbstractSet<Number> {
 		lc = Caffeine
 				.newBuilder()
 				.maximumSize(l)
-				.build(n -> insert(n));
+				.build(this::insert);
 		
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Created first-level-cache with size {}", String.format("%,d", l));
 		}
 	}
 	
-	/**
-	 * Adds a number to the cache
-	 * @param n the number (usually long)
-	 * @return false iff the cache already contained n, true in all other cases, even if an error occurred 
-	 * or the cache wasn't setup correctly
-	 */
 	@Override
-	public boolean add(Number n) {
+	public boolean add(T n) {
 		boolean b = lc.get(n);
 		
 		// b == true: n was successfully added to the set/database. Return this success but cache false for future
@@ -87,16 +80,14 @@ public class UnlimitedNumberSet extends AbstractSet<Number> {
 		return b;
 	}
 	
-	private boolean insert(Number n) {
+	private boolean insert(T n) throws SQLException {
 		try {
-			pstmt.setDouble(1, n.doubleValue());
+			pstmt.setString(1, n.toString());
 			pstmt.executeUpdate();
 			
 			return true;
 		} catch (JdbcSQLIntegrityConstraintViolationException e) {
 			return false;
-		} catch (SQLException e) {
-			return true;
 		}
 	}
 
@@ -106,7 +97,7 @@ public class UnlimitedNumberSet extends AbstractSet<Number> {
 	}
 
 	@Override
-	public Iterator<Number> iterator() {
+	public Iterator<T> iterator() {
 		throw new UnsupportedOperationException();
 	}
 }

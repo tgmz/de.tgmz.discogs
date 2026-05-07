@@ -42,7 +42,6 @@ public class Artist extends PrimaryEntity {
 	@Column(length = 512)
 	private String realname;
 	@ElementCollection
-	@Column(length = 256)
 	private Set<String> variations;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	@JoinTable(name = "artist_members")

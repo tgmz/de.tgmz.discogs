@@ -15,14 +15,14 @@ import de.tgmz.discogs.domain.Label;
 
 public class LabelCsvPersister extends AbstractCsvPersister<Label> {
 	public LabelCsvPersister(String target) {
-		super(target, "Label");
+		super(target, Table.Label);
 	}
 	protected int doSave(Label l) throws IOException {
 		Label pl = l.getParentLabel();
 		
 		Long pls = pl != null ? pl.getId() : null;  
 		
-		m.get("Label").printRecord(
+		m.get(Table.Label).printRecord(
 			l.getDataQuality().ordinal()
 			, l.getId()
 			, pls

@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.tgmz.discogs.database.DatabaseService;
+import de.tgmz.discogs.load.persist.csv.Table;
 import de.tgmz.discogs.logging.LogUtil;
 import jakarta.persistence.EntityManager;
 
@@ -43,56 +44,12 @@ public class CsvLoader {
 	}
 	
 	public void load() {
-			loadTable("Artist");
-			loadTable("artist_aliases_all");
-			loadTable("artist_aliases");
-			loadTable("artist_groups_all");
-			loadTable("artist_groups");
-			loadTable("artist_members_all");
-			loadTable("artist_members");
-			loadTable("Artist_variations");
-   		
-			loadTable("Label");
-   		
-			loadTable("Master");
-			loadTable("Genre");
-			loadTable("Master_Genre");
-			loadTable("Style");
-			loadTable("Master_Style");
-			loadTable("artist_master_all");
-			loadTable("Master_Artist");
-   		
-			loadTable("Series");
-			loadTable("Release");
-			loadTable("Release_Genre");
-			loadTable("Release_Style");
-			loadTable("Release_labels");
-			loadTable("EntityType");
-			loadTable("Company");
-			loadTable("release_company");
-			loadTable("Format");
-			loadTable("Format_descriptions");
-			loadTable("Release_Format");
-			loadTable("artist_release_all");		
-			loadTable("Release_Artist");
-			loadTable("ExtraArtist");
- 			loadTable("artist_release_extraartist_all");
-			loadTable("release_extraartist");
-			loadTable("ReleaseExtraArtist_applicableTracks");
-			
-   			loadTable("Track");
- 			loadTable("artist_release_track_all");
- 			loadTable("Track_Artist");
-			loadTable("artist_release_track_extraartist_all");
-			loadTable("Track_ExtraArtist");
-			loadTable("Release_Track");
- 			loadTable("SubTrack");
-			loadTable("artist_release_subtrack_extraartist_all");
-			loadTable("SubTrack_ExtraArtist");
-			loadTable("Track_SubTrack");
+		for (Table t : Table.values()) {
+			loadTable(t);
+		}
 	}
 	
-	public void loadTable(String table) {
+	public void loadTable(Table table) {
 		List<String> stmts = new LinkedList<>();
 		
 		stmts.add(String.format("DROP TABLE IF EXISTS %s CASCADE", table));
@@ -135,16 +92,16 @@ public class CsvLoader {
 			execute(stmt);
 		}
 	}
-	private String getCreate(String table) {
-		return getDdl().lines().filter(l -> l.startsWith("create table " + table + " ")).findFirst().orElse("");
+	private String getCreate(Table table) {
+		return getDdl().lines().filter(l -> l.startsWith("create table " + table.toString() + " ")).findFirst().orElse("");
 	}
 	
-	private List<String> getAlter(String table) {
-		return getDdl().lines().filter(l -> l.startsWith("alter table if exists " + table + " ")).toList();
+	private List<String> getAlter(Table table) {
+		return getDdl().lines().filter(l -> l.startsWith("alter table if exists " + table.toString() + " ")).toList();
 	}
 	
-	private List<String> getIndex(String table) {
-		return getDdl().lines().filter(l -> l.matches("^create index \\w+ on " + table + " .*$")).toList();
+	private List<String> getIndex(Table table) {
+		return getDdl().lines().filter(l -> l.matches("^create index \\w+ on " + table.toString() + " .*$")).toList();
 	}
 	
 	private String getDdl() {
@@ -168,7 +125,7 @@ public class CsvLoader {
 		try (EntityManager em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager()) {
 			em.runWithConnection((Connection conn) -> {
 				int i = conn.createStatement().executeUpdate(sql);
-    			
+				
 				if (i > 0 && LOG.isInfoEnabled()) {
 					LOG.info("{} rows were affected in {}", String.format("%,d", i), LogUtil.formatDuration(start, System.currentTimeMillis()));
     			}
