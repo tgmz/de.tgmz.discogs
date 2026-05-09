@@ -201,7 +201,15 @@
 		<profile>
 			<id>sonar</id>
 			<properties>
-				<sonar.exclusions>**/Table.java,**/Identifier.java</sonar.exclusions>
+				<sonar.issue.ignore.multicriteria>e1,e2,e3,e4</sonar.issue.ignore.multicriteria>
+				<sonar.issue.ignore.multicriteria.e1.ruleKey>java:S115</sonar.issue.ignore.multicriteria.e1.ruleKey>
+				<sonar.issue.ignore.multicriteria.e1.resourceKey>**/Table.java</sonar.issue.ignore.multicriteria.e1.resourceKey>
+				<sonar.issue.ignore.multicriteria.e2.ruleKey>java:S116</sonar.issue.ignore.multicriteria.e2.ruleKey>
+				<sonar.issue.ignore.multicriteria.e2.resourceKey>**/Identifier.java</sonar.issue.ignore.multicriteria.e2.resourceKey>
+				<sonar.issue.ignore.multicriteria.e3.ruleKey>java:S116</sonar.issue.ignore.multicriteria.e3.ruleKey>
+				<sonar.issue.ignore.multicriteria.e3.resourceKey>**/PrimaryEntity.java</sonar.issue.ignore.multicriteria.e3.resourceKey>
+				<sonar.issue.ignore.multicriteria.e4.ruleKey>java:S2160</sonar.issue.ignore.multicriteria.e4.ruleKey>
+				<sonar.issue.ignore.multicriteria.e4.resourceKey>**/UnlimitedSet.java</sonar.issue.ignore.multicriteria.e4.resourceKey>
 			</properties>
 			<build>
 				<plugins>
