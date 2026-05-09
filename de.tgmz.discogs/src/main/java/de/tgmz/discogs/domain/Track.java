@@ -51,7 +51,7 @@ public class Track implements Serializable {
 	private String title;
 	private String position;
 	private String duration;
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
 	@JoinTable(name = "Track_Artist"
 	, indexes = {
 		@Index(columnList = "Track_release_id,Track_sequence,artists_id", name = "Track_Artist_pk_idx", unique = true),

@@ -28,7 +28,7 @@ public abstract class Discogs extends PrimaryEntity {
 	private static final long serialVersionUID = -8920772069254927533L;
 	@Column(length = 512)
 	private String title;
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
 	private Set<Artist> artists;
 	@Column(length = 512)
 	private String albumArtist;
