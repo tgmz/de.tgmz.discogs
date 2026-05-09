@@ -14,9 +14,9 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.Instant;
 import java.util.AbstractSet;
 import java.util.Iterator;
+import java.util.UUID;
 
 import org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException;
 import org.slf4j.Logger;
@@ -35,6 +35,7 @@ public class UnlimitedSet<T> extends AbstractSet<T> {
 	private static final String SQL_INSERT = "INSERT INTO %s (id) VALUES (?)";
 	private Connection con;
 	private PreparedStatement pstmt;
+	private String table;
 	private LoadingCache<T, Boolean> lc;
 	
 	public UnlimitedSet() {
@@ -44,7 +45,7 @@ public class UnlimitedSet<T> extends AbstractSet<T> {
 			con = DriverManager.getConnection("jdbc:h2:mem:n_cache", "sa", "sa");
 
 			try (Statement stmt = con.createStatement()) {
-				String table = "n_cache_" + Instant.now().toEpochMilli();
+				table = "n_cache_" + UUID.randomUUID().toString().replace("-", "");
 			
 				stmt.executeUpdate(String.format(SQL_CREATE, table));
 				
@@ -62,7 +63,7 @@ public class UnlimitedSet<T> extends AbstractSet<T> {
 				.build(this::insert);
 		
 		if (LOG.isDebugEnabled()) {
-			LOG.debug("Created first-level-cache with size {}", String.format("%,d", l));
+			LOG.debug("Constructed unlimited set with table {} of size {}", table, String.format("%,d", l));
 		}
 	}
 	
