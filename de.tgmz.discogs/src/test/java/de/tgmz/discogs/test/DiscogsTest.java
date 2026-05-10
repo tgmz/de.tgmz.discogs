@@ -205,6 +205,18 @@ public abstract class DiscogsTest {
 		assertTrue(format.getDescriptions().contains("Remastered"));
 	}
 	@Test
+	public void testPurpleRain() {
+		Release r = em.find(Release.class, 33418256L);
+		
+		assertEquals("Prince And The Revolution", r.getAlbumArtist());
+		assertEquals("Purple Rain", r.getTitle());
+
+		// Assert that subRole is not splitted by ","
+		ReleaseExtraArtist prb = getExtraArtist(r, 28795, "Remastered By [LP Remastered, 2015]");
+		
+		assertEquals("Prince", prb.getExtraArtist().getArtist().getName());
+	}
+	@Test
 	public void testSubtrack() {
 		Release r = em.find(Release.class, 2460568L);
 		assertTrue(r.getUnfilteredTracklist().get(10).getSubTracklist().isEmpty());
