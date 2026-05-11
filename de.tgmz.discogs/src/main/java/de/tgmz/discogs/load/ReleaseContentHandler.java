@@ -14,8 +14,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -43,7 +43,6 @@ import de.tgmz.discogs.domain.Track;
 import de.tgmz.discogs.load.persist.ReleasePersistable;
 
 public class ReleaseContentHandler extends DiscogsContentHandler {
-	private static final String EA_ROLE_SPLIT = ",\\s+";
 	protected static final Logger LOG = LoggerFactory.getLogger(ReleaseContentHandler.class);
 	private List<String> bandArtists;
 	private List<String> bandJoins;
@@ -407,7 +406,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			return result;
 		}
 		
-		Stream.of(allRoles.split(EA_ROLE_SPLIT)).forEach(singleRole -> result.add(new ExtraArtist(draft.getArtist(), singleRole)));
+		splitRoles(allRoles).forEach(singleRole -> result.add(new ExtraArtist(draft.getArtist(), singleRole)));
 		
 		return result;
 	}
@@ -422,7 +421,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			return result;
 		}
 		
-		for (String singleRole : allRoles.split(EA_ROLE_SPLIT)) {
+		for (String singleRole : splitRoles(allRoles)) {
 			ReleaseExtraArtist rea = new ReleaseExtraArtist();
 			
 			rea.setExtraArtist(new ExtraArtist(draft.getExtraArtist().getArtist(), singleRole));
@@ -462,6 +461,28 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 		
 		// Finally we add the new ExtraArtists
 		result.addAll(reas1.stream().filter(x -> !reas0.contains(x)).toList());
+		
+		return result;
+	}
+	private Set<String> splitRoles(String allRoles) {
+		Set<String> result = new HashSet<>();
+		
+		StringJoiner sj = new StringJoiner(", ");
+		
+		for (String split : allRoles.split(",\\s+")) {
+			sj.add(split);
+			
+			String temp = sj.toString().strip();
+			
+			// Join roles which contain a comma between square brackets and were therefore mistakenly split
+			if (temp.contains("[") && !temp.contains("]")) {
+				continue;
+			}
+			
+			result.add(temp);
+			
+			sj = new StringJoiner(", ");
+		}
 		
 		return result;
 	}
