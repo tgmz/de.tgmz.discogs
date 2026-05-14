@@ -19,7 +19,7 @@ import jakarta.persistence.Transient;
  *  
  */
 @MappedSuperclass
-public abstract class PrimaryEntity extends AtomicEntity<Long> {
+public abstract class PrimaryEntity extends AtomicEntity<Integer> {
 	@Transient
 	private static final long serialVersionUID = -2201861486429131211L;
 	@Enumerated(EnumType.ORDINAL)
@@ -29,7 +29,7 @@ public abstract class PrimaryEntity extends AtomicEntity<Long> {
 		super();
 	}
 
-	protected PrimaryEntity(long id) {
+	protected PrimaryEntity(int id) {
 		this();
 		
 		setId(id);

@@ -42,7 +42,7 @@ public class LabelContentHandler extends DiscogsContentHandler {
 			break;
 		case "[labels, label, parentLabel]":
 			Label pl = new Label();
-			pl.setId(Long.parseLong(attributes.getValue("id")));
+			pl.setId(Integer.parseInt(attributes.getValue("id")));
 			
 			label.setParentLabel(pl);
 			
@@ -55,7 +55,7 @@ public class LabelContentHandler extends DiscogsContentHandler {
 	public void endElement(String uri, String localName, String qName) {
 		switch (path) {
 		case "[labels, label, id]":
-			label.setId(Long.parseLong(getChars()));
+			label.setId(Integer.parseInt(getChars()));
 			break;
 		case "[labels, label, name]":
 			label.setName(getChars(true));

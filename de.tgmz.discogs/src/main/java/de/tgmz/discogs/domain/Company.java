@@ -21,7 +21,7 @@ import jakarta.persistence.Transient;
 @Table(indexes = {
 	@Index(columnList = "name", name = "Company_name_idx"),
 })
-public class Company extends AtomicEntity<Long> {
+public class Company extends AtomicEntity<Integer> {
 	@Transient
 	private static final long serialVersionUID = -2527932623058215441L;
 	private String name;
@@ -30,7 +30,7 @@ public class Company extends AtomicEntity<Long> {
 		super();
 	}
 	
-	public Company(long id, String name) {
+	public Company(int id, String name) {
 		super(id);
 		
 		this.name = name;

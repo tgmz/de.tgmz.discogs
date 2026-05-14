@@ -34,6 +34,7 @@ import jakarta.persistence.Transient;
 @Table(indexes = {
 	@Index(columnList = "track_release_id,track_sequence,subTrackNumber", name = "SubTrack_pk_idx", unique = true),
 })
+
 public class SubTrack implements Serializable {
 	@Transient
 	private static final long serialVersionUID = 5772183040087284559L;

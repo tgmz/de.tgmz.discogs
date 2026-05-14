@@ -54,10 +54,10 @@ public class Artist extends PrimaryEntity {
 	private Set<Artist> groups;
 
 	public Artist() {
-		this(0L);
+		this(0);
 	}
 
-	public Artist(long id) {
+	public Artist(int id) {
 		super(id);
 		
 		variations = new TreeSet<>();

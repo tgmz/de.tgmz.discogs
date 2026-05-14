@@ -164,7 +164,7 @@ public abstract class DiscogsTest {
 		Release r = em.find(Release.class, 2324L);
 		
 		// Mixed by GusGus
-		ReleaseExtraArtist mbgg = em.find(ReleaseExtraArtist.class, new ReleaseExtraArtistKey(r.getId(), 231513L, "Mixed By"));
+		ReleaseExtraArtist mbgg = em.find(ReleaseExtraArtist.class, new ReleaseExtraArtistKey(r.getId(), 231513, "Mixed By"));
 		
 		// "1 to 4, 6 to 11"
 		Set<String> applicableTracks = mbgg.getApplicableTracks();
@@ -303,7 +303,7 @@ public abstract class DiscogsTest {
 		
 		Series s = r.getSeries();
 		
-		assertEquals(117965L, (long) s.getId());
+		assertEquals(117965, (int) s.getId());
 		assertEquals("World Network", s.getName());
 		assertEquals("16", s.getCatno());
 	}
@@ -424,7 +424,7 @@ public abstract class DiscogsTest {
 		assertEquals("Text", lIdent.getFirst().getDescription());
 	}
 	
-	private ReleaseExtraArtist getExtraArtist(Release r, long artistId, String role) {
+	private ReleaseExtraArtist getExtraArtist(Release r, int artistId, String role) {
 		return r.getReleaseExtraArtists()
 			.stream()
 			.filter(rea -> rea.getExtraArtist().getArtist().getId() == artistId && role.equals(rea.getExtraArtist().getRole()))

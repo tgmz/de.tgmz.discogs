@@ -16,7 +16,7 @@ import jakarta.persistence.Transient;
  * Series entity.
  */
 @Entity
-public class Series extends AtomicEntity<Long> {
+public class Series extends AtomicEntity<Integer> {
 	@Transient
 	private static final long serialVersionUID = -9147451633557425171L;
 	private String name;
@@ -26,7 +26,7 @@ public class Series extends AtomicEntity<Long> {
 		super();
 	}
 	
-	public Series(long id, String catno, String name) {
+	public Series(int id, String catno, String name) {
 		super(id);
 
 		this.catno = catno;
