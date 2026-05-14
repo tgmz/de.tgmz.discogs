@@ -44,7 +44,7 @@ public class DiscogsContentHandler extends DefaultHandler {
 	private XMLReader xmlReader;
 	private int saved;
 	private int count;
-	private long logThreshold = 10_000L;
+	private int logThreshold = 10_000;
 	private int saveThreshold = 100;
 	private StringBuilder chars;
 	private DBDefrag defrag;

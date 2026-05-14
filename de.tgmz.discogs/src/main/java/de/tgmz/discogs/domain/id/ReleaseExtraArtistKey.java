@@ -22,17 +22,17 @@ public final class ReleaseExtraArtistKey implements Serializable {
 	private static final long serialVersionUID = 5444222193660844182L;
 	
 	@Column(name = "release_id")
-	private long releaseId;
+	private int releaseId;
 	@Column(name = "artist_id")
-	private long artistId;
+	private int artistId;
 	@Column(name = "role_id")
 	private String roleId;
 	
 	public ReleaseExtraArtistKey() {
-		this(0L, 0L, null);
+		this(0, 0, null);
 	}
 	
-	public ReleaseExtraArtistKey(long releaseId, long artistId, String roleId) {
+	public ReleaseExtraArtistKey(int releaseId, int artistId, String roleId) {
 		super();
 		setReleaseId(releaseId);
 		setArtistId(artistId);
@@ -42,10 +42,10 @@ public final class ReleaseExtraArtistKey implements Serializable {
 	public String getRoleId() {
 		return roleId;
 	}
-	public void setReleaseId(long releaseId) {
+	public void setReleaseId(int releaseId) {
 		this.releaseId = releaseId;
 	}
-	public void setArtistId(long artistId) {
+	public void setArtistId(int artistId) {
 		this.artistId = artistId;
 	}
 	public void setRoleId(String roleId) {

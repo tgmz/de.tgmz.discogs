@@ -46,13 +46,13 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 			artist = new Artist();
 			break;
 		case "[artists, artist, members, name]":
-			member = new Artist(Long.parseLong(attributes.getValue("id")));
+			member = new Artist(Integer.parseInt(attributes.getValue("id")));
 			break;
 		case "[artists, artist, aliases, name]":
-			alias = new Artist(Long.parseLong(attributes.getValue("id")));
+			alias = new Artist(Integer.parseInt(attributes.getValue("id")));
 			break;
 		case "[artists, artist, groups, name]":
-			group = new Artist(Long.parseLong(attributes.getValue("id")));
+			group = new Artist(Integer.parseInt(attributes.getValue("id")));
 			break;
 		default:
 		}
@@ -62,7 +62,7 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 	public void endElement(String uri, String localName, String qName) {
 		switch (path) {
 		case "[artists, artist, id]":
-			artist.setId(Long.parseLong(getChars()));
+			artist.setId(Integer.parseInt(getChars()));
 			
 			break;
 		case "[artists, artist, data_quality]":

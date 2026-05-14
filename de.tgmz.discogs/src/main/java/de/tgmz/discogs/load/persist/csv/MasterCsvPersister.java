@@ -21,38 +21,38 @@ public class MasterCsvPersister extends AbstractCsvPersister<Master> {
 		super(target
 			, Table.Master, Table.Master_Artist, Table.Genre, Table.Style, Table.Master_Genre, Table.Master_Style, Table.artist_master_all);
 	}
-	
-	protected int doSave(Master l) throws IOException {
-		m.get(Table.Master).printRecord(
-			l.getDataQuality().ordinal()
-			, l.getPublished()
-			, l.getId()
-			, l.getAlbumArtist()
-			, l.getTitle()
+
+	protected int doSave(Master m) throws IOException {
+		pm.get(Table.Master).printRecord(
+			m.getDataQuality().ordinal()
+			, m.getId()
+			, m.getPublished()
+			, m.getAlbumArtist()
+			, m.getTitle()
 		);
 		
-		for (Artist a : l.getArtists()) {
-			m.get(Table.Master_Artist).printRecord(
-				l.getId()
+		for (Artist a : m.getArtists()) {
+			pm.get(Table.Master_Artist).printRecord(
+				m.getId()
 				, a.getId()
 			);
 			
-			m.get(Table.artist_master_all).printRecordUsingCache(
+			pm.get(Table.artist_master_all).printRecordUsingCache(
 					a.getId()
 					, a.getName()
 			);
 		}
 		
-		for (Genre g : l.getGenres()) {
-			m.get(Table.Master_Genre).printRecord(
-				l.getId()
+		for (Genre g : m.getGenres()) {
+			pm.get(Table.Master_Genre).printRecord(
+				m.getId()
 				, g.getId()
 			);
 		}
 
-		for (Style s : l.getStyles()) {
-			m.get(Table.Master_Style).printRecord(
-				l.getId()
+		for (Style s : m.getStyles()) {
+			pm.get(Table.Master_Style).printRecord(
+				m.getId()
 				, s.getId()
 			);
 		}

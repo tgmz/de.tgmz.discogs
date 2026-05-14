@@ -78,7 +78,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 		case "[releases, release]":
 			r = new Release();
 			
-			r.setId(Long.parseLong(attributes.getValue("id")));
+			r.setId(Integer.parseInt(attributes.getValue("id")));
 			
 			break;
 		case "[releases, release, master_id]":
@@ -131,7 +131,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			if (id != null) {
 				Label l = new Label(); 
-				l.setId(Long.parseLong(attributes.getValue("id")));
+				l.setId(Integer.parseInt(attributes.getValue("id")));
 			
 				String catno = attributes.getValue("catno");
 			
@@ -159,7 +159,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			String s = attributes.getValue("id");
 			
 			if (StringUtils.isNotEmpty(s)) {
-				r.setSeries(new Series(Long.parseLong(s), attributes.getValue("catno"), attributes.getValue("name")));
+				r.setSeries(new Series(Integer.parseInt(s), attributes.getValue("catno"), attributes.getValue("name")));
 			}
 			
 			break;
@@ -172,7 +172,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 		switch (path) {
 		case "[releases, release, master_id]":
 			Master m = new Master();
-			m.setId(Long.parseLong(getChars()));
+			m.setId(Integer.parseInt(getChars()));
 			
 			r.setMaster(m);
 
@@ -209,7 +209,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			break;
 		case "[releases, release, artists, artist, id]"
 			, "[releases, release, tracklist, track, artists, artist, id]":
-			artist.setId(Long.valueOf(getChars()));
+			artist.setId(Integer.parseInt(getChars()));
 			
 			break;
 		case "[releases, release, artists, artist, name]":
@@ -238,7 +238,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 		// extraartists
 			
 		case "[releases, release, extraartists, artist, id]":
-			releaseExtraArtist.getExtraArtist().getArtist().setId(Long.parseLong(getChars()));
+			releaseExtraArtist.getExtraArtist().getArtist().setId(Integer.parseInt(getChars()));
 				
 			break;
 		case "[releases, release, extraartists, artist, name]":
@@ -256,7 +256,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			break;
 		case "[releases, release, tracklist, track, extraartists, artist, id]"
 			, "[releases, release, tracklist, track, sub_tracks, track, extraartists, artist, id]":
-			extraArtist.getArtist().setId(Long.parseLong(getChars()));
+			extraArtist.getArtist().setId(Integer.parseInt(getChars()));
 			
 			break;
 		case "[releases, release, tracklist, track, extraartists, artist, name]"
@@ -349,7 +349,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, companies, company, id]":
-			company.setId(Long.parseLong(getChars()));
+			company.setId(Integer.parseInt(getChars()));
 			
 			break;
 		case "[releases, release, companies, company, name]":

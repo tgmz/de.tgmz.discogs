@@ -20,6 +20,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Transient;
 
 @Entity
@@ -29,7 +30,8 @@ public class Identifier implements Serializable {
 	private static final int MAX_LENGTH = 255;
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
-	private long id;
+	@SequenceGenerator(name ="identifier_seq", allocationSize = 1)
+	private int id;
 	@Enumerated(EnumType.ORDINAL)
 	private IdentType _type;
 	private String _description;
@@ -47,11 +49,11 @@ public class Identifier implements Serializable {
 		this._value = StringUtils.left(value, MAX_LENGTH);
 	}
 
-	public long getId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 

@@ -29,7 +29,7 @@ import jakarta.persistence.EntityManager;
 
 public class MasterContentHandler extends DiscogsContentHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(MasterContentHandler.class);
-	private long artistId;
+	private int artistId;
 	private String artistName;
 	private Master master;
 	private List<String> artistNames;
@@ -56,7 +56,7 @@ public class MasterContentHandler extends DiscogsContentHandler {
 		case "[masters, master]":
 			master = new Master();
 			
-			master.setId(Long.parseLong(attributes.getValue("id")));
+			master.setId(Integer.parseInt(attributes.getValue("id")));
 			
 			break;
 		case "[masters, master, artists]":
@@ -72,7 +72,7 @@ public class MasterContentHandler extends DiscogsContentHandler {
 	public void endElement(String uri, String localName, String qName) {
 		switch (path) {
 		case "[masters, master, artists, artist, id]":
-			artistId = Long.parseLong(getChars());
+			artistId = Integer.parseInt(getChars());
 			
 			break;
 		case "[masters, master, title]":

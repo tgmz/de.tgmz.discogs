@@ -22,16 +22,16 @@ public final class ReleaseCompanyKey implements Serializable {
 	private static final long serialVersionUID = 8460138400268050387L;
 
 	@Column(name = "release_id")
-	private long releaseId;
+	private int releaseId;
 	@Column(name = "company_id")
-	private long companyId;
+	private int companyId;
 	@Column(name = "entityType_id")
 	private short entityTypeId;
 	
-	public void setReleaseId(long releaseId) {
+	public void setReleaseId(int releaseId) {
 		this.releaseId = releaseId;
 	}
-	public void setCompanyId(long companyId) {
+	public void setCompanyId(int companyId) {
 		this.companyId = companyId;
 	}
 	public void setEntityTypeId(short entityTypeId) {

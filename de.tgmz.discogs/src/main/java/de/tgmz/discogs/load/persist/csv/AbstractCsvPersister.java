@@ -27,10 +27,10 @@ import jakarta.persistence.EntityManager;
 public abstract class AbstractCsvPersister<T> implements IPersistable<T> {
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractCsvPersister.class);
 	private static final String SQL_COLS = "SELECT * FROM %s";
-	protected Map<Table, DiscogsCsvPrinter> m;
+	protected Map<Table, DiscogsCsvPrinter> pm;
 
 	protected AbstractCsvPersister(String target, Table... tables) {
-		m = new TreeMap<>();
+		pm = new TreeMap<>();
 		
 		try (EntityManager em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager()) {
 			em.runWithConnection((Connection con) -> {
@@ -55,7 +55,7 @@ public abstract class AbstractCsvPersister<T> implements IPersistable<T> {
 					
 					csvp.printRecord(cols);
 					
-					m.put(table, csvp);
+					pm.put(table, csvp);
 				}
 			});
 		}
@@ -75,7 +75,7 @@ public abstract class AbstractCsvPersister<T> implements IPersistable<T> {
 	@Override
 	public int flush() {
 		try {
-			for (DiscogsCsvPrinter e : m.values()) {
+			for (DiscogsCsvPrinter e : pm.values()) {
 				e.flush();
 				e.close();
 			}

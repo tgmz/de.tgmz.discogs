@@ -16,15 +16,15 @@ import de.tgmz.discogs.domain.Release;
 import jakarta.persistence.EntityManager;
 
 public class IgnoreUpToFilter implements Predicate<Release> {
-	private long rMaxId;
+	private int rMaxId;
 	
 	public IgnoreUpToFilter() {
 		try (EntityManager em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager()) {
-			this.rMaxId = (long) em.createNativeQuery("SELECT COALESCE(MAX(id), 0) FROM Release", Long.class).getSingleResult();
+			this.rMaxId = (int) em.createNativeQuery("SELECT COALESCE(MAX(id), 0) FROM Release", Integer.class).getSingleResult();
 		}
 	}
 	
-	public IgnoreUpToFilter(long maxId) {
+	public IgnoreUpToFilter(int maxId) {
 		this.rMaxId = maxId;
 	}
 	
