@@ -26,7 +26,6 @@ import jakarta.persistence.MappedSuperclass;
 @MappedSuperclass
 public abstract class Discogs extends PrimaryEntity {
 	private static final long serialVersionUID = -8920772069254927533L;
-	@Column(length = 512)
 	private String title;
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
 	private Set<Artist> artists;
@@ -90,7 +89,7 @@ public abstract class Discogs extends PrimaryEntity {
 	}
 	
 	public void setTitle(String title) {
-		this.title = StringUtils.left(title, 512);
+		this.title = title;
 	}
 
 	public void setAlbumArtist(String albumArtist) {

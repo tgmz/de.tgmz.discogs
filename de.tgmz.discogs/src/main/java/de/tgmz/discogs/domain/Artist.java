@@ -13,8 +13,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.lang3.StringUtils;
+
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -37,9 +38,7 @@ import jakarta.persistence.Transient;
 public class Artist extends PrimaryEntity {
 	@Transient
 	private static final long serialVersionUID = -5230886354906404806L;
-	@Column(length = 512)
 	private String name;
-	@Column(length = 512)
 	private String realname;
 	@ElementCollection
 	private Set<String> variations;
@@ -99,11 +98,11 @@ public class Artist extends PrimaryEntity {
 	}
 	
 	public void setName(String name) {
-		this.name = name;
+		this.name = StringUtils.left(name, 255);
 	}
 
 	public void setRealname(String realName) {
-		this.realname = realName;
+		this.realname = StringUtils.left(realName, 255);
 	}
 
 	public void setVariations(Set<String> variations) {

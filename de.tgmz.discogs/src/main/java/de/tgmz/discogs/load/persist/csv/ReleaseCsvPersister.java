@@ -76,9 +76,9 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 			, r.getMaster() !=  null && r.getMaster().getId() > 0 ? r.getMaster().getId() : null
 			, ser != null && ser.getId() > 0 ? ser.getId() : null
 			, r.getAlbumArtist()
-			, r.getTitle()
 			, r.getCountry()
 			, r.getReleased()
+			, r.getTitle()
 		);
 		
 		for (Genre g : r.getGenres()) {
