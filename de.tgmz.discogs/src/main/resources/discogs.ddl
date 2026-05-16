@@ -7,11 +7,9 @@
 --*
 --* SPDX-License-Identifier: EPL-2.0
 --**********************************************************************/
-create global temporary table HTE_Format(id integer, rn_ integer not null, name varchar(255), qty varchar(255), text varchar(255), primary key (rn_)) transactional
-create global temporary table HTE_Identifier(_type smallint, id integer, rn_ integer not null, _description varchar(255), _value varchar(255), primary key (rn_)) transactional
 create sequence format_seq start with 1 increment by 1
 create sequence identifier_seq start with 1 increment by 1
-create table Artist (data_quality smallint check ((data_quality between 0 and 5)), id integer not null, name varchar(512), realname varchar(512), primary key (id))
+create table Artist (data_quality smallint check ((data_quality between 0 and 5)), id integer not null, name varchar(255), realname varchar(255), primary key (id))
 create table artist_aliases (Artist_id integer not null, aliases_id integer not null, primary key (Artist_id, aliases_id))
 create table artist_groups (Artist_id integer not null, groups_id integer not null, primary key (Artist_id, groups_id))
 create table artist_members (Artist_id integer not null, members_id integer not null, primary key (Artist_id, members_id))
@@ -24,11 +22,11 @@ create table Format_descriptions (Format_id integer not null, descriptions varch
 create table Genre (id varchar(255) not null, primary key (id))
 create table Identifier (_type smallint check ((_type between 0 and 13)), id integer not null, _description varchar(255), _value varchar(255), primary key (id))
 create table Label (data_quality smallint check ((data_quality between 0 and 5)), id integer not null, parentLabel_id integer, name varchar(255), primary key (id))
-create table Master (data_quality smallint check ((data_quality between 0 and 5)), id integer not null, published integer, albumArtist varchar(512), title varchar(512), primary key (id))
+create table Master (data_quality smallint check ((data_quality between 0 and 5)), id integer not null, published integer, albumArtist varchar(512), title varchar(255), primary key (id))
 create table Master_Artist (Master_id integer not null, artists_id integer not null, primary key (Master_id, artists_id))
 create table Master_Genre (Master_id integer not null, genres_id varchar(255) not null, primary key (Master_id, genres_id))
 create table Master_Style (Master_id integer not null, styles_id varchar(255) not null, primary key (Master_id, styles_id))
-create table Release (_main boolean not null, data_quality smallint check ((data_quality between 0 and 5)), id integer not null, master_id integer, series_id integer, albumArtist varchar(512), title varchar(512), country varchar(255), released varchar(255), primary key (id))
+create table Release (_main boolean not null, data_quality smallint check ((data_quality between 0 and 5)), id integer not null, master_id integer, series_id integer, albumArtist varchar(512), country varchar(255), released varchar(255), title varchar(255), primary key (id))
 create table Release_Artist (Release_id integer not null, artists_id integer not null, primary key (Release_id, artists_id))
 create table release_company (company_id integer not null, entityType_id smallint not null, release_id integer not null, constraint ReleaseCompany_pk_idx primary key (release_id, company_id, entityType_id))
 create table release_extraartist (artist_id integer not null, release_id integer not null, role_id varchar(255) not null, constraint ReleaseExtraArtist_pk_idx primary key (release_id, artist_id, role_id))
@@ -104,14 +102,14 @@ alter table if exists Track_ExtraArtist add constraint FK3t7ccbnqlg3uuh41kwggrbi
 alter table if exists Track_SubTrack add constraint FKnt4modbpx6s534dv57uv6lj8i foreign key (subTracklist_track_release_id, subTracklist_track_sequence, subTracklist_subTrackNumber) references SubTrack
 alter table if exists Track_SubTrack add constraint FKgau3arxwbit77g334gpvo4i1k foreign key (Track_release_id, Track_sequence) references Track
 
-create table artist_aliases_all (id integer not null, name varchar(512))
-create table artist_groups_all (id integer not null, name varchar(512))
-create table artist_members_all (id integer not null, name varchar(512))
+create table artist_aliases_all (id integer not null, name varchar(255))
+create table artist_groups_all (id integer not null, name varchar(255))
+create table artist_members_all (id integer not null, name varchar(255))
 
-create table artist_master_all (id integer not null, name varchar(512))
+create table artist_master_all (id integer not null, name varchar(255))
 
-create table artist_release_all (id integer not null, name varchar(512))
-create table artist_release_extraartist_all (id integer not null, name varchar(512))
-create table artist_release_track_all (id integer not null, name varchar(512))
-create table artist_release_track_extraartist_all (id integer not null, name varchar(512))
-create table artist_release_subtrack_extraartist_all (id integer not null, name varchar(512))
+create table artist_release_all (id integer not null, name varchar(255))
+create table artist_release_extraartist_all (id integer not null, name varchar(255))
+create table artist_release_track_all (id integer not null, name varchar(255))
+create table artist_release_track_extraartist_all (id integer not null, name varchar(255))
+create table artist_release_subtrack_extraartist_all (id integer not null, name varchar(255))
