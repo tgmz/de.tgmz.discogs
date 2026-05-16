@@ -75,6 +75,8 @@ public class CsvLoader {
 			}
 		}
 		
+		stmts.addAll(getInit(table));
+		
 		Map<String, String> t = new TreeMap<>();
 
 		for (Entry<Object, Object> e : getProperties().entrySet()) {
@@ -94,6 +96,18 @@ public class CsvLoader {
 	}
 	private String getCreate(Table table) {
 		return getDdl().lines().filter(l -> l.startsWith("create table " + table.toString() + " ")).findFirst().orElse("");
+	}
+	
+	private List<String> getInit(Table table) {
+		List<String> result = new LinkedList<>();
+		
+		String ddl = getDdl();
+		
+		result.addAll(ddl.lines().filter(l -> l.startsWith("update " + table.toString() + " ")).toList());
+		result.addAll(ddl.lines().filter(l -> l.startsWith("insert into " + table.toString() + " ")).toList());
+		result.addAll(ddl.lines().filter(l -> l.startsWith("insert into " + table.toString() + "(")).toList());
+		
+		return result;
 	}
 	
 	private List<String> getAlter(Table table) {

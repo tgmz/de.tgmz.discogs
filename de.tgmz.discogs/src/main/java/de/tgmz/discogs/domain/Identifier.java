@@ -20,7 +20,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.TableGenerator;
 import jakarta.persistence.Transient;
 
 @Entity
@@ -28,9 +28,9 @@ public class Identifier implements Serializable {
 	@Transient
 	private static final long serialVersionUID = 46435372147406742L;
 	private static final int MAX_LENGTH = 255;
+	@TableGenerator(name = "identifier_gen")
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
-	@SequenceGenerator(name ="identifier_seq", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "identifier_gen")
 	private int id;
 	@Enumerated(EnumType.ORDINAL)
 	private IdentType _type;
