@@ -31,16 +31,18 @@ public enum Table {
 	, Release_Genre
 	, Release_Style
 	, Release_labels
+	, artist_release_all		
+	, Release_Artist
 	, EntityType
 	, Company
 	, release_company
+	, format_gen
 	, Format
 	, Format_descriptions
 	, Release_Format
+	, identifier_gen
 	, Identifier
 	, Release_Identifier
-	, artist_release_all		
-	, Release_Artist
 	, ExtraArtist
 	, artist_release_extraartist_all
 	, release_extraartist

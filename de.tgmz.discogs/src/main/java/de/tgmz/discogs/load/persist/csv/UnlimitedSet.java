@@ -55,7 +55,7 @@ public class UnlimitedSet<T> extends AbstractSet<T> {
 			LOG.error("Cannot create, reason:", e);
 		}
 		
-		long l = (long) (Runtime.getRuntime().freeMemory() * 0.0125);
+		long l = (long) (Runtime.getRuntime().freeMemory() * 0.0075);
 		
 		lc = Caffeine
 				.newBuilder()

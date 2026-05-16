@@ -22,16 +22,16 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.TableGenerator;
 import jakarta.persistence.Transient;
 
 @Entity
 public class Format implements Serializable { 
 	@Transient
 	private static final long serialVersionUID = 1820280634515019733L;
+	@TableGenerator(name = "format_gen")
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
-	@SequenceGenerator(name ="format_seq", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "format_gen")
 	private int id;
 	private String name;
 	private String qty;

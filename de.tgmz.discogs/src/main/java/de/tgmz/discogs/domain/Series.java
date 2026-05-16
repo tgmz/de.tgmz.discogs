@@ -10,12 +10,17 @@
 package de.tgmz.discogs.domain;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
 /**
  * Series entity.
  */
 @Entity
+@Table(indexes = {
+	@Index(columnList = "name", name = "Series_name_idx"),
+})
 public class Series extends AtomicEntity<Integer> {
 	@Transient
 	private static final long serialVersionUID = -9147451633557425171L;

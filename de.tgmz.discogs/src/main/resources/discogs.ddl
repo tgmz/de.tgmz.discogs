@@ -7,8 +7,6 @@
 --*
 --* SPDX-License-Identifier: EPL-2.0
 --**********************************************************************/
-create sequence format_seq start with 1 increment by 1
-create sequence identifier_seq start with 1 increment by 1
 create table Artist (data_quality smallint check ((data_quality between 0 and 5)), id integer not null, name varchar(255), realname varchar(255), primary key (id))
 create table artist_aliases (Artist_id integer not null, aliases_id integer not null, primary key (Artist_id, aliases_id))
 create table artist_groups (Artist_id integer not null, groups_id integer not null, primary key (Artist_id, groups_id))
@@ -19,8 +17,12 @@ create table EntityType (id smallint not null, name varchar(255), primary key (i
 create table ExtraArtist (artist_id integer not null, role varchar(255) not null, constraint ExtraArtist_pk_idx primary key (artist_id, role))
 create table Format (id integer not null, name varchar(255), qty varchar(255), text varchar(255), primary key (id))
 create table Format_descriptions (Format_id integer not null, descriptions varchar(255))
+create table format_gen (next_val bigint, sequence_name varchar(255) not null, primary key (sequence_name))
+insert into format_gen(sequence_name, next_val) values ('Format',0)
 create table Genre (id varchar(255) not null, primary key (id))
 create table Identifier (_type smallint check ((_type between 0 and 13)), id integer not null, _description varchar(255), _value varchar(255), primary key (id))
+create table identifier_gen (next_val bigint, sequence_name varchar(255) not null, primary key (sequence_name))
+insert into identifier_gen(sequence_name, next_val) values ('Identifier',0)
 create table Label (data_quality smallint check ((data_quality between 0 and 5)), id integer not null, parentLabel_id integer, name varchar(255), primary key (id))
 create table Master (data_quality smallint check ((data_quality between 0 and 5)), id integer not null, published integer, albumArtist varchar(512), title varchar(255), primary key (id))
 create table Master_Artist (Master_id integer not null, artists_id integer not null, primary key (Master_id, artists_id))
@@ -53,6 +55,7 @@ create index Master_albumArtist_idx on Master (albumArtist)
 create index Release_albumArtist_title_idx on Release (albumArtist, title)
 create index Release_albumArtist_idx on Release (albumArtist)
 create index Release_title_idx on Release (title)
+create index Series_name_idx on Series (name)
 alter table if exists artist_aliases add constraint FK51lsn2wy2ma5fyb67roffvpkk foreign key (aliases_id) references Artist
 alter table if exists artist_aliases add constraint FKelhahxktvecoipysvk9xjhug7 foreign key (Artist_id) references Artist
 alter table if exists artist_groups add constraint FK1kq8p1rnbcqu0duxsajtmahem foreign key (groups_id) references Artist

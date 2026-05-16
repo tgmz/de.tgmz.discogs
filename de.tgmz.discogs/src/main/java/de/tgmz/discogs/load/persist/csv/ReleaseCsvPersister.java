@@ -51,6 +51,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 				, Table.Format, Table.Format_descriptions, Table.Release_Format
 				, Table.artist_release_all, Table.artist_release_track_all, Table.artist_release_extraartist_all, Table.artist_release_track_extraartist_all, Table.artist_release_subtrack_extraartist_all
 				, Table.Identifier, Table.Release_Identifier
+				, Table.format_gen, Table.identifier_gen
 		);
 		
 		this.filter = filter;
