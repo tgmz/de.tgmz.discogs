@@ -146,7 +146,9 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			
 			break;
 		case "[releases, release, formats, format]":
-			format = new Format(attributes.getValue("name"), attributes.getValue("qty"), attributes.getValue("text"));
+			format = new Format(attributes.getValue("name")
+					, Float.parseFloat(attributes.getValue("qty"))
+					, attributes.getValue("text"));
 			
 			break;
 		case "[releases, release, identifiers, identifier]":

@@ -197,10 +197,10 @@ public abstract class DiscogsTest {
 		
 		assertEquals(1, formats.size());
 		
-		Format format = formats.toArray(new Format[1])[0];
+		Format format = formats.stream().findFirst().orElseThrow();
 		
 		assertEquals("CD", format.getName());
-		assertEquals("1", format.getQty());
+		assertEquals(1, format.getQty().intValue());
 		assertTrue(format.getDescriptions().contains("Compilation"));
 		assertTrue(format.getDescriptions().contains("Remastered"));
 	}
@@ -306,6 +306,21 @@ public abstract class DiscogsTest {
 		assertEquals(117965, (int) s.getId());
 		assertEquals("World Network", s.getName());
 		assertEquals("16", s.getCatno());
+	}
+
+	@Test
+	public void testFormat() {
+		Release r = em.find(Release.class, 22838444);
+		
+		assertEquals("Defaultest 93", r.getTitle());
+		
+		Format f = r.getFormats().stream().findFirst().orElseThrow();
+		
+		assertEquals("File", f.getName());
+		assertEquals("Anti-release", f.getText());
+		assertEquals(Float.POSITIVE_INFINITY, f.getQty().floatValue(), 0f);
+		
+		assertEquals("FLAC", f.getDescriptions().stream().findFirst().orElseThrow());
 	}
 
 	protected static void extractAndProcess(String resource, DiscogsContentHandler dch) throws IOException {
