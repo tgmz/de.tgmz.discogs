@@ -9,6 +9,8 @@
 **********************************************************************/
 package de.tgmz.discogs.domain;
 
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Transient;
 
@@ -16,6 +18,7 @@ import jakarta.persistence.Transient;
  * Style entity
  */
 @Entity
+@AttributeOverride(name = "id", column = @Column(length = 31))
 public class Style extends AtomicEntity<String> {
 	@Transient
 	private static final long serialVersionUID = 5684918391708831387L;

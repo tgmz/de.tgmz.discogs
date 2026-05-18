@@ -16,6 +16,7 @@ import java.util.TreeSet;
 
 import org.apache.commons.lang3.StringUtils;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -33,6 +34,7 @@ public class Format implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.TABLE, generator = "format_gen")
 	private int id;
+	@Column(length = 31)
 	private String name;
 	private String qty;
 	private String text;
