@@ -264,8 +264,8 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 	private void save(Release r, Format f) throws IOException {
 		pm.get(Table.Format).printRecord(
 				fid
-				, f.getName()
 				, f.getQty()
+				, f.getName()
 				, f.getText()
 			);
 				

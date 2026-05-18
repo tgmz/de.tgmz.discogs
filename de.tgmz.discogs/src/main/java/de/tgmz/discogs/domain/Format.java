@@ -36,7 +36,7 @@ public class Format implements Serializable {
 	private int id;
 	@Column(length = 31)
 	private String name;
-	private String qty;
+	private Float qty;
 	private String text;
 	@ElementCollection(fetch = FetchType.LAZY)
 	private Set<String> descriptions;
@@ -47,7 +47,7 @@ public class Format implements Serializable {
 		descriptions = new TreeSet<>();
 	}
 
-	public Format(String name, String qty, String text) {
+	public Format(String name, Float qty, String text) {
 		this();
 		
 		this.name = name;
@@ -67,7 +67,7 @@ public class Format implements Serializable {
 		return name;
 	}
 
-	public String getQty() {
+	public Float getQty() {
 		return qty;
 	}
 

@@ -15,7 +15,7 @@ create table Artist_variations (Artist_id integer not null, variations varchar(2
 create table Company (id integer not null, name varchar(255), primary key (id))
 create table EntityType (id smallint not null, name varchar(255), primary key (id))
 create table ExtraArtist (artist_id integer not null, role varchar(255) not null, constraint ExtraArtist_pk_idx primary key (artist_id, role))
-create table Format (id integer not null, name varchar(31), qty varchar(255), text varchar(255), primary key (id))
+create table Format (id integer not null, qty float(24), name varchar(31), text varchar(255), primary key (id))
 create table Format_descriptions (Format_id integer not null, descriptions varchar(255))
 create table format_gen (next_val bigint, sequence_name varchar(255) not null, primary key (sequence_name))
 insert into format_gen(sequence_name, next_val) values ('Format',0)
