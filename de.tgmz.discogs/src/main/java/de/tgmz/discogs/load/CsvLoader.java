@@ -101,11 +101,11 @@ public class CsvLoader {
 	private List<String> getInit(Table table) {
 		List<String> result = new LinkedList<>();
 		
-		String ddl = getDdl();
+		String ddl0 = getDdl();
 		
-		result.addAll(ddl.lines().filter(l -> l.startsWith("update " + table.toString() + " ")).toList());
-		result.addAll(ddl.lines().filter(l -> l.startsWith("insert into " + table.toString() + " ")).toList());
-		result.addAll(ddl.lines().filter(l -> l.startsWith("insert into " + table.toString() + "(")).toList());
+		result.addAll(ddl0.lines().filter(l -> l.startsWith("update " + table.toString() + " ")).toList());
+		result.addAll(ddl0.lines().filter(l -> l.startsWith("insert into " + table.toString() + " ")).toList());
+		result.addAll(ddl0.lines().filter(l -> l.startsWith("insert into " + table.toString() + "(")).toList());
 		
 		return result;
 	}
