@@ -105,14 +105,6 @@ alter table if exists Track_ExtraArtist add constraint FK3t7ccbnqlg3uuh41kwggrbi
 alter table if exists Track_SubTrack add constraint FKnt4modbpx6s534dv57uv6lj8i foreign key (subTracklist_track_release_id, subTracklist_track_sequence, subTracklist_subTrackNumber) references SubTrack
 alter table if exists Track_SubTrack add constraint FKgau3arxwbit77g334gpvo4i1k foreign key (Track_release_id, Track_sequence) references Track
 
-create table artist_aliases_all (id integer not null, name varchar(255))
-create table artist_groups_all (id integer not null, name varchar(255))
-create table artist_members_all (id integer not null, name varchar(255))
-
+create table artist_artist_all (id integer not null, name varchar(255))
 create table artist_master_all (id integer not null, name varchar(255))
-
 create table artist_release_all (id integer not null, name varchar(255))
-create table artist_release_extraartist_all (id integer not null, name varchar(255))
-create table artist_release_track_all (id integer not null, name varchar(255))
-create table artist_release_track_extraartist_all (id integer not null, name varchar(255))
-create table artist_release_subtrack_extraartist_all (id integer not null, name varchar(255))

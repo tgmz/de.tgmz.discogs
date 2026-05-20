@@ -11,11 +11,9 @@ package de.tgmz.discogs.load.persist.csv;
 
 public enum Table {
 	Artist
-	, artist_aliases_all
+	, artist_artist_all
 	, artist_aliases
-	, artist_groups_all
 	, artist_groups
-	, artist_members_all
 	, artist_members
 	, Artist_variations
 	, Label
@@ -44,17 +42,14 @@ public enum Table {
 	, Identifier
 	, Release_Identifier
 	, ExtraArtist
-	, artist_release_extraartist_all
 	, release_extraartist
 	, ReleaseExtraArtist_applicableTracks
 	, Track
-	, artist_release_track_all
 	, Track_Artist
-	, artist_release_track_extraartist_all
 	, Track_ExtraArtist
 	, Release_Track
 	, SubTrack
-	, artist_release_subtrack_extraartist_all
 	, SubTrack_ExtraArtist
 	, Track_SubTrack
+	;
 }
