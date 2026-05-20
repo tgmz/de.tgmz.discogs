@@ -49,7 +49,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 				, Table.ExtraArtist, Table.Company, Table.EntityType
 				, Table.Release_labels, Table.release_company
 				, Table.Format, Table.Format_descriptions, Table.Release_Format
-				, Table.artist_release_all, Table.artist_release_track_all, Table.artist_release_extraartist_all, Table.artist_release_track_extraartist_all, Table.artist_release_subtrack_extraartist_all
+				, Table.artist_release_all
 				, Table.Identifier, Table.Release_Identifier
 				, Table.format_gen, Table.identifier_gen
 		);
@@ -167,7 +167,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 					, a.getId()
 				);
 
-			pm.get(Table.artist_release_track_all).printRecordUsingCache(
+			pm.get(Table.artist_release_all).printRecordUsingCache(
 					a.getId()
 					, a.getName()
 			);
@@ -181,7 +181,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 					, ea.getRole()
 				);
 		
-			pm.get(Table.artist_release_track_extraartist_all).printRecordUsingCache(
+			pm.get(Table.artist_release_all).printRecordUsingCache(
 					ea.getArtist().getId()
 					, ea.getArtist().getName()
 			);
@@ -218,7 +218,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 					, ea.getRole()
 			);
 					
-			pm.get(Table.artist_release_subtrack_extraartist_all).printRecordUsingCache(
+			pm.get(Table.artist_release_all).printRecordUsingCache(
 					ea.getArtist().getId()
 					, ea.getArtist().getName()
 			);
@@ -244,7 +244,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 			LOG.error("Role is NULL on {}", rea);
 		}
 		
-		pm.get(Table.artist_release_extraartist_all).printRecordUsingCache(
+		pm.get(Table.artist_release_all).printRecordUsingCache(
 				rea.getExtraArtist().getArtist().getId()
 				, rea.getExtraArtist().getArtist().getName()
 		);

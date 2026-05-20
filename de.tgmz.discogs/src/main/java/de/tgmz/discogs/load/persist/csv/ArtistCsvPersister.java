@@ -18,8 +18,7 @@ public class ArtistCsvPersister extends AbstractCsvPersister<Artist> {
 		super(target
 			,Table.Artist
 			, Table.artist_aliases, Table.artist_groups, Table.artist_members
-			, Table.Artist_variations, Table.artist_aliases_all, Table.artist_groups_all
-			, Table.artist_members_all);
+			, Table.Artist_variations, Table.artist_artist_all);
 	}
 	
 	protected int doSave(Artist a) throws IOException {
@@ -36,7 +35,7 @@ public class ArtistCsvPersister extends AbstractCsvPersister<Artist> {
 				, aa.getId()
 			);
 			
-			pm.get(Table.artist_aliases_all).printRecordUsingCache(
+			pm.get(Table.artist_artist_all).printRecordUsingCache(
 					aa.getId()
 					, aa.getName()
 			);
@@ -48,7 +47,7 @@ public class ArtistCsvPersister extends AbstractCsvPersister<Artist> {
 				, ag.getId()
 			);
 			
-			pm.get(Table.artist_groups_all).printRecordUsingCache(
+			pm.get(Table.artist_artist_all).printRecordUsingCache(
 					ag.getId()
 					, ag.getName()
 			);
@@ -60,7 +59,7 @@ public class ArtistCsvPersister extends AbstractCsvPersister<Artist> {
 				, am.getId()
 			);
 			
-			pm.get(Table.artist_members_all).printRecordUsingCache(
+			pm.get(Table.artist_artist_all).printRecordUsingCache(
 					am.getId()
 					, am.getName()
 			);

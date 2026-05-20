@@ -32,6 +32,7 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 public class UnlimitedSet<T> extends AbstractSet<T> {
 	private static final Logger LOG = LoggerFactory.getLogger(UnlimitedSet.class);
 	private static final String SQL_CREATE = "CREATE TABLE %s (id VARCHAR(255) NOT NULL, UNIQUE (id))";
+	private static final String SQL_DROP = "DROP TABLE %s";
 	private static final String SQL_INSERT = "INSERT INTO %s (id) VALUES (?)";
 	private Connection con;
 	private PreparedStatement pstmt;
@@ -39,6 +40,13 @@ public class UnlimitedSet<T> extends AbstractSet<T> {
 	private LoadingCache<T, Boolean> lc;
 	
 	public UnlimitedSet() {
+		this((long) (Runtime.getRuntime().freeMemory() * 0.0075));
+	}	
+	
+	/**
+	 * @param flcSize first-level-cache size
+	 */
+	public UnlimitedSet(long flcSize) {
 		super();
 		
 		try {
@@ -55,15 +63,14 @@ public class UnlimitedSet<T> extends AbstractSet<T> {
 			LOG.error("Cannot create, reason:", e);
 		}
 		
-		long l = (long) (Runtime.getRuntime().freeMemory() * 0.0075);
-		
 		lc = Caffeine
 				.newBuilder()
-				.maximumSize(l)
+				.maximumSize(flcSize)
+				.recordStats()
 				.build(this::insert);
 		
 		if (LOG.isDebugEnabled()) {
-			LOG.debug("Constructed unlimited set with table {} of size {}", table, String.format("%,d", l));
+			LOG.debug("Constructed unlimited set with table {} of size {}", table, String.format("%,d", flcSize));
 		}
 	}
 	
@@ -90,6 +97,18 @@ public class UnlimitedSet<T> extends AbstractSet<T> {
 		} catch (JdbcSQLIntegrityConstraintViolationException e) {
 			return false;
 		}
+	}
+	
+	@Override
+	public void clear() {
+		try (Statement stmt = con.createStatement()) {
+			stmt.executeUpdate(String.format(SQL_DROP, table));
+			stmt.executeUpdate(String.format(SQL_CREATE, table));
+		} catch (SQLException e) {
+			LOG.error("Clear failed:", e);
+		}
+		
+		lc.invalidateAll();
 	}
 
 	@Override
