@@ -16,7 +16,8 @@ import org.slf4j.LoggerFactory;
 
 public class LogUtil {
 	private static final Logger LOG = LoggerFactory.getLogger(LogUtil.class);
-	private static final String FORM_S = "%d second%s, %d msec%s";
+	private static final String FORM = "%d msec%s";
+	private static final String FORM_S = "%d second%s, " + FORM;
 	private static final String FORM_MS = "%d minute%s, " + FORM_S; 
 	private static final String FORM_HMS = "%d hour%s, " + FORM_MS; 
 	
@@ -55,11 +56,18 @@ public class LogUtil {
 					);
 		}
 		
-		return String.format(FORM_S
+		if (seconds > 0) {
+			return String.format(FORM_S
 					, seconds, getSuffix(seconds)
 					, msecs, getSuffix(msecs)
 					);
+		}
+		
+		return String.format(FORM
+				, msecs, getSuffix(msecs)
+				);
 	}
+	
 	private static String getSuffix(long i) {
 		return i == 1 ? "" : "s";
 	}
