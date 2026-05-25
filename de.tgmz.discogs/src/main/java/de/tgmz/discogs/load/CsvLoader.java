@@ -12,8 +12,12 @@ package de.tgmz.discogs.load;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -26,12 +30,11 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.load.persist.csv.Table;
 import de.tgmz.discogs.logging.LogUtil;
-import jakarta.persistence.EntityManager;
 
-public class CsvLoader {
+public class CsvLoader implements Serializable {
+	private static final long serialVersionUID = 4849976746745238450L;
 	private static final Logger LOG = LoggerFactory.getLogger(CsvLoader.class);
 	private String ddl;
 	private Properties prop;
@@ -43,23 +46,24 @@ public class CsvLoader {
 		this.root = root;
 	}
 	
-	public void load() {
+	public void load(boolean withVerification) {
 		for (Table t : Table.values()) {
-			loadTable(t);
+			loadTable(t, withVerification);
 		}
 	}
 	
-	public void loadTable(Table table) {
+	public void verify() {
+		for (Table t : Table.values()) {
+			constraintTable(t);
+		}
+	}
+	
+	public void loadTable(Table table, boolean withVerification) {
 		List<String> stmts = new LinkedList<>();
 		
 		stmts.add(String.format("DROP TABLE IF EXISTS %s CASCADE", table));
 		
-		if (DatabaseService
-				.getInstance()
-				.getEntityManagerFactory()
-				.getProperties()
-				.get("jakarta.persistence.jdbc.url")
-				.toString()
+		if (System.getProperty("jakarta.persistence.jdbc.url")
 				.toLowerCase(Locale.getDefault())
 				.startsWith("jdbc:postgresql")) {
 			stmts.add(getCreate(table));
@@ -87,8 +91,23 @@ public class CsvLoader {
 
 		t.forEach((k,v) -> stmts.add(v));
 		
-		stmts.addAll(getAlter(table));
+		if (withVerification) {
+			stmts.addAll(getAlter(table));
+			stmts.addAll(getIndex(table));
+		}
+		
+		for (String stmt : stmts) {
+			execute(stmt);
+		}
+		
+		LOG.info("{} successfully processed", table);
+	}
+	
+	public void constraintTable(Table table) {
+		List<String> stmts = new LinkedList<>();
+		
 		stmts.addAll(getIndex(table));
+		stmts.addAll(getAlter(table));
 		
 		for (String stmt : stmts) {
 			execute(stmt);
@@ -136,14 +155,18 @@ public class CsvLoader {
 		
 		LOG.info("Execute {}", sql);
 
-		try (EntityManager em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager()) {
-			em.runWithConnection((Connection conn) -> {
-				int i = conn.createStatement().executeUpdate(sql);
+		try (Connection conn = DriverManager
+				.getConnection(System.getProperty("jakarta.persistence.jdbc.url")
+						, System.getProperty("jakarta.persistence.jdbc.user")
+						, System.getProperty("jakarta.persistence.jdbc.password"));
+				Statement stmt = conn.createStatement()) {
+			int i = stmt.executeUpdate(sql);
 				
-				if (i > 0 && LOG.isInfoEnabled()) {
-					LOG.info("{} rows were affected in {}", String.format("%,d", i), LogUtil.formatDuration(start, System.currentTimeMillis()));
-    			}
-			});
+			if (i > 0 && LOG.isInfoEnabled()) {
+				LOG.info("{} rows were affected in {}", String.format("%,d", i), LogUtil.formatDuration(start, System.currentTimeMillis()));
+			}
+		} catch (SQLException e) {
+			LOG.error("Execution failed: {}", e.getMessage());
 		}
 	}
 	private Properties getProperties() {

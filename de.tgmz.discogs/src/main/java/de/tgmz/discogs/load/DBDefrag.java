@@ -9,14 +9,15 @@
 **********************************************************************/
 package de.tgmz.discogs.load;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.logging.LogUtil;
-import jakarta.persistence.EntityManager;
 
 public class DBDefrag {
 	private static final Logger LOG = LoggerFactory.getLogger(DBDefrag.class);
@@ -24,18 +25,23 @@ public class DBDefrag {
 	public void run() {
 		long start = System.currentTimeMillis();
 		
-        try (EntityManager em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager()) {
-        	em.runWithConnection((Connection conn) -> {
-        		if (conn.getMetaData().getURL().startsWith("jdbc:h2:file")) {
-        			LOG.info("Begin database defrag");
-        			
-        			conn.prepareCall("SHUTDOWN DEFRAG").execute();
-        		}
-        	});
-        }
-        
-        if (LOG.isInfoEnabled()) {
-        	LOG.info("Defrag took {}", LogUtil.formatDuration(start, System.currentTimeMillis()));
-        }
+		String url = System.getProperty("jakarta.persistence.jdbc.url");
+		
+		if (url.startsWith("jdbc:h2:file")) {
+			try (Connection conn = DriverManager.getConnection(url
+						, System.getProperty("jakarta.persistence.jdbc.user")
+						, System.getProperty("jakarta.persistence.jdbc.password"));
+					CallableStatement defrag = conn.prepareCall("SHUTDOWN DEFRAG")) {
+    			LOG.info("Begin database defrag");
+    			
+    			defrag.execute();
+    	        
+    	        if (LOG.isInfoEnabled()) {
+    	        	LOG.info("Defrag took {}", LogUtil.formatDuration(start, System.currentTimeMillis()));
+    	        }
+			} catch (SQLException e) {
+				LOG.error("Execution failed", e);
+			}
+		}
 	}
 }
