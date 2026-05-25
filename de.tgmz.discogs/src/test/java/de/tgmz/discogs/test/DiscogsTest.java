@@ -61,7 +61,7 @@ import nl.jqno.equalsverifier.Warning;
 public abstract class DiscogsTest {
 	protected static Path dataDir;
 	
-	private static EntityManager em;
+	protected static EntityManager em;
 	
 	protected static void setupOnce() throws IOException {
 		dataDir = Files.createTempDirectory("discogs_test");
