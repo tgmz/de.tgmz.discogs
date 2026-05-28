@@ -310,17 +310,24 @@ public abstract class DiscogsTest {
 
 	@Test
 	public void testFormat() {
-		Release r = em.find(Release.class, 22838444);
+		Release r0 = em.find(Release.class, 22838444);
 		
-		assertEquals("Defaultest 93", r.getTitle());
+		assertEquals("Defaultest 93", r0.getTitle());
 		
-		Format f = r.getFormats().stream().findFirst().orElseThrow();
+		Format f0 = r0.getFormats().stream().findFirst().orElseThrow();
 		
-		assertEquals("File", f.getName());
-		assertEquals("Anti-release", f.getText());
-		assertEquals(Float.POSITIVE_INFINITY, f.getQty().floatValue(), 0f);
+		assertEquals("File", f0.getName());
+		assertEquals("Anti-release", f0.getText());
+		assertEquals(Float.POSITIVE_INFINITY, f0.getQty().floatValue(), 0f);
 		
-		assertEquals("FLAC", f.getDescriptions().stream().findFirst().orElseThrow());
+		assertEquals("FLAC", f0.getDescriptions().stream().findFirst().orElseThrow());
+		
+		Release r1 = em.find(Release.class, 4957101);
+		
+		assertEquals(3, r1.getFormats().size());
+		
+		Format f1 = r1.getFormats().stream().filter(f -> "CD".equals(f.getName())).findFirst().orElseThrow();
+		assertEquals(41, f1.getQty().floatValue(), 0);
 	}
 
 	protected static void extractAndProcess(String resource, DiscogsContentHandler dch) throws IOException {
