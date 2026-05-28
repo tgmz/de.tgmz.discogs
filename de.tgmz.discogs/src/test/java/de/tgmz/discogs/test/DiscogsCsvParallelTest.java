@@ -10,17 +10,14 @@
 package de.tgmz.discogs.test;
 
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.ForkJoinTask;
-import java.util.stream.Stream;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-import de.tgmz.discogs.load.CsvLoader;
-import de.tgmz.discogs.load.LoadAction;
-import de.tgmz.discogs.load.persist.csv.Table;
+import de.tgmz.discogs.load.Action;
+import de.tgmz.discogs.load.ActionFactory;
+import de.tgmz.discogs.load.Mode;
 
 public class DiscogsCsvParallelTest extends DiscogsCsvTest {
 	@BeforeClass
@@ -29,21 +26,10 @@ public class DiscogsCsvParallelTest extends DiscogsCsvTest {
 		
 		init();
 
-		CsvLoader csvl = new CsvLoader(dataDir.toString());
-		
-		List<LoadAction> loadActions = new LinkedList<>();
-		
-		Stream.of(Table.values()).forEach(t -> loadActions.add(new LoadAction(csvl, t)));
-		
-		for (LoadAction la : loadActions) {
-			List<Table> dependsOn = la.getTable().getDependsOn();
-			
-			la.getPredecessors().addAll(loadActions.stream().filter(la0 -> dependsOn.contains(la0.getTable())).toList());
-		}
-		
-		ForkJoinTask.invokeAll(loadActions);
-
-		csvl.verify();
+		ForkJoinTask.invokeAll(ActionFactory.getInstance().create(Action.LOAD, Mode.PARALLEL, dataDir.toString()));
+		ForkJoinTask.invokeAll(ActionFactory.getInstance().create(Action.RECONCILE, Mode.DEPENDING));
+		ForkJoinTask.invokeAll(ActionFactory.getInstance().create(Action.OPTIMIZE, Mode.SUMMUP));
+		ForkJoinTask.invokeAll(ActionFactory.getInstance().create(Action.VALIDATE, Mode.SEQUENTIAL));
 	}
 	
 	@AfterClass
