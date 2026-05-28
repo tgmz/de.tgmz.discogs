@@ -19,36 +19,38 @@ import org.slf4j.LoggerFactory;
 
 import de.tgmz.discogs.load.persist.csv.Table;
 
-public class LoadAction extends RecursiveAction {
+public abstract class PredecessorAwareAction extends RecursiveAction {
 	private static final long serialVersionUID = -3804048897401974703L;
-	private static final Logger LOG = LoggerFactory.getLogger(LoadAction.class);
-	private CsvLoader csvl;
-	private Table table;
+	private static final Logger LOG = LoggerFactory.getLogger(PredecessorAwareAction.class);
 	private List<RecursiveAction> predecessors;
+	private Table table;
 
-	public LoadAction(CsvLoader csvl, Table t) {
+	protected PredecessorAwareAction(Table table) {
 		super();
-		this.csvl = csvl;
-		this.table = t;
+		this.table = table;
 		
 		predecessors = new LinkedList<>();
 	}
 
 	@Override
-	protected void compute() {
+	public void compute() {
+		// Wait for predecessors to finish
 		try {
-			// Wait for predecessors to finish
 			for (RecursiveAction ra : predecessors) {
+				LOG.debug("Await {} ({})", ra, ra.state());
+			
 				ra.get();
 			}
-		
-			csvl.loadTable(table, false);
-		} catch (ExecutionException | InterruptedException e) {
-			LOG.error("Predecessor failed, aborting", e);
+		} catch (InterruptedException | ExecutionException e) {
+			LOG.error("Predecessor failed", e);
 			
 			Thread.currentThread().interrupt();
 		}
+		
+		execute();
 	}
+	
+	protected abstract void execute();
 
 	public Table getTable() {
 		return table;
@@ -56,5 +58,10 @@ public class LoadAction extends RecursiveAction {
 
 	public List<RecursiveAction> getPredecessors() {
 		return predecessors;
+	}
+
+	@Override
+	public String toString() {
+		return "PredecessorAwareAction [table=" + table + "]";
 	}
 }
