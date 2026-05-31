@@ -40,6 +40,7 @@ import jakarta.persistence.Transient;
 @Entity
 @Table(indexes = {
 	@Index(columnList = "release_id,sequence", name = "Track_pk_idx", unique = true),
+	@Index(columnList = "title", name = "Track_title_idx"), 
 })
 public class Track implements Serializable {
 	@Transient

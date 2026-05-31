@@ -33,6 +33,7 @@ import jakarta.persistence.Transient;
 @Entity
 @Table(indexes = {
 	@Index(columnList = "track_release_id,track_sequence,subTrackNumber", name = "SubTrack_pk_idx", unique = true),
+	@Index(columnList = "title", name = "SubTrack_title_idx"), 
 })
 
 public class SubTrack implements Serializable {
