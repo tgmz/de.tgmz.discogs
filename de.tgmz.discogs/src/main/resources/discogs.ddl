@@ -56,6 +56,8 @@ create index Release_albumArtist_title_idx on Release (albumArtist, title)
 create index Release_albumArtist_idx on Release (albumArtist)
 create index Release_title_idx on Release (title)
 create index Series_name_idx on Series (name)
+create index SubTrack_title_idx on SubTrack (title)
+create index Track_title_idx on Track (title)
 alter table if exists artist_aliases add constraint FK51lsn2wy2ma5fyb67roffvpkk foreign key (aliases_id) references Artist
 alter table if exists artist_aliases add constraint FKelhahxktvecoipysvk9xjhug7 foreign key (Artist_id) references Artist
 alter table if exists artist_groups add constraint FK1kq8p1rnbcqu0duxsajtmahem foreign key (groups_id) references Artist
