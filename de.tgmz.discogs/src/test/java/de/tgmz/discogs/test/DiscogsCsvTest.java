@@ -61,9 +61,12 @@ public class DiscogsCsvTest extends DiscogsTest {
 	
 	@AfterClass
 	public static void teardownOnce() throws IOException {
+		DiscogsContentHandler dch = new ReleaseContentHandler();
+		
+		dch.setSaveThreshold(1);
+		extractAndProcess("discogs_releases.xml.gz", dch);
 		DiscogsTest.teardownOnce();
 	}
-
 	
 	@Test
 	public void testMissingArtists() {

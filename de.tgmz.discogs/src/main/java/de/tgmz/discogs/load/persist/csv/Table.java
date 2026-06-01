@@ -41,9 +41,6 @@ public enum Table {
 	, Format(format_gen)
 	, Format_descriptions
 	, Release_Format
-	, identifier_gen
-	, Identifier(identifier_gen)
-	, Release_Identifier
 	, ExtraArtist
 	, release_extraartist(ExtraArtist)
 	, ReleaseExtraArtist_applicableTracks
