@@ -20,9 +20,6 @@ create table Format_descriptions (Format_id integer not null, descriptions varch
 create table format_gen (next_val bigint, sequence_name varchar(255) not null, primary key (sequence_name))
 insert into format_gen(sequence_name, next_val) values ('Format',0)
 create table Genre (id varchar(31) not null, primary key (id))
-create table Identifier (_type smallint check ((_type between 0 and 13)), id integer not null, _description varchar(255), _value varchar(255), primary key (id))
-create table identifier_gen (next_val bigint, sequence_name varchar(255) not null, primary key (sequence_name))
-insert into identifier_gen(sequence_name, next_val) values ('Identifier',0)
 create table Label (data_quality smallint check ((data_quality between 0 and 5)), id integer not null, parentLabel_id integer, name varchar(255), primary key (id))
 create table Master (data_quality smallint check ((data_quality between 0 and 5)), id integer not null, published integer, albumArtist varchar(512), title varchar(255), primary key (id))
 create table Master_Artist (Master_id integer not null, artists_id integer not null, primary key (Master_id, artists_id))
@@ -34,7 +31,6 @@ create table release_company (company_id integer not null, entityType_id smallin
 create table release_extraartist (artist_id integer not null, release_id integer not null, role_id varchar(255) not null, constraint ReleaseExtraArtist_pk_idx primary key (release_id, artist_id, role_id))
 create table Release_Format (Release_id integer not null, formats_id integer not null unique, primary key (Release_id, formats_id))
 create table Release_Genre (Release_id integer not null, genres_id varchar(31) not null, primary key (Release_id, genres_id))
-create table Release_Identifier (Release_id integer not null, identifiers_id integer not null unique, primary key (Release_id, identifiers_id))
 create table Release_labels (Release_id integer not null, labels_KEY integer not null, catno varchar(255), primary key (Release_id, labels_KEY))
 create table Release_Style (Release_id integer not null, styles_id varchar(31) not null, primary key (Release_id, styles_id))
 create table Release_Track (Release_id integer not null, tracklist_release_id integer not null, tracklist_sequence smallint not null, unique (tracklist_release_id, tracklist_sequence))
@@ -87,8 +83,6 @@ alter table if exists Release_Format add constraint FK7xusesury62xvm0sb24xw66y8 
 alter table if exists Release_Format add constraint FKmqmurqv4284ssyx79dofa8oln foreign key (Release_id) references Release
 alter table if exists Release_Genre add constraint FK4vks82y2nynvveo0kftbgbrnr foreign key (genres_id) references Genre
 alter table if exists Release_Genre add constraint FKm9o9ge8knafrmtmu6k35u8sxd foreign key (Release_id) references Release
-alter table if exists Release_Identifier add constraint FKrnl2qlko71sq2raamr6tgh6tn foreign key (identifiers_id) references Identifier
-alter table if exists Release_Identifier add constraint FKbtl3xr934xbca7wtoa9r3cwru foreign key (Release_id) references Release
 alter table if exists Release_labels add constraint FKa7dyo3m3in0g3hb6gjlvruuga foreign key (labels_KEY) references Label
 alter table if exists Release_labels add constraint FKht4lrxrosuqi1qb0c1j6qijbq foreign key (Release_id) references Release
 alter table if exists Release_Style add constraint FKkfpgqf0qfpjub3px2h8w05rlf foreign key (styles_id) references Style

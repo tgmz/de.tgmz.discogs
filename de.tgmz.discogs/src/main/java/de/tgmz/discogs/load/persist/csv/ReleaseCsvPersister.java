@@ -20,7 +20,6 @@ import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.ExtraArtist;
 import de.tgmz.discogs.domain.Format;
 import de.tgmz.discogs.domain.Genre;
-import de.tgmz.discogs.domain.Identifier;
 import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Release;
 import de.tgmz.discogs.domain.ReleaseCompany;
@@ -34,7 +33,6 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 	private static final Logger LOG = LoggerFactory.getLogger(ReleaseCsvPersister.class);
 	private Predicate<Release> filter;
 	private int fid = 0;
-	private int iid = 0;
 
 	public ReleaseCsvPersister(String target) {
 		this (target, c -> true);
@@ -50,8 +48,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 				, Table.Release_labels, Table.release_company
 				, Table.Format, Table.Format_descriptions, Table.Release_Format
 				, Table.artist_release_all
-				, Table.Identifier, Table.Release_Identifier
-				, Table.format_gen, Table.identifier_gen
+				, Table.format_gen
 		);
 		
 		this.filter = filter;
@@ -132,10 +129,6 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 		
 		for (Format f : r.getFormats()) {
 			save(r, f);
-		}
-		
-		for (Identifier i : r.getIdentifiers()) {
-			save(r, i);
 		}
 		
 		for (Track t : r.getUnfilteredTracklist()) {
@@ -282,22 +275,6 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 			}
 			
 			++fid;
-	}
-	
-	private void save(Release r, Identifier i) throws IOException {
-		pm.get(Table.Identifier).printRecord(
-				i.getType().ordinal()
-				, iid
-				, i.getDescription()
-				, i.getValue()
-			);
-				
-			pm.get(Table.Release_Identifier).printRecord(
-					r.getId()
-					, iid
-				);
-			
-			++iid;
 	}
 }
  
