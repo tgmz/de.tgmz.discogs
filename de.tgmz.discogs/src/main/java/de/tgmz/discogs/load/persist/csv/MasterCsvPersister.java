@@ -19,7 +19,10 @@ import de.tgmz.discogs.domain.Style;
 public class MasterCsvPersister extends AbstractCsvPersister<Master> {
 	public MasterCsvPersister(String target) {
 		super(target
-			, Table.Master, Table.Master_Artist, Table.Genre, Table.Style, Table.Master_Genre, Table.Master_Style, Table.artist_master_all);
+			, Table.Master
+			, Table.Master_Artist
+			, Table.Genre, Table.Style, Table.Master_Genre, Table.Master_Style
+			, Table.artist_master_all.useCache());
 	}
 
 	protected int doSave(Master m) throws IOException {
