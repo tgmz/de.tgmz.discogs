@@ -53,6 +53,7 @@ public enum Table {
 	, Track_SubTrack
 	;
 	
+	private boolean useCache = false;
 	private List<Table> dependsOn;
 
 	private Table(Table... dependsOn) {
@@ -61,5 +62,15 @@ public enum Table {
 
 	public List<Table> getDependsOn() {
 		return dependsOn;
+	}
+
+	public boolean isUseCache() {
+		return useCache;
+	}
+
+	public Table useCache() {
+		this.useCache = true;
+		
+		return this;
 	}
 }

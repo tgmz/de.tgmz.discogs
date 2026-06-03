@@ -30,7 +30,9 @@ public class DiscogsCsvPrinter {
 	public DiscogsCsvPrinter(String target, Table table) throws IOException {
 		super();
 		
-		cache = new UnlimitedSet<>();
+		if (table.isUseCache()) {
+			cache = new UnlimitedSet<>();
+		}
 		
 		p = new CSVPrinter(new BufferedWriter(new FileWriter(target + File.separator + table.toString() + ".csv", StandardCharsets.UTF_8)), CSVFormat.POSTGRESQL_CSV);
 	}
@@ -51,7 +53,10 @@ public class DiscogsCsvPrinter {
 	}
 
 	public void close() throws IOException {
-		cache.clear();
+		if (cache != null) {
+			cache.clear();
+		}
+		
 		p.close();
 	}
 }

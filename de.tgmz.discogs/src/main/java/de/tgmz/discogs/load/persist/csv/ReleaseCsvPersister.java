@@ -42,12 +42,13 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 		super(target
 				, Table.Release, Table.Track, Table.SubTrack
 				, Table.Release_Track, Table.Track_SubTrack, Table.Release_Genre, Table.Release_Style, Table.Release_Artist
-				, Table.Series, Table.Track_Artist, Table.release_extraartist, Table.ReleaseExtraArtist_applicableTracks
-				, Table.Track_ExtraArtist, Table.SubTrack_ExtraArtist
-				, Table.ExtraArtist, Table.Company, Table.EntityType
+				, Table.Series.useCache()
+				, Table.Track_Artist, Table.release_extraartist, Table.ReleaseExtraArtist_applicableTracks
+				, Table.Track_ExtraArtist, Table.SubTrack_ExtraArtist, Table.ExtraArtist
+				, Table.Company.useCache(), Table.EntityType.useCache()
 				, Table.Release_labels, Table.release_company
 				, Table.Format, Table.Format_descriptions, Table.Release_Format
-				, Table.artist_release_all
+				, Table.artist_release_all.useCache()
 				, Table.format_gen
 		);
 		

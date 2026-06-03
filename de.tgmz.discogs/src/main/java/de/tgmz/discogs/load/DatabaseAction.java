@@ -51,7 +51,7 @@ public class DatabaseAction extends PredecessorAwareAction {
 
 			int[] affected = stmt.executeBatch();
 			
-			StringJoiner sj = new StringJoiner("/");
+			StringJoiner sj = new StringJoiner(" / ");
 			
 			for (int i : affected) {
 				if (i > 0) {
