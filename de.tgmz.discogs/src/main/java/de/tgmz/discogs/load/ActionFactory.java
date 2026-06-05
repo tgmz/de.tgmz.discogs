@@ -18,8 +18,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
@@ -29,41 +32,57 @@ import org.slf4j.LoggerFactory;
 import de.tgmz.discogs.load.persist.csv.Table;
 public final class ActionFactory {
 	private static final Logger LOG = LoggerFactory.getLogger(ActionFactory.class);
+	
+	private static final String BASE_PATTERN = "^(create table.*)(,)( %s \\([\\w\\s,]+\\))(.*)$";
+	
+	// The different types of primary keys used in discogs.ddl
+	private static final List<String> PK_TYPE = List.of(
+		"constraint \\w+ primary key"	// Named primary key, used with @EmbeddedId
+		, "constraint \\w+ unique"		// Named unique, used with @*ToMany when target uses @EmbeddedId
+		, "primary key"					// Anonymous primary key, used with @Id
+		, "unique"						// Anonymous unique, used with @ElementCollection
+	);
+		
 	private static final ActionFactory INSTANCE = new ActionFactory();
+	
 	private String ddl;
 	private Properties prop;
+	private List<Pattern> pkPattern;
 
 	/**
 	 * Private constructor for security reasons
 	 */
 	private ActionFactory() {
+		pkPattern = new LinkedList<>();
+		
+		PK_TYPE.forEach(s -> pkPattern.add(Pattern.compile(String.format(BASE_PATTERN, s))));
 	}
 
 	public static ActionFactory getInstance() {
 		return INSTANCE;
 	}
 
-	public List<PredecessorAwareAction> create(Action a) {
+	public List<DatabaseAction> create(Action a) {
 		return create(a, Mode.PARALLEL, null);
 	}
 	
-	public List<PredecessorAwareAction> create(Action a, Mode m) {
+	public List<DatabaseAction> create(Action a, Mode m) {
 		return create(a, m, null);
 	}
 	
-	public List<PredecessorAwareAction> create(Action a, Mode m, String root) {
-		List<PredecessorAwareAction> result = new LinkedList<>();
+	public List<DatabaseAction> create(Action a, Mode m, String root) {
+		List<DatabaseAction> result = new LinkedList<>();
 		
 		Stream.of(Table.values()).forEach(t -> result.add(new DatabaseAction(t, createSql(t, a, root))));
 		
-		result.removeIf( da -> ((DatabaseAction) da).getSqls().isEmpty());
+		result.removeIf( da -> da.getSqls().isEmpty());
 		
 		switch (m) {
 		case DEPENDING: 
-			for (PredecessorAwareAction da : result) {
+			for (DatabaseAction da : result) {
 				List<Table> dependsOn = da.getTable().getDependsOn();
 				
-				da.getPredecessors().addAll(result.stream().filter(la0 -> dependsOn.contains(la0.getTable())).toList());
+				da.getPredecessors().addAll(result.stream().filter(da0 -> dependsOn.contains(da0.getTable())).toList());
 			}
 			
 			break;
@@ -76,7 +95,7 @@ public final class ActionFactory {
 		case SUMMUP:
 			List<String> combinedSql = new LinkedList<>();
 			
-			result.forEach(pwa -> combinedSql.addAll(((DatabaseAction) pwa).getSqls()));
+			result.forEach(da -> combinedSql.addAll(da.getSqls()));
 			
 			result.clear();
 			result.add(new DatabaseAction(null, combinedSql));
@@ -120,12 +139,18 @@ public final class ActionFactory {
 		List<String> stmts;
 		
 		switch (a) {
-		case OPTIMIZE:
+		case INDEX:
 			stmts = getDdl().lines().filter(l -> l.matches("^create index \\w+ on " + t.toString() + " .*$")).toList();
 			
 			break;
-		case VALIDATE:
+		case CONSTRAINT:
 			stmts = getDdl().lines().filter(l -> l.startsWith("alter table if exists " + t.toString() + " ")).toList();
+			
+			break;
+		case PRIMARY_KEY:
+			stmts = new LinkedList<>();
+
+			Optional.ofNullable(getPrimaryKey(t)).ifPresent(stmts::add);
 			
 			break;
 		case RECONCILE:
@@ -142,8 +167,9 @@ public final class ActionFactory {
 			m.forEach((k,v) -> stmts.add(v));
 			
 			break;
-		case LOAD:
+		case LOAD, LOAD_NO_PK:
 		default:
+			boolean noPk = (a == Action.LOAD_NO_PK);
 			stmts = new LinkedList<>();
 
 			stmts.add(String.format("DROP TABLE IF EXISTS %s CASCADE", t));
@@ -151,16 +177,16 @@ public final class ActionFactory {
 			if (System.getProperty("jakarta.persistence.jdbc.url")
 					.toLowerCase(Locale.getDefault())
 					.startsWith("jdbc:postgresql")) {
-				stmts.add(getCreate(t));
+				stmts.add(getCreate(t, noPk));
 				
 				stmts.add(String.format("COPY %s FROM '%s' (FORMAT csv, HEADER)", t, String.format("%s/%s.csv", root, t)));
 			} else {
 				File csv = new File(String.format("%s/%s.csv", root, t));
 				
 				if (csv.exists()) {
-					stmts.add(String.format("%s AS SELECT * FROM CSVREAD('%s')", getCreate(t), csv.toString()));
+					stmts.add(String.format("%s AS SELECT * FROM CSVREAD('%s')", getCreate(t, noPk), csv.toString()));
 				} else {
-					stmts.add(getCreate(t));
+					stmts.add(getCreate(t, noPk));
 				}
 			}
 			
@@ -172,8 +198,34 @@ public final class ActionFactory {
 		return stmts;
 	}
 	
-	private String getCreate(Table t) {
-		return getDdl().lines().filter(l -> l.startsWith("create table " + t.toString() + " ")).findFirst().orElse("");
+	private String getCreate(Table t, boolean noPk) {
+		String s = getDdl().lines().filter(l -> l.startsWith("create table " + t.toString() + " ")).findFirst().orElseThrow();
+
+		if (noPk) {
+			for (Pattern p : pkPattern) {
+				Matcher m = p.matcher(s);
+		
+				if (m.matches()) {
+					return m.group(1) + m.group(4);
+				}
+			}
+		}
+		
+		return s;
+	}
+	
+	private String getPrimaryKey(Table t) {
+		String s = getDdl().lines().filter(l -> l.startsWith("create table " + t.toString() + " ")).findFirst().orElseThrow();
+
+		for (Pattern p : pkPattern) {
+			Matcher m = p.matcher(s);
+		
+			if (m.matches()) {
+				return "ALTER TABLE " + t.toString() + " ADD" + m.group(3);
+			}
+		}
+		
+		return null;
 	}
 	
 	private List<String> getInit(Table t) {

@@ -22,7 +22,7 @@ public class MasterCsvPersister extends AbstractCsvPersister<Master> {
 			, Table.Master
 			, Table.Master_Artist
 			, Table.Genre, Table.Style, Table.Master_Genre, Table.Master_Style
-			, Table.artist_master_all.useCache());
+			, Table.artist_master_all.useCache(500_000));
 	}
 
 	protected int doSave(Master m) throws IOException {

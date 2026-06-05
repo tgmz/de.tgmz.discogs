@@ -66,11 +66,10 @@ public class UnlimitedSet<T> extends AbstractSet<T> {
 		lc = Caffeine
 				.newBuilder()
 				.maximumSize(flcSize)
-				.recordStats()
 				.build(this::insert);
 		
 		if (LOG.isDebugEnabled()) {
-			LOG.debug("Constructed unlimited set with table {} of size {}", table, String.format("%,d", flcSize));
+			LOG.debug("Constructed unlimited set with table {} and cache size {}", table, String.format("%,d", flcSize));
 		}
 	}
 	

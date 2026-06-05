@@ -23,11 +23,11 @@ import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.load.Action;
 import de.tgmz.discogs.load.ActionFactory;
 import de.tgmz.discogs.load.ArtistContentHandler;
+import de.tgmz.discogs.load.DatabaseAction;
 import de.tgmz.discogs.load.DiscogsContentHandler;
 import de.tgmz.discogs.load.LabelContentHandler;
 import de.tgmz.discogs.load.MasterContentHandler;
 import de.tgmz.discogs.load.Mode;
-import de.tgmz.discogs.load.PredecessorAwareAction;
 import de.tgmz.discogs.load.ReleaseContentHandler;
 import de.tgmz.discogs.load.persist.csv.ArtistCsvPersister;
 import de.tgmz.discogs.load.persist.csv.LabelCsvPersister;
@@ -41,22 +41,15 @@ public class DiscogsCsvTest extends DiscogsTest {
 		DiscogsTest.setupOnce();
 		
 		init();
-
-		List<PredecessorAwareAction> m = new LinkedList<>();
 		
-		List<PredecessorAwareAction> l0 = ActionFactory.getInstance().create(Action.LOAD, Mode.PARALLEL, dataDir.toString());
-		List<PredecessorAwareAction> l1 = ActionFactory.getInstance().create(Action.RECONCILE);
-		List<PredecessorAwareAction> l2 = ActionFactory.getInstance().create(Action.OPTIMIZE);
-		List<PredecessorAwareAction> l3 = ActionFactory.getInstance().create(Action.VALIDATE);
+		List<DatabaseAction> l = new LinkedList<>(ActionFactory.getInstance().create(Action.LOAD, Mode.PARALLEL, dataDir.toString()));
+		l.addAll(ActionFactory.getInstance().create(Action.RECONCILE));
+		l.addAll(ActionFactory.getInstance().create(Action.INDEX));
+		l.addAll(ActionFactory.getInstance().create(Action.CONSTRAINT));
 		
 		for (Table t : Table.values()) {
-			m.addAll(l0.stream().filter(da -> da.getTable() == t).toList());
-			m.addAll(l1.stream().filter(da -> da.getTable() == t).toList());
-			m.addAll(l2.stream().filter(da -> da.getTable() == t).toList());
-			m.addAll(l3.stream().filter(da -> da.getTable() == t).toList());
+			l.stream().filter(da -> da.getTable() == t).forEach(da -> da.compute());
 		}
-		
-		m.forEach(da -> da.compute());
 	}
 	
 	@AfterClass

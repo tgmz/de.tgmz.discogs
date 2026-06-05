@@ -10,8 +10,10 @@
 package de.tgmz.discogs.load;
 
 public enum Action {
-	LOAD			// Create table and load or, respectively initialize 
+	LOAD			// Create table with primary key and load it
+	, LOAD_NO_PK	// Create table with _no_ primary key and load it
 	, RECONCILE		// Heal inconsistencies
-	, OPTIMIZE		// Create indexes
-	, VALIDATE		// Add constraints
+	, PRIMARY_KEY	// Create primary keys
+	, INDEX			// Create indexes
+	, CONSTRAINT	// Add constraints
 }

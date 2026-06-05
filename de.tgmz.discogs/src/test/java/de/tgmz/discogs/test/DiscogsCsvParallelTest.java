@@ -26,10 +26,11 @@ public class DiscogsCsvParallelTest extends DiscogsCsvTest {
 		
 		init();
 
-		ForkJoinTask.invokeAll(ActionFactory.getInstance().create(Action.LOAD, Mode.PARALLEL, dataDir.toString()));
+		ForkJoinTask.invokeAll(ActionFactory.getInstance().create(Action.LOAD_NO_PK, Mode.PARALLEL, dataDir.toString()));
+		ForkJoinTask.invokeAll(ActionFactory.getInstance().create(Action.PRIMARY_KEY, Mode.SEQUENTIAL));
 		ForkJoinTask.invokeAll(ActionFactory.getInstance().create(Action.RECONCILE, Mode.DEPENDING));
-		ForkJoinTask.invokeAll(ActionFactory.getInstance().create(Action.OPTIMIZE, Mode.SUMMUP));
-		ForkJoinTask.invokeAll(ActionFactory.getInstance().create(Action.VALIDATE, Mode.SEQUENTIAL));
+		ForkJoinTask.invokeAll(ActionFactory.getInstance().create(Action.INDEX, Mode.SUMMUP));
+		ForkJoinTask.invokeAll(ActionFactory.getInstance().create(Action.CONSTRAINT, Mode.SEQUENTIAL));
 	}
 	
 	@AfterClass
