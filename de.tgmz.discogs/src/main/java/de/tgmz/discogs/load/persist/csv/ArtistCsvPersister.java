@@ -18,7 +18,7 @@ public class ArtistCsvPersister extends AbstractCsvPersister<Artist> {
 		super(target
 			,Table.Artist
 			, Table.artist_aliases, Table.artist_groups, Table.artist_members
-			, Table.Artist_variations, Table.artist_artist_all.useCache());
+			, Table.Artist_variations, Table.artist_artist_all.useCache(1_000_000));
 	}
 	
 	protected int doSave(Artist a) throws IOException {

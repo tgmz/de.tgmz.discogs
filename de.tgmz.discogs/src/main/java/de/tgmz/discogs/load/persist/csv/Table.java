@@ -21,15 +21,15 @@ public enum Table {
 	, Master
 	, Label
 	, Genre
-	, Master_Genre(Genre)	// A "real" dependency: Master_Genre updates Genre
+	, Master_Genre(Genre)	// Logical dependency: Master_Genre updates Genre
 	, Style
 	, Master_Style(Style)
-	, artist_master_all(Artist, artist_artist_all)	// This dependency ensures that artist_master and artist_artist_all do not run parallel.
+	, artist_master_all(Artist, artist_artist_all)	// Technical dependency: artist_master and artist_artist_all must not run parallel.
 													// They both update Artist which could lead to a deadlock
 	, Master_Artist
 	, Series(Label)
 	, Release(Series, Master)
-	, Release_Genre(Genre, Master_Genre)
+	, Release_Genre(Genre, Master_Genre)	// Combined logical and technical dependency
 	, Release_Style(Style, Master_Style)
 	, Release_labels(Label)
 	, artist_release_all(Artist, artist_artist_all, artist_master_all)
@@ -53,7 +53,7 @@ public enum Table {
 	, Track_SubTrack
 	;
 	
-	private boolean useCache = false;
+	private int cacheSize = -1;
 	private List<Table> dependsOn;
 
 	private Table(Table... dependsOn) {
@@ -64,12 +64,12 @@ public enum Table {
 		return dependsOn;
 	}
 
-	public boolean isUseCache() {
-		return useCache;
+	public int getCacheSize() {
+		return cacheSize;
 	}
 
-	public Table useCache() {
-		this.useCache = true;
+	public Table useCache(int cacheSize) {
+		this.cacheSize = cacheSize;
 		
 		return this;
 	}

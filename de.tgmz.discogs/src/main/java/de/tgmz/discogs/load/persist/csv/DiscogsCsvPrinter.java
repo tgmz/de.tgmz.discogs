@@ -30,8 +30,8 @@ public class DiscogsCsvPrinter {
 	public DiscogsCsvPrinter(String target, Table table) throws IOException {
 		super();
 		
-		if (table.isUseCache()) {
-			cache = new UnlimitedSet<>();
+		if (table.getCacheSize() > -1) {
+			cache = new UnlimitedSet<>(table.getCacheSize());
 		}
 		
 		p = new CSVPrinter(new BufferedWriter(new FileWriter(target + File.separator + table.toString() + ".csv", StandardCharsets.UTF_8)), CSVFormat.POSTGRESQL_CSV);
