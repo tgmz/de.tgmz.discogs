@@ -27,7 +27,7 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "release_extraartist"
 	, indexes = {
-		@Index(columnList = "release_id,artist_id,role_id", name = "ReleaseExtraArtist_pk_idx", unique = true),
+		@Index(columnList = "release_id,artist_id,role_id", name = "ReleaseExtraArtist_pkey", unique = true),
 })
 public class ReleaseExtraArtist implements Serializable {
 	private static final long serialVersionUID = 1087312827584224994L;

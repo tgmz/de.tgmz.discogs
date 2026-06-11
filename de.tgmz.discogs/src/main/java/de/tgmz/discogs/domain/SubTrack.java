@@ -32,7 +32,7 @@ import jakarta.persistence.Transient;
  */
 @Entity
 @Table(indexes = {
-	@Index(columnList = "track_release_id,track_sequence,subTrackNumber", name = "SubTrack_pk_idx", unique = true),
+	@Index(columnList = "track_release_id,track_sequence,subTrackNumber", name = "SubTrack_pkey", unique = true),
 	@Index(columnList = "title", name = "SubTrack_title_idx"), 
 })
 
@@ -47,7 +47,7 @@ public class SubTrack implements Serializable {
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	@JoinTable(name = "SubTrack_ExtraArtist"
 	, indexes = {
-		@Index(columnList = "SubTrack_track_release_id,SubTrack_track_sequence,SubTrack_subTrackNumber,extraArtists_artist_id,extraArtists_role", name = "SubTrack_ExtraArtist_pk_idx", unique = true),
+		@Index(columnList = "SubTrack_track_release_id,SubTrack_track_sequence,SubTrack_subTrackNumber,extraArtists_artist_id,extraArtists_role", name = "SubTrack_ExtraArtist_pkey", unique = true),
 	})
 	private Set<ExtraArtist> extraArtists;
 	private String duration;

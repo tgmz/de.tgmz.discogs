@@ -21,7 +21,7 @@ import jakarta.persistence.Transient;
 
 @Entity
 @Table(indexes = {
-	@Index(columnList = "artist_id,role", name = "ExtraArtist_pk_idx", unique = true),
+	@Index(columnList = "artist_id,role", name = "ExtraArtist_pkey", unique = true),
 })
 public class ExtraArtist implements Serializable { 
 	@Transient
