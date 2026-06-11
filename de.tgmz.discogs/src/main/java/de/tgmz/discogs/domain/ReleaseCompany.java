@@ -24,7 +24,7 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "release_company"
 , indexes = {
-		@Index(columnList = "release_id,company_id,entityType_id", name = "ReleaseCompany_pk_idx", unique = true),
+		@Index(columnList = "release_id,company_id,entityType_id", name = "ReleaseCompany_pkey", unique = true),
 })
 public class ReleaseCompany implements Serializable {
 	private static final long serialVersionUID = 1087312827584224994L;

@@ -39,7 +39,7 @@ import jakarta.persistence.Transient;
  */
 @Entity
 @Table(indexes = {
-	@Index(columnList = "release_id,sequence", name = "Track_pk_idx", unique = true),
+	@Index(columnList = "release_id,sequence", name = "Track_pkey", unique = true),
 	@Index(columnList = "title", name = "Track_title_idx"), 
 })
 public class Track implements Serializable {
@@ -55,19 +55,19 @@ public class Track implements Serializable {
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
 	@JoinTable(name = "Track_Artist"
 	, indexes = {
-		@Index(columnList = "Track_release_id,Track_sequence,artists_id", name = "Track_Artist_pk_idx", unique = true),
+		@Index(columnList = "Track_release_id,Track_sequence,artists_id", name = "Track_Artist_pkey", unique = true),
 	})
 	private Set<Artist> artists;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	@JoinTable(name = "Track_ExtraArtist"
 	, indexes = {
-		@Index(columnList = "Track_release_id,Track_sequence,extraArtists_artist_id,extraArtists_role", name = "Track_ExtraArtist_pk_idx", unique = true),
+		@Index(columnList = "Track_release_id,Track_sequence,extraArtists_artist_id,extraArtists_role", name = "Track_ExtraArtist_pkey", unique = true),
 	})
 	private Set<ExtraArtist> extraArtists;
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinTable(name = "Track_SubTrack"
 	, indexes = {
-		@Index(columnList = "subTracklist_track_release_id,subTracklist_track_sequence,subTracklist_subTrackNumber", name = "Track_SubTrack_pk_idx", unique = true),
+		@Index(columnList = "subTracklist_track_release_id,subTracklist_track_sequence,subTracklist_subTrackNumber", name = "Track_SubTrack_pkey", unique = true),
 	})
 	@OrderBy(value = "subTrackNumber")
 	private List<SubTrack> subTracklist;
