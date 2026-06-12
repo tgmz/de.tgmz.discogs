@@ -13,14 +13,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -121,7 +121,7 @@ public final class ActionFactory {
 		
 		return ddl;
 	}
-	private Properties getProperties() {
+	private List<Entry<Object, Object>> getProperties(String keyPattern) {
 		if (prop == null) {
 			prop = new Properties();
 		
@@ -132,7 +132,8 @@ public final class ActionFactory {
 			}
 		}
 		
-		return prop;
+		// Contruct an entirely new list so we can sort it.
+		return new ArrayList<>(prop.entrySet().stream().filter(e -> ((String) e.getKey()).matches(keyPattern)).toList());
 	}
 	
 	private List<String> createSql(Table t, Action a, String root) {
@@ -156,15 +157,11 @@ public final class ActionFactory {
 		case RECONCILE:
 			stmts = new LinkedList<>();
 
-			Map<String, String> m = new TreeMap<>();
+			List<Entry<Object, Object>> l = getProperties("^" + t + "\\.?\\d?$");
 
-			for (Entry<Object, Object> e : getProperties().entrySet()) {
-				if (((String) e.getKey()).matches("^" + t + "\\.?\\d?$")) {
-					m.put((String) e.getKey(), (String) e.getValue());
-				}
-			}
+			Collections.sort(l, (e0,e1) -> ((String) e0.getKey()).compareTo((String) e1.getKey()));
 
-			m.forEach((k,v) -> stmts.add(v));
+			l.forEach(e -> stmts.add((String) e.getValue()));
 			
 			break;
 		case LOAD, LOAD_NO_PK:
@@ -178,7 +175,7 @@ public final class ActionFactory {
 					.toLowerCase(Locale.getDefault())
 					.startsWith("jdbc:postgresql")) {
 				stmts.add(getCreate(t, noPk));
-				
+				stmts.add("COMMIT");	// Keep the table even if LOAD fails. Usefull if we want to load only a portion of the database
 				stmts.add(String.format("COPY %s FROM '%s' (FORMAT csv, HEADER)", t, String.format("%s/%s.csv", root, t)));
 			} else {
 				File csv = new File(String.format("%s/%s.csv", root, t));
