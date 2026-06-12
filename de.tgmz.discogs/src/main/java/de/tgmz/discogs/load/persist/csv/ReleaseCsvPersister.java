@@ -50,6 +50,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 				, Table.Format, Table.Format_descriptions, Table.Release_Format
 				, Table.artist_release_all.useCache(5_000_000)
 				, Table.format_gen
+				, Table.label_release_all.useCache(1_500_000)
 		);
 		
 		this.filter = filter;
@@ -91,6 +92,13 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 			pm.get(Table.Release_Style).printRecord(
 				r.getId()
 				, s.getId()
+			);
+		}
+		
+		for (Label l : r.getLabels().keySet()) {
+			pm.get(Table.label_release_all).printRecordUsingCache(
+				l.getId()
+				, l.getName()
 			);
 		}
 		

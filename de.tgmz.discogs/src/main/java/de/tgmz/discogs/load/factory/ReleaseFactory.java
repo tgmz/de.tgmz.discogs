@@ -34,8 +34,7 @@ public class ReleaseFactory implements IFactory<Release> {
 		easf = new SetFactory<>(new ExtraArtistFactory());
 		rcsf = new SetFactory<>(new ReleaseCompanyFactory());
 		
-		// Do not use a real factory here. It will never return null and we want to remove non-existing labels
-		lmf = new MapFactory<>((EntityManager x, Label l) -> x.find(Label.class, l.getId()));
+		lmf = new MapFactory<>(new AtomicEntityFactory<>());
 		
 		reasf = new SetFactory<>(new ReleaseExtraArtistFactory());
 	}
