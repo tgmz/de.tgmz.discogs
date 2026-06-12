@@ -438,6 +438,20 @@ public abstract class DiscogsTest {
 		assertEquals("9 26081-2", r.getLabels().get(l));
 	}
 	
+	@Test
+	public void testLabel() {
+		Label repriseRecords = em.find(Label.class, 157);
+		
+		assertEquals("Reprise Records", repriseRecords.getName());
+		assertEquals("Reprise Records Inc.", repriseRecords.getParentLabel().getName());
+		
+		Release tin = em.find(Release.class, 2324);
+		assertEquals("This Is Normal", tin.getTitle());
+		
+		Label fad = em.find(Label.class, 634);
+		assertEquals("CAD 9006 CD", tin.getLabels().get(fad));
+	}
+	
 	private ReleaseExtraArtist getExtraArtist(Release r, int artistId, String role) {
 		return r.getReleaseExtraArtists()
 			.stream()

@@ -19,7 +19,8 @@ public enum Table {
 	, artist_members
 	, Artist_variations
 	, Master
-	, Label
+	, label_parent_all
+	, Label(label_parent_all)
 	, Genre
 	, Master_Genre(Genre)	// Logical dependency: Master_Genre updates Genre
 	, Style
@@ -31,7 +32,8 @@ public enum Table {
 	, Release(Series, Master)
 	, Release_Genre(Genre, Master_Genre)	// Combined logical and technical dependency
 	, Release_Style(Style, Master_Style)
-	, Release_labels(Label)
+	, label_release_all(Release, Label, label_parent_all)
+	, Release_labels(Label, label_release_all)
 	, artist_release_all(Artist, artist_artist_all, artist_master_all)
 	, Release_Artist
 	, EntityType

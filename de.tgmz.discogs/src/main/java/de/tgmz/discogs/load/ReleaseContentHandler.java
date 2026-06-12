@@ -130,6 +130,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			if (id != null) {
 				Label l = new Label(); 
 				l.setId(Integer.parseInt(attributes.getValue("id")));
+				l.setName(attributes.getValue("name"));
 			
 				String catno = attributes.getValue("catno");
 			

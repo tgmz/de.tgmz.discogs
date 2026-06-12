@@ -15,7 +15,7 @@ import de.tgmz.discogs.domain.Label;
 
 public class LabelCsvPersister extends AbstractCsvPersister<Label> {
 	public LabelCsvPersister(String target) {
-		super(target, Table.Label);
+		super(target, Table.Label, Table.label_parent_all.useCache(100_000));
 	}
 	protected int doSave(Label l) throws IOException {
 		Label pl = l.getParentLabel();
@@ -28,6 +28,13 @@ public class LabelCsvPersister extends AbstractCsvPersister<Label> {
 			, pls
 			, l.getName()
 		);
+		
+		if (pl != null) {
+			pm.get(Table.label_parent_all).printRecordUsingCache(
+				pl.getId()
+				, pl.getName()
+			);
+		}
 		
 		return 1;
 	}
