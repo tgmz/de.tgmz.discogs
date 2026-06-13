@@ -23,20 +23,20 @@ public final class ReleaseExtraArtistKey implements Serializable {
 	
 	@Column(name = "release_id")
 	private int releaseId;
-	@Column(name = "artist_id")
-	private int artistId;
 	@Column(name = "role_id")
 	private String roleId;
+	@Column(name = "artist_id")
+	private int artistId;
 	
 	public ReleaseExtraArtistKey() {
-		this(0, 0, null);
+		this(0, null, 0);
 	}
 	
-	public ReleaseExtraArtistKey(int releaseId, int artistId, String roleId) {
+	public ReleaseExtraArtistKey(int releaseId, String roleId, int artistId) {
 		super();
 		setReleaseId(releaseId);
-		setArtistId(artistId);
 		setRoleId(roleId);
+		setArtistId(artistId);
 	}
 
 	public String getRoleId() {

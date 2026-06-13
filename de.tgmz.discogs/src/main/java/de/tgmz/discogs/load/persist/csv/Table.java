@@ -28,12 +28,12 @@ public enum Table {
 	, artist_master_all(Artist, artist_artist_all)	// Technical dependency: artist_master and artist_artist_all must not run parallel.
 													// They both update Artist which could lead to a deadlock
 	, Master_Artist
-	, Series(Label)
+	, Series
 	, Release(Series, Master)
 	, Release_Genre(Genre, Master_Genre)	// Combined logical and technical dependency
 	, Release_Style(Style, Master_Style)
-	, label_release_all(Release, Label, label_parent_all)
-	, Release_labels(Label, label_release_all)
+	, label_release_all(Label, label_parent_all)
+	, Release_labels(Label, label_parent_all, label_release_all)
 	, artist_release_all(Artist, artist_artist_all, artist_master_all)
 	, Release_Artist
 	, EntityType

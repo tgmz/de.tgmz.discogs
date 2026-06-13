@@ -21,7 +21,7 @@ import jakarta.persistence.Transient;
 
 @Entity
 @Table(indexes = {
-	@Index(columnList = "artist_id,role", name = "ExtraArtist_pkey", unique = true),
+	@Index(columnList = "role,artist_id", name = "ExtraArtist_pkey", unique = true),
 })
 public class ExtraArtist implements Serializable { 
 	@Transient
@@ -33,11 +33,11 @@ public class ExtraArtist implements Serializable {
 		id = new ExtraArtistId();
 	}
 
-	public ExtraArtist(Artist artist, String role) {
+	public ExtraArtist(String role, Artist artist) {
 		this();
 		
-		this.id.setArtist(artist);
 		this.id.setRole(role);
+		this.id.setArtist(artist);
 	}
 
 	public ExtraArtistId getId() {
