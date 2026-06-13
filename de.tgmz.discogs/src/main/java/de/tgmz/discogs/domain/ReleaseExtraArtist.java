@@ -27,7 +27,7 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "release_extraartist"
 	, indexes = {
-		@Index(columnList = "release_id,artist_id,role_id", name = "ReleaseExtraArtist_pkey", unique = true),
+		@Index(columnList = "release_id,role_id,artist_id", name = "ReleaseExtraArtist_pkey", unique = true),
 })
 public class ReleaseExtraArtist implements Serializable {
 	private static final long serialVersionUID = 1087312827584224994L;
@@ -42,8 +42,8 @@ public class ReleaseExtraArtist implements Serializable {
 	
 	@ManyToOne
 	@MapsId("extraArtistId")
-	@JoinColumn(name = "artist_id", referencedColumnName = "artist_id")
 	@JoinColumn(name = "role_id", referencedColumnName = "role")
+	@JoinColumn(name = "artist_id", referencedColumnName = "artist_id")
 	private ExtraArtist extraArtist;
 	
 	@ElementCollection

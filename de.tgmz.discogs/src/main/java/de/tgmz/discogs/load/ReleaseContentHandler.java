@@ -401,7 +401,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			return result;
 		}
 		
-		splitRoles(allRoles).forEach(singleRole -> result.add(new ExtraArtist(draft.getArtist(), singleRole)));
+		splitRoles(allRoles).forEach(singleRole -> result.add(new ExtraArtist(singleRole, draft.getArtist())));
 		
 		return result;
 	}
@@ -419,7 +419,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 		for (String singleRole : splitRoles(allRoles)) {
 			ReleaseExtraArtist rea = new ReleaseExtraArtist();
 			
-			rea.setExtraArtist(new ExtraArtist(draft.getExtraArtist().getArtist(), singleRole));
+			rea.setExtraArtist(new ExtraArtist(singleRole, draft.getExtraArtist().getArtist()));
 			rea.setRelease(draft.getRelease());
 			rea.getApplicableTracks().addAll(draft.getApplicableTracks());
 			

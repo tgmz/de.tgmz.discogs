@@ -27,20 +27,20 @@ public class ExtraArtistId implements Serializable {
 	@Transient
 	private static final long serialVersionUID = 9128908612765815149L;
 	
+	private String role;
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	@JoinColumn(name = "artist_id")
 	private Artist artist;
-	private String role;
 	
 	public ExtraArtistId() {
-		this(new Artist(), null);
+		this(null, new Artist());
 	}
 
-	public ExtraArtistId(Artist artist, String role) {
+	public ExtraArtistId(String role, Artist artist) {
 		super();
 		
-		setArtist(artist);
 		setRole(role);
+		setArtist(artist);
 	}
 
 	public Artist getArtist() {

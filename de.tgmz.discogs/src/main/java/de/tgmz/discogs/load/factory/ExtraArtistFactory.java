@@ -38,7 +38,7 @@ public class ExtraArtistFactory implements IFactory<ExtraArtist> {
 		
 		draft.setArtist(a);
 		
-		ExtraArtist ea = em.find(ExtraArtist.class, new ExtraArtistId(a, draft.getRole()));
+		ExtraArtist ea = em.find(ExtraArtist.class, new ExtraArtistId(draft.getRole(), a));
 		
 		if (ea == null) {
 			LOG.trace("ExtraArtist {} not present, creating...", draft);
