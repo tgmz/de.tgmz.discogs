@@ -56,7 +56,9 @@ public class MasterContentHandler extends DiscogsContentHandler {
 		case "[masters, master]":
 			master = new Master();
 			
-			master.setId(Integer.parseInt(attributes.getValue("id")));
+			this.id = Integer.parseInt(attributes.getValue("id"));
+
+			master.setId(id);
 			
 			break;
 		case "[masters, master, artists]":

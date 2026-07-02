@@ -55,7 +55,9 @@ public class LabelContentHandler extends DiscogsContentHandler {
 	public void endElement(String uri, String localName, String qName) {
 		switch (path) {
 		case "[labels, label, id]":
-			label.setId(Integer.parseInt(getChars()));
+			super.id = Integer.parseInt(getChars());
+			
+			label.setId(id);
 			break;
 		case "[labels, label, name]":
 			label.setName(getChars(true));

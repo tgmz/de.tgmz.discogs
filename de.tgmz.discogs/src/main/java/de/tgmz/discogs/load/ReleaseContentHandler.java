@@ -76,7 +76,9 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 		case "[releases, release]":
 			r = new Release();
 			
-			r.setId(Integer.parseInt(attributes.getValue("id")));
+			super.id = Integer.parseInt(attributes.getValue("id"));
+			
+			r.setId(id);
 			
 			break;
 		case "[releases, release, master_id]":

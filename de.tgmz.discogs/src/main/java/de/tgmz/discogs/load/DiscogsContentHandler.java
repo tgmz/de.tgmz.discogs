@@ -50,6 +50,7 @@ public class DiscogsContentHandler extends DefaultHandler {
 	private DBDefrag defrag;
 	private BiPredicate<Integer, Integer> defragThreshold = (c,s) -> false;
 	protected String path;
+	protected int id;
 	@SuppressWarnings("rawtypes")
 	private IPersistable persister;
 
@@ -59,9 +60,14 @@ public class DiscogsContentHandler extends DefaultHandler {
 			spf.setNamespaceAware(false);
 			spf.setValidating(false);
 			
-			SAXParser saxParser = spf.newSAXParser();
+			SAXParser sp = spf.newSAXParser();
+			
+			// Deactivate JDK 24+ limits 
+			sp.setProperty("jdk.xml.totalEntitySizeLimit", "0");
+			sp.setProperty("jdk.xml.maxGeneralEntitySizeLimit", "0");
+			
 
-			xmlReader = saxParser.getXMLReader();
+			xmlReader = sp.getXMLReader();
 		} catch (ParserConfigurationException | SAXException e) {
 			throw new RuntimeException(e);
 		}
@@ -73,7 +79,7 @@ public class DiscogsContentHandler extends DefaultHandler {
 		try {
 			xmlReader.parse(new InputSource(is));
 		} catch (IOException | SAXException e) {
-			LOG.error("Parsing error", e);
+			LOG.error("Parsing error. Current id is {}", id, e);
 		}
 	}
 

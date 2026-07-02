@@ -62,7 +62,9 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 	public void endElement(String uri, String localName, String qName) {
 		switch (path) {
 		case "[artists, artist, id]":
-			artist.setId(Integer.parseInt(getChars()));
+			super.id = Integer.parseInt(getChars());
+			
+			artist.setId(super.id);
 			
 			break;
 		case "[artists, artist, data_quality]":
