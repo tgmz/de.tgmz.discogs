@@ -11,7 +11,7 @@ package de.tgmz.discogs.load.persist.csv;
 
 import java.util.List;
 
-public enum Table {
+public enum Table implements ITable {
 	Artist
 	, artist_artist_all(Artist)
 	, artist_aliases
@@ -56,13 +56,14 @@ public enum Table {
 	;
 	
 	private int cacheSize = -1;
-	private List<Table> dependsOn;
+	private List<ITable> dependsOn;
 
 	private Table(Table... dependsOn) {
 		this.dependsOn = List.of(dependsOn);
 	}
 
-	public List<Table> getDependsOn() {
+	@Override
+	public List<ITable> dependsOn() {
 		return dependsOn;
 	}
 

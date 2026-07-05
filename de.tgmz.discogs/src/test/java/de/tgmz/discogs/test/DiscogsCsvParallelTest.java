@@ -18,6 +18,7 @@ import org.junit.BeforeClass;
 import de.tgmz.discogs.load.Action;
 import de.tgmz.discogs.load.ActionFactory;
 import de.tgmz.discogs.load.Mode;
+import de.tgmz.discogs.load.persist.csv.Table;
 
 public class DiscogsCsvParallelTest extends DiscogsCsvTest {
 	@BeforeClass
@@ -25,12 +26,14 @@ public class DiscogsCsvParallelTest extends DiscogsCsvTest {
 		DiscogsTest.setupOnce();
 		
 		init();
+		
+		ActionFactory af = ActionFactory.getInstance().forTables(Table.values());
 
-		ForkJoinTask.invokeAll(ActionFactory.getInstance().create(Action.LOAD_NO_PK, Mode.PARALLEL, dataDir.toString()));
-		ForkJoinTask.invokeAll(ActionFactory.getInstance().create(Action.PRIMARY_KEY, Mode.SEQUENTIAL));
-		ForkJoinTask.invokeAll(ActionFactory.getInstance().create(Action.RECONCILE, Mode.DEPENDING));
-		ForkJoinTask.invokeAll(ActionFactory.getInstance().create(Action.INDEX, Mode.SUMMUP));
-		ForkJoinTask.invokeAll(ActionFactory.getInstance().create(Action.CONSTRAINT, Mode.SEQUENTIAL));
+		ForkJoinTask.invokeAll(af.create(Action.LOAD_NO_PK, Mode.PARALLEL, dataDir.toString()));
+		ForkJoinTask.invokeAll(af.create(Action.PRIMARY_KEY, Mode.SEQUENTIAL));
+		ForkJoinTask.invokeAll(af.create(Action.RECONCILE, Mode.DEPENDING));
+		ForkJoinTask.invokeAll(af.create(Action.INDEX, Mode.SUMMUP));
+		ForkJoinTask.invokeAll(af.create(Action.CONSTRAINT, Mode.SEQUENTIAL));
 	}
 	
 	@AfterClass

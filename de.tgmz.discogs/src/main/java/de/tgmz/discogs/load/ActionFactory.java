@@ -12,6 +12,7 @@ package de.tgmz.discogs.load;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,6 +22,8 @@ import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -29,7 +32,9 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.tgmz.discogs.load.persist.csv.Table;
+import de.tgmz.discogs.load.persist.csv.ITable;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ScanResult;
 public final class ActionFactory {
 	private static final Logger LOG = LoggerFactory.getLogger(ActionFactory.class);
 	
@@ -42,12 +47,15 @@ public final class ActionFactory {
 		, "primary key"					// Anonymous primary key, used with @Id
 		, "unique"						// Anonymous unique, used with @ElementCollection
 	);
+	
+	private static final Pattern DDL_PATTERN = Pattern.compile("^.*\\.ddl$"); 
 		
 	private static final ActionFactory INSTANCE = new ActionFactory();
 	
-	private String ddl;
+	private List<String> ddl;
 	private Properties prop;
 	private List<Pattern> pkPattern;
+	private ITable[] tables;
 
 	/**
 	 * Private constructor for security reasons
@@ -56,6 +64,14 @@ public final class ActionFactory {
 		pkPattern = new LinkedList<>();
 		
 		PK_TYPE.forEach(s -> pkPattern.add(Pattern.compile(String.format(BASE_PATTERN, s))));
+		
+		tables = new ITable[0];
+	}
+	
+	public ActionFactory forTables(ITable[] tables) {
+		this.tables = tables;
+		
+		return this;
 	}
 
 	public static ActionFactory getInstance() {
@@ -73,14 +89,14 @@ public final class ActionFactory {
 	public List<DatabaseAction> create(Action a, Mode m, String root) {
 		List<DatabaseAction> result = new LinkedList<>();
 		
-		Stream.of(Table.values()).forEach(t -> result.add(new DatabaseAction(t, createSql(t, a, root))));
+		Stream.of(tables).forEach(t -> result.add(new DatabaseAction(t, createSql(t, a, root))));
 		
 		result.removeIf( da -> da.getSqls().isEmpty());
 		
 		switch (m) {
 		case DEPENDING: 
 			for (DatabaseAction da : result) {
-				List<Table> dependsOn = da.getTable().getDependsOn();
+				List<ITable> dependsOn = da.getTable().dependsOn();
 				
 				da.getPredecessors().addAll(result.stream().filter(da0 -> dependsOn.contains(da0.getTable())).toList());
 			}
@@ -108,15 +124,21 @@ public final class ActionFactory {
 		
 		return result;
 	}
-	private String getDdl() {
+	private List<String> getDdl() {
 		if (ddl == null) {
-			try (InputStream is = this.getClass().getClassLoader().getResourceAsStream("discogs.ddl")) {
-				ddl = IOUtils.toString(is, StandardCharsets.UTF_8);
+			Set<String> ddl0 = new TreeSet<>();	// Avoid duplicates lines in case a DDL is multiple times in classpath
+			
+			try (ScanResult scanResult = new ClassGraph().scan()) {
+				for (URI uri : scanResult.getResourcesMatchingPattern(DDL_PATTERN).getURIs()) {
+					LOG.info("Loaded DDL from {}", uri);
+					
+					ddl0.addAll(IOUtils.toString(uri, StandardCharsets.UTF_8).lines().toList());
+				}
 			} catch (IOException e) {
 				LOG.error("Cannot get DDL", e);
-				
-				ddl = "";
 			}
+			
+			ddl = new LinkedList<>(ddl0);
 		}
 		
 		return ddl;
@@ -136,16 +158,16 @@ public final class ActionFactory {
 		return new ArrayList<>(prop.entrySet().stream().filter(e -> ((String) e.getKey()).matches(keyPattern)).toList());
 	}
 	
-	private List<String> createSql(Table t, Action a, String root) {
+	private List<String> createSql(ITable t, Action a, String root) {
 		List<String> stmts;
 		
 		switch (a) {
 		case INDEX:
-			stmts = getDdl().lines().filter(l -> l.matches("^create index \\w+ on " + t.toString() + " .*$")).toList();
+			stmts = getDdl().stream().filter(l -> l.matches("^create index \\w+ on " + t.toString() + " .*$")).toList();
 			
 			break;
 		case CONSTRAINT:
-			stmts = getDdl().lines().filter(l -> l.startsWith("alter table if exists " + t.toString() + " ")).toList();
+			stmts = getDdl().stream().filter(l -> l.startsWith("alter table if exists " + t.toString() + " ")).toList();
 			
 			break;
 		case PRIMARY_KEY:
@@ -195,8 +217,8 @@ public final class ActionFactory {
 		return stmts;
 	}
 	
-	private String getCreate(Table t, boolean noPk) {
-		String s = getDdl().lines().filter(l -> l.startsWith("create table " + t.toString() + " ")).findFirst().orElseThrow();
+	private String getCreate(ITable t, boolean noPk) {
+		String s = getDdl().stream().filter(l -> l.startsWith("create table " + t.toString() + " ")).findFirst().orElseThrow();
 
 		if (noPk) {
 			for (Pattern p : pkPattern) {
@@ -211,8 +233,8 @@ public final class ActionFactory {
 		return s;
 	}
 	
-	private String getPrimaryKey(Table t) {
-		String s = getDdl().lines().filter(l -> l.startsWith("create table " + t.toString() + " ")).findFirst().orElseThrow();
+	private String getPrimaryKey(ITable t) {
+		String s = getDdl().stream().filter(l -> l.startsWith("create table " + t.toString() + " ")).findFirst().orElseThrow();
 
 		for (Pattern p : pkPattern) {
 			Matcher m = p.matcher(s);
@@ -225,15 +247,11 @@ public final class ActionFactory {
 		return null;
 	}
 	
-	private List<String> getInit(Table t) {
-		List<String> result = new LinkedList<>();
+	private List<String> getInit(ITable t) {
+		String t0 = t.toString();
 		
-		String ddl0 = getDdl();
-		
-		result.addAll(ddl0.lines().filter(l -> l.startsWith("update " + t.toString() + " ")).toList());
-		result.addAll(ddl0.lines().filter(l -> l.startsWith("insert into " + t.toString() + " ")).toList());
-		result.addAll(ddl0.lines().filter(l -> l.startsWith("insert into " + t.toString() + "(")).toList());
-		
-		return result;
+		return getDdl().stream().filter(l -> l.startsWith("update " + t0 + " ")
+										|| l.startsWith("insert into " + t0 + " ")
+										|| l.startsWith("insert into " + t0 + "(")).toList();
 	}
 }

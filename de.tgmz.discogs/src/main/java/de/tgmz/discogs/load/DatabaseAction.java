@@ -22,17 +22,17 @@ import java.util.stream.IntStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.tgmz.discogs.load.persist.csv.Table;
+import de.tgmz.discogs.load.persist.csv.ITable;
 import de.tgmz.discogs.logging.LogUtil;
 
 public class DatabaseAction extends RecursiveAction {
 	private static final long serialVersionUID = -3804048897401974703L;
 	private static final Logger LOG = LoggerFactory.getLogger(DatabaseAction.class);
-	private Table table;
+	private transient ITable table;
 	private List<String> sqls;
 	private List<RecursiveAction> predecessors;
 
-	public DatabaseAction(Table table, List<String> sqls) {
+	public DatabaseAction(ITable table, List<String> sqls) {
 		super();
 		
 		this.table = table;
@@ -90,7 +90,7 @@ public class DatabaseAction extends RecursiveAction {
 		return predecessors;
 	}
 
-	public Table getTable() {
+	public ITable getTable() {
 		return table;
 	}
 	

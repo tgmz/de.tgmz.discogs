@@ -42,10 +42,12 @@ public class DiscogsCsvTest extends DiscogsTest {
 		
 		init();
 		
-		List<DatabaseAction> l = new LinkedList<>(ActionFactory.getInstance().create(Action.LOAD, Mode.PARALLEL, dataDir.toString()));
-		l.addAll(ActionFactory.getInstance().create(Action.RECONCILE));
-		l.addAll(ActionFactory.getInstance().create(Action.INDEX));
-		l.addAll(ActionFactory.getInstance().create(Action.CONSTRAINT));
+		ActionFactory af = ActionFactory.getInstance().forTables(Table.values());
+
+		List<DatabaseAction> l = new LinkedList<>(af.create(Action.LOAD, Mode.PARALLEL, dataDir.toString()));
+		l.addAll(af.create(Action.RECONCILE));
+		l.addAll(af.create(Action.INDEX));
+		l.addAll(af.create(Action.CONSTRAINT));
 		
 		for (Table t : Table.values()) {
 			l.stream().filter(da -> da.getTable() == t).forEach(da -> da.compute());
