@@ -9,10 +9,10 @@
 **********************************************************************/
 package de.tgmz.discogs.load.factory;
 
-import de.tgmz.discogs.domain.AtomicEntity;
+import de.tgmz.discogs.domain.IIdentifiable;
 import jakarta.persistence.EntityManager;
 
-public class AtomicEntityFactory<T extends AtomicEntity<?>> implements IFactory<T> {
+public class BasicEntityFactory<T extends IIdentifiable<?>> implements IFactory<T> {
 	@Override
 	public T get(EntityManager em, T draft) {
 		// There must be a better way other than calling getClass() but I can't figure out one

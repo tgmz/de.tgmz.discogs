@@ -13,7 +13,7 @@ import java.util.function.Predicate;
 
 import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Label;
-import de.tgmz.discogs.load.factory.AtomicEntityFactory;
+import de.tgmz.discogs.load.factory.BasicEntityFactory;
 import de.tgmz.discogs.load.factory.IFactory;
 import jakarta.persistence.EntityManager;
 
@@ -28,7 +28,7 @@ public class LabelPersistable extends AbstractDefaultPersistable<Label> {
 	public LabelPersistable(Predicate<Label> filter) {
 		this.filter = filter;
 		
-		lf = new AtomicEntityFactory<>();
+		lf = new BasicEntityFactory<>();
 	}
 
 	@Override

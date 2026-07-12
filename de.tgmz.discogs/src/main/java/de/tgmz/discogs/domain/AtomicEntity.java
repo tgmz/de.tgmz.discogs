@@ -22,7 +22,7 @@ import jakarta.persistence.Transient;
  * @param <T>: the ids type
  */
 @MappedSuperclass
-public abstract class AtomicEntity<T extends Serializable> implements Serializable {
+public abstract class AtomicEntity<T extends Serializable> implements Serializable, IIdentifiable<T> {
 	@Transient
 	private static final long serialVersionUID = -8652708757318456206L;
 	@Id

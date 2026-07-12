@@ -19,8 +19,8 @@ public class ReleaseCompanyFactory implements IFactory<ReleaseCompany> {
 	private IFactory<EntityType> etf;
 	
 	public ReleaseCompanyFactory() {
-		cf = new AtomicEntityFactory<>();
-		etf = new AtomicEntityFactory<>();
+		cf = new BasicEntityFactory<>();
+		etf = new BasicEntityFactory<>();
 	}
 	
 	@Override

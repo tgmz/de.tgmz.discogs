@@ -34,7 +34,7 @@ public class ReleaseFactory implements IFactory<Release> {
 		easf = new SetFactory<>(new ExtraArtistFactory());
 		rcsf = new SetFactory<>(new ReleaseCompanyFactory());
 		
-		lmf = new MapFactory<>(new AtomicEntityFactory<>());
+		lmf = new MapFactory<>(new BasicEntityFactory<>());
 		
 		reasf = new SetFactory<>(new ReleaseExtraArtistFactory());
 	}

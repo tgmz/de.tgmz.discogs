@@ -27,7 +27,8 @@ import jakarta.persistence.TableGenerator;
 import jakarta.persistence.Transient;
 
 @Entity
-public class Format implements Serializable { 
+//No need to reference IIdentifiable: An entitiy with a generated id cannot be used with a BasicEntityFactory 
+public class Format implements Serializable {
 	@Transient
 	private static final long serialVersionUID = 1820280634515019733L;
 	@TableGenerator(name = "format_gen")
