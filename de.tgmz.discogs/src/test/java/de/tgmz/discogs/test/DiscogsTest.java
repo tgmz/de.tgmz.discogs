@@ -326,6 +326,15 @@ public abstract class DiscogsTest {
 		
 		Format f1 = r1.getFormats().stream().filter(f -> "CD".equals(f.getName())).findFirst().orElseThrow();
 		assertEquals(41, f1.getQty().floatValue(), 0);
+		
+		Release r2 = em.find(Release.class, 2723);
+		
+		assertEquals("Out There And Back", r2.getTitle());
+		assertEquals(2, r2.getFormats().size());
+		assertTrue(r2.getFormats().stream().allMatch(f -> "CD".equals(f.getName())
+														&& "".equals(f.getText())
+														&& 1f == f.getQty())); 
+		
 	}
 
 	protected static void extractAndProcess(String resource, DiscogsContentHandler dch) throws IOException {
