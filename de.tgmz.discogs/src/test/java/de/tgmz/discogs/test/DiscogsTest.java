@@ -13,6 +13,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -453,6 +454,14 @@ public abstract class DiscogsTest {
 		
 		assertEquals("Reprise Records", repriseRecords.getName());
 		assertEquals("Reprise Records Inc.", repriseRecords.getParentLabel().getName());
+		
+		Label straight = repriseRecords.getSubLabels().stream().filter(l -> l.getId() == 51954).findFirst().orElseThrow(); 
+		assertEquals("Straight", straight.getName());
+		
+		Label dm = em.find(Label.class, 21);
+		assertEquals("Drop Music", dm.getName());
+		// Ridiculous: A label where parent- and sublabel are the same
+		assertSame(dm.getParentLabel(), dm.getSubLabels().stream().findFirst().orElseThrow());
 		
 		Release tin = em.find(Release.class, 2324);
 		assertEquals("This Is Normal", tin.getTitle());
