@@ -21,6 +21,7 @@ create table format_gen (next_val bigint, sequence_name varchar(255) not null, p
 insert into format_gen(sequence_name, next_val) values ('Format',0)
 create table Genre (id varchar(31) not null, primary key (id))
 create table Label (data_quality smallint check ((data_quality between 0 and 5)), id integer not null, parentLabel_id integer, name varchar(255), primary key (id))
+create table Label_Label (Label_id integer not null, subLabels_id integer not null, primary key (Label_id, subLabels_id))
 create table Master (data_quality smallint check ((data_quality between 0 and 5)), id integer not null, published integer, albumArtist varchar(512), title varchar(255), primary key (id))
 create table Master_Artist (Master_id integer not null, artists_id integer not null, primary key (Master_id, artists_id))
 create table Master_Genre (Master_id integer not null, genres_id varchar(31) not null, primary key (Master_id, genres_id))
@@ -63,6 +64,8 @@ alter table if exists Artist_variations add constraint FKrki9786wlsmogjq85ssqll2
 alter table if exists ExtraArtist add constraint FK4dgigpw7yg0pkadbpitorqkaj foreign key (artist_id) references Artist
 alter table if exists Format_descriptions add constraint FKduoc80owico3gub8yr6qokedi foreign key (Format_id) references Format
 alter table if exists Label add constraint FKdecmav21lxstcu445twxnghd8 foreign key (parentLabel_id) references Label
+alter table if exists Label_Label add constraint FKcsnyi4muwxxgtjlehg6hjgbiq foreign key (subLabels_id) references Label
+alter table if exists Label_Label add constraint FK3fnkr733992ywq1wd0poxxxbv foreign key (Label_id) references Label
 alter table if exists Master_Artist add constraint FKsjc60rjhpsy6u3lpuh94ekco7 foreign key (artists_id) references Artist
 alter table if exists Master_Artist add constraint FKe5ks2nepjou9dxjya4uv7a6m1 foreign key (Master_id) references Master
 alter table if exists Master_Genre add constraint FKsi7jqsjajj0gyi1o1icwka217 foreign key (genres_id) references Genre
