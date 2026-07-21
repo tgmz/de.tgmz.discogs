@@ -23,6 +23,7 @@ public class LabelContentHandler extends DiscogsContentHandler {
 	@SuppressWarnings("unused")
 	private static final Logger LOG = LoggerFactory.getLogger(LabelContentHandler.class);
 	private Label label;
+	private Label subLabel;
 
 	public LabelContentHandler() {
 		this (l -> true);
@@ -47,6 +48,11 @@ public class LabelContentHandler extends DiscogsContentHandler {
 			label.setParentLabel(pl);
 			
 			break;
+		case "[labels, label, sublabels, label]":
+			subLabel = new Label();
+			subLabel.setId(Integer.parseInt(attributes.getValue("id")));
+			
+			break;
 		default:
 		}
 	}
@@ -69,6 +75,13 @@ public class LabelContentHandler extends DiscogsContentHandler {
 			break;
 		case "[labels, label, parentLabel]":
 			label.getParentLabel().setName(getChars(true));
+			
+			break;
+		case "[labels, label, sublabels, label]":
+			subLabel.setName(getChars());
+			subLabel.setParentLabel(label);
+			
+			label.getSubLabels().add(subLabel);
 			
 			break;
 		case "[labels, label]":

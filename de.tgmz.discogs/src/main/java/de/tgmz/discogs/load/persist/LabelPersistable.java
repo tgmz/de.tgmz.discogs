@@ -15,11 +15,13 @@ import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.load.factory.BasicEntityFactory;
 import de.tgmz.discogs.load.factory.IFactory;
+import de.tgmz.discogs.load.factory.collections.SetFactory;
 import jakarta.persistence.EntityManager;
 
 public class LabelPersistable extends AbstractDefaultPersistable<Label> {
 	private Predicate<Label> filter;
 	private IFactory<Label> lf;
+	private SetFactory<Label> lsf;
 	
 	public LabelPersistable() {
 		this(x -> true);
@@ -29,12 +31,15 @@ public class LabelPersistable extends AbstractDefaultPersistable<Label> {
 		this.filter = filter;
 		
 		lf = new BasicEntityFactory<>();
+		lsf = new SetFactory<>(lf);
 	}
 
 	@Override
 	// Inserting labels in batch mode cause trouble if a label is its own parent label
 	public int save(int threshold, Label label) {
 		if (filter.test(label)) {
+			LOG.debug("Save {}", label);
+			
 			try (EntityManager em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager()) {
 				em.getTransaction().begin();
 				
@@ -54,6 +59,8 @@ public class LabelPersistable extends AbstractDefaultPersistable<Label> {
 						l.setParentLabel(lf.get(em, pl));
 					}
 				}
+				
+				l.setSubLabels(lsf.replaceAll(em, l.getSubLabels()));
 			
 				em.merge(l);
 				
