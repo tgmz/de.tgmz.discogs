@@ -11,5 +11,5 @@ create table artist_artist_all (id integer not null, name varchar(255))
 create table artist_master_all (id integer not null, name varchar(255))
 create table artist_release_all (id integer not null, name varchar(255))
 
-create table label_parent_all (id integer not null, name varchar(255))
+create table label_label_all (id integer not null, name varchar(255))
 create table label_release_all (id integer not null, name varchar(255))

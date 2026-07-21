@@ -19,8 +19,9 @@ public enum Table implements ITable {
 	, artist_members
 	, Artist_variations
 	, Master
-	, label_parent_all
-	, Label(label_parent_all)
+	, label_label_all
+	, Label(label_label_all)
+	, Label_Label(Label,label_label_all)
 	, Genre
 	, Master_Genre(Genre)	// Logical dependency: Master_Genre updates Genre
 	, Style
@@ -32,8 +33,8 @@ public enum Table implements ITable {
 	, Release(Series, Master)
 	, Release_Genre(Genre, Master_Genre)	// Combined logical and technical dependency
 	, Release_Style(Style, Master_Style)
-	, label_release_all(Label, label_parent_all)
-	, Release_labels(Label, label_parent_all, label_release_all)
+	, label_release_all(Label, label_label_all)
+	, Release_labels(Label, label_label_all, label_release_all)
 	, artist_release_all(Artist, artist_artist_all, artist_master_all)
 	, Release_Artist
 	, EntityType
