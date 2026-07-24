@@ -9,7 +9,6 @@
 **********************************************************************/
 package de.tgmz.discogs.domain;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -42,7 +41,7 @@ import jakarta.persistence.Transient;
 	@Index(columnList = "release_id,sequence", name = "Track_pkey", unique = true),
 	@Index(columnList = "title", name = "Track_title_idx"), 
 })
-public class Track implements Serializable {
+public class Track implements IIdentifiable<TrackId> {
 	@Transient
 	private static final long serialVersionUID = 5684918391708831387L;
 	@EmbeddedId

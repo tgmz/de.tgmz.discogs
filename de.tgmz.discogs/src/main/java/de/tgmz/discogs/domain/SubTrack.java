@@ -9,7 +9,6 @@
 **********************************************************************/
 package de.tgmz.discogs.domain;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,7 +35,7 @@ import jakarta.persistence.Transient;
 	@Index(columnList = "title", name = "SubTrack_title_idx"), 
 })
 
-public class SubTrack implements Serializable {
+public class SubTrack implements IIdentifiable<SubTrackId> {
 	@Transient
 	private static final long serialVersionUID = 5772183040087284559L;
 	@EmbeddedId
@@ -62,6 +61,10 @@ public class SubTrack implements Serializable {
 		this();
 		
 		id.setTrack(t);
+	}
+	
+	public SubTrackId getId() {
+		return id;
 	}
 	
 	public short getSubTrackNumber() {

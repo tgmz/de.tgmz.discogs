@@ -271,19 +271,19 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 				, f.getText()
 			);
 				
-			pm.get(Table.Release_Format).printRecord(
-					r.getId()
-					, fid
-				);
+		pm.get(Table.Release_Format).printRecord(
+				r.getId()
+				, fid
+			);
 					
-			for (String s : f.getDescriptions()) {
-				pm.get(Table.Format_descriptions).printRecord(
-						fid
-						, s
-				);
-			}
+		for (String s : f.getDescriptions()) {
+			pm.get(Table.Format_descriptions).printRecord(
+				fid
+				, s
+			);
+		}
 			
-			++fid;
+		++fid;
 	}
 }
  

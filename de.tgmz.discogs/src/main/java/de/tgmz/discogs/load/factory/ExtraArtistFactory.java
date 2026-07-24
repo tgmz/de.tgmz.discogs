@@ -9,45 +9,25 @@
 **********************************************************************/
 package de.tgmz.discogs.load.factory;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.ExtraArtist;
-import de.tgmz.discogs.domain.id.ExtraArtistId;
 import jakarta.persistence.EntityManager;
 
 public class ExtraArtistFactory implements IFactory<ExtraArtist> {
-	private static final Logger LOG = LoggerFactory.getLogger(ExtraArtistFactory.class);
+	private BasicEntityFactory<Artist> baf;
+	private BasicEntityFactory<ExtraArtist> beaf;
+
+	public ExtraArtistFactory() {
+		baf = new BasicEntityFactory<>();
+		beaf = new BasicEntityFactory<>();
+	}
 	
 	@Override
 	public ExtraArtist get(EntityManager em, ExtraArtist draft) {
-		return findOrCreate(em, draft);
-	}
-	
-	private ExtraArtist findOrCreate(EntityManager em, ExtraArtist draft) {
-		Artist a = em.find(Artist.class, draft.getArtist().getId());
-		
-		if (a == null) {
-			a = draft.getArtist();
-
-			LOG.trace("{} not present, creating...", a);
-			
-			em.persist(a);
-		}
+		Artist a = baf.get(em, draft.getArtist());
 		
 		draft.setArtist(a);
 		
-		ExtraArtist ea = em.find(ExtraArtist.class, new ExtraArtistId(draft.getRole(), a));
-		
-		if (ea == null) {
-			LOG.trace("ExtraArtist {} not present, creating...", draft);
-			
-			ea = draft;
-			
-			em.persist(ea);
-		}
-		
-		return ea;
+		return beaf.get(em, draft);
 	}
 }

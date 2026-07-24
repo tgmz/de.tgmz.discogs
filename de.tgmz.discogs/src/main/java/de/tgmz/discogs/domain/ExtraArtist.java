@@ -9,7 +9,6 @@
 **********************************************************************/
 package de.tgmz.discogs.domain;
 
-import java.io.Serializable;
 import java.util.Objects;
 
 import de.tgmz.discogs.domain.id.ExtraArtistId;
@@ -23,7 +22,7 @@ import jakarta.persistence.Transient;
 @Table(indexes = {
 	@Index(columnList = "role,artist_id", name = "ExtraArtist_pkey", unique = true),
 })
-public class ExtraArtist implements Serializable { 
+public class ExtraArtist implements IIdentifiable<ExtraArtistId> { 
 	@Transient
 	private static final long serialVersionUID = 2296552658329482485L;
 	@EmbeddedId

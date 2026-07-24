@@ -34,6 +34,7 @@ public class Format implements Serializable {
 	@TableGenerator(name = "format_gen")
 	@Id
 	@GeneratedValue(strategy = GenerationType.TABLE, generator = "format_gen")
+	@TableGenerator(allocationSize = 1)
 	private int id;
 	@Column(length = 31)
 	private String name;

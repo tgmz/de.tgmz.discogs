@@ -9,14 +9,20 @@
 **********************************************************************/
 package de.tgmz.discogs.load.factory;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import de.tgmz.discogs.domain.Artist;
+import de.tgmz.discogs.load.factory.collections.SetFactory;
 import jakarta.persistence.EntityManager;
 
 public class ArtistFactory implements IFactory<Artist> {
 	private EntityManager em;
+	private BasicEntityFactory<Artist> baf;
+	private SetFactory<Artist> saf;
+	
+	public ArtistFactory() {
+		baf = new BasicEntityFactory<>();
+		
+		saf = new SetFactory<>(baf);
+	}
 	
 	@Override
 	public Artist get(EntityManager em, Artist draft) {
@@ -26,7 +32,7 @@ public class ArtistFactory implements IFactory<Artist> {
 	}
 	
 	private Artist enrich(Artist draft) {
-		Artist a0 = findOrCreate(draft);
+		Artist a0 = baf.get(em, draft);
 		
 		if (a0.getAliases().isEmpty()) {
 			a0.setAliases(draft.getAliases());
@@ -56,29 +62,9 @@ public class ArtistFactory implements IFactory<Artist> {
 			a0.setVariations(draft.getVariations());
 		}
 		
-		a0.setAliases(replaceAll(a0.getAliases()));
-		a0.setGroups(replaceAll(a0.getGroups()));
-		a0.setMembers(replaceAll(a0.getMembers()));
-		
-		return a0;
-	}
-
-	private Set<Artist> replaceAll(Set<Artist> artists) {
-		Set<Artist> l = new HashSet<>();
-		
-		artists.forEach(a -> l.add(findOrCreate(a)));
-		
-		return l;
-	}
-	
-	private Artist findOrCreate(Artist draft) {
-		Artist a0 = em.find(Artist.class, draft.getId());
-		
-		if (a0  == null) {
-			a0 = draft;
-			
-			em.persist(a0);
-		}
+		a0.setAliases(saf.replaceAll(em, a0.getAliases()));
+		a0.setGroups(saf.replaceAll(em, a0.getGroups()));
+		a0.setMembers(saf.replaceAll(em, a0.getMembers()));
 		
 		return a0;
 	}

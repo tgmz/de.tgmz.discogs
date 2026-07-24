@@ -11,6 +11,6 @@ package de.tgmz.discogs.domain;
 
 import java.io.Serializable;
 
-public interface IIdentifiable<T extends Serializable> {
+public interface IIdentifiable<T> extends Serializable {
 	T getId();
 }

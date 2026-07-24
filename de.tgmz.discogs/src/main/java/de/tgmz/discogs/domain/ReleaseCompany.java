@@ -9,7 +9,6 @@
 **********************************************************************/
 package de.tgmz.discogs.domain;
 
-import java.io.Serializable;
 import java.util.Objects;
 
 import de.tgmz.discogs.domain.id.ReleaseCompanyKey;
@@ -20,13 +19,15 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 @Entity
 @Table(name = "release_company"
 , indexes = {
 		@Index(columnList = "release_id,company_id,entityType_id", name = "ReleaseCompany_pkey", unique = true),
 })
-public class ReleaseCompany implements Serializable {
+public class ReleaseCompany implements IIdentifiable<ReleaseCompanyKey> {
+	@Transient
 	private static final long serialVersionUID = 1087312827584224994L;
 	
 	@EmbeddedId
@@ -49,6 +50,11 @@ public class ReleaseCompany implements Serializable {
 	
 	public ReleaseCompany() {
 		id = new ReleaseCompanyKey();
+	}
+
+	@Override
+	public ReleaseCompanyKey getId() {
+		return id;
 	}
 	
 	public Release getRelease() {

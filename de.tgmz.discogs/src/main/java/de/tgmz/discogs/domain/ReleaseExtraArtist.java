@@ -9,7 +9,6 @@
 **********************************************************************/
 package de.tgmz.discogs.domain;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -23,13 +22,15 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 @Entity
 @Table(name = "release_extraartist"
 	, indexes = {
 		@Index(columnList = "release_id,role_id,artist_id", name = "ReleaseExtraArtist_pkey", unique = true),
 })
-public class ReleaseExtraArtist implements Serializable {
+public class ReleaseExtraArtist implements IIdentifiable<ReleaseExtraArtistKey> {
+	@Transient
 	private static final long serialVersionUID = 1087312827584224994L;
 	
 	@EmbeddedId
@@ -53,6 +54,11 @@ public class ReleaseExtraArtist implements Serializable {
 		id = new ReleaseExtraArtistKey();
 		
 		applicableTracks = new HashSet<>();
+	}
+	
+	@Override
+	public ReleaseExtraArtistKey getId() {
+		return id;
 	}
 	
 	public Release getRelease() {
