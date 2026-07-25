@@ -18,7 +18,7 @@ create table ExtraArtist (artist_id integer not null, role varchar(255) not null
 create table Format (id integer not null, qty float(24), name varchar(31), text varchar(255), primary key (id))
 create table Format_descriptions (Format_id integer not null, descriptions varchar(255), unique (Format_id, descriptions))
 create table format_gen (next_val bigint, sequence_name varchar(255) not null, primary key (sequence_name))
-insert into format_gen(sequence_name, next_val) values ('Format',0)
+insert into format_gen(sequence_name, next_val) values ('Format',1)
 create table Genre (id varchar(31) not null, primary key (id))
 create table Label (data_quality smallint check ((data_quality between 0 and 5)), id integer not null, parentLabel_id integer, name varchar(255), primary key (id))
 create table Label_Label (Label_id integer not null, subLabels_id integer not null, primary key (Label_id, subLabels_id))

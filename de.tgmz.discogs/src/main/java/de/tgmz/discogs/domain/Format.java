@@ -31,10 +31,9 @@ import jakarta.persistence.Transient;
 public class Format implements Serializable {
 	@Transient
 	private static final long serialVersionUID = 1820280634515019733L;
-	@TableGenerator(name = "format_gen")
 	@Id
 	@GeneratedValue(strategy = GenerationType.TABLE, generator = "format_gen")
-	@TableGenerator(allocationSize = 1)
+	@TableGenerator(name = "format_gen", allocationSize = 1, initialValue = 1)
 	private int id;
 	@Column(length = 31)
 	private String name;

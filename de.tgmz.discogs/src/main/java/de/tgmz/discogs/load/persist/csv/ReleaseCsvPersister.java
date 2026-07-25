@@ -32,7 +32,7 @@ import de.tgmz.discogs.domain.Track;
 public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 	private static final Logger LOG = LoggerFactory.getLogger(ReleaseCsvPersister.class);
 	private Predicate<Release> filter;
-	private int fid = 0;
+	private int fid = 1;
 
 	public ReleaseCsvPersister(String target) {
 		this (target, c -> true);
