@@ -67,7 +67,7 @@ public class DatabaseAction extends RecursiveAction {
 				LOG.info("{}: {} rows were affected in {}", table, String.format("%,d", affected), LogUtil.formatDuration(start, System.currentTimeMillis()));
 			}
 		} catch (SQLException e) {
-			LOG.error("Execution failed: {}", e.getMessage());
+			LOG.error("{}: Execution failed: {}", table, e.getMessage());
 		}
 	}
 	

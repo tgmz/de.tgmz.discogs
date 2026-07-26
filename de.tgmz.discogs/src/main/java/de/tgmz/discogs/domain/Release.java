@@ -59,6 +59,8 @@ public class Release extends Discogs {
 	private Set<Format> formats;
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private Series series;
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<Identifier> identifiers;
 
 	public Release() {
 		super();
@@ -68,6 +70,7 @@ public class Release extends Discogs {
 		labels = new HashMap<>();
 		releaseCompanies = new HashSet<>();
 		formats = new HashSet<>();
+		identifiers = new HashSet<>();
 	}
 	
 	/**
@@ -100,6 +103,10 @@ public class Release extends Discogs {
 
 	public Set<Format> getFormats() {
 		return formats;
+	}
+
+	public Set<Identifier> getIdentifiers() {
+		return identifiers;
 	}
 
 	public Master getMaster() {
