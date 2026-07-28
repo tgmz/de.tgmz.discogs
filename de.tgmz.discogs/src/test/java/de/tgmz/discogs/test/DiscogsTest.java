@@ -468,6 +468,7 @@ public abstract class DiscogsTest {
 		
 		Label dm = em.find(Label.class, 21);
 		assertEquals("Drop Music", dm.getName());
+		assertEquals("Email: info@dropmusic.co.uk", dm.getContactinfo());
 		// Ridiculous: A label where parent- and sublabel are the same
 		assertSame(dm.getParentLabel(), dm.getSubLabels().stream().findFirst().orElseThrow());
 		

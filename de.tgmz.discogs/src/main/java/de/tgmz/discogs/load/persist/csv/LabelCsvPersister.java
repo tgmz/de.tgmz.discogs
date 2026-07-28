@@ -30,6 +30,7 @@ public class LabelCsvPersister extends AbstractCsvPersister<Label> {
 			, l.getId()
 			, pls
 			, l.getName()
+			, l.getContactinfo()
 		);
 		
 		if (pl != null) {

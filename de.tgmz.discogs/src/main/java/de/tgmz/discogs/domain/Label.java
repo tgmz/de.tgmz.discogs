@@ -16,6 +16,7 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Index;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -36,6 +37,8 @@ public class Label extends PrimaryEntity {
 	private Label parentLabel;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private Set<Label> subLabels;
+	@Lob
+	private String contactinfo;
 
 	public Label() {
 		super();
@@ -58,6 +61,10 @@ public class Label extends PrimaryEntity {
 		return subLabels;
 	}
 
+	public String getContactinfo() {
+		return contactinfo;
+	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -68,6 +75,10 @@ public class Label extends PrimaryEntity {
 
 	public void setSubLabels(Set<Label> subLabels) {
 		this.subLabels = subLabels;
+	}
+
+	public void setContactinfo(String contactinfo) {
+		this.contactinfo = contactinfo;
 	}
 
 	@Override

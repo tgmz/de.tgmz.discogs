@@ -77,6 +77,10 @@ public class LabelContentHandler extends DiscogsContentHandler {
 			label.getParentLabel().setName(getChars(true));
 			
 			break;
+		case "[labels, label, contactinfo]":
+			label.setContactinfo(getChars());
+			
+			break;
 		case "[labels, label, sublabels, label]":
 			subLabel.setName(getChars());
 			subLabel.setParentLabel(label);
