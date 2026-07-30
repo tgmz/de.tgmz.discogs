@@ -21,10 +21,10 @@ import org.apache.commons.csv.CSVPrinter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DiscogsCsvPrinter {
+public class DiscogsCsvPrinter<T> {
 	@SuppressWarnings("unused")
 	private static final Logger LOG = LoggerFactory.getLogger(DiscogsCsvPrinter.class);
-	private Set<Number> cache;
+	private Set<T> cache;
 	private CSVPrinter p;
 	
 	public DiscogsCsvPrinter(String target, Table table) throws IOException {
@@ -38,8 +38,12 @@ public class DiscogsCsvPrinter {
 	}
 	
 	public void printRecordUsingCache(Object... values) throws IOException {
-		if (!(values[0] instanceof Number n)
-			|| cache.add(n)) {
+		printRecordUsingCacheOnColumn(0, values);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void printRecordUsingCacheOnColumn(int idCol, Object... values) throws IOException {
+		if (cache.add((T) values[idCol])) {
 			p.printRecord(values);
 		}
 	}

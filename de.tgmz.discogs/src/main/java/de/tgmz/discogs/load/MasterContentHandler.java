@@ -24,6 +24,7 @@ import de.tgmz.discogs.domain.DataQuality;
 import de.tgmz.discogs.domain.Genre;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Style;
+import de.tgmz.discogs.domain.Video;
 import de.tgmz.discogs.load.persist.MasterPersistable;
 import jakarta.persistence.EntityManager;
 
@@ -32,6 +33,7 @@ public class MasterContentHandler extends DiscogsContentHandler {
 	private int artistId;
 	private String artistName;
 	private Master master;
+	private Video video;
 	private List<String> artistNames;
 	private List<String> joins;
 	private long artistsBefore;
@@ -64,6 +66,13 @@ public class MasterContentHandler extends DiscogsContentHandler {
 		case "[masters, master, artists]":
 			artistNames = new ArrayList<>();
 			joins = new ArrayList<>();
+			
+			break;
+		case "[masters, master, videos, video]":
+			video = new Video(attributes.getValue("src"));
+			
+			video.setDuration(Integer.parseInt(attributes.getValue("duration")));
+			video.setEmbed(Boolean.parseBoolean(attributes.getValue("embed")));
 			
 			break;
 		default:
@@ -120,6 +129,18 @@ public class MasterContentHandler extends DiscogsContentHandler {
 			break;
 		case "[masters, master, artists, artist, anv]":
 			artistNames.set(artistNames.size() - 1, getChars());
+			
+			break;
+		case "[masters, master, videos, video, title]":
+			video.setTitle(getChars());
+			
+			break;
+		case "[masters, master, videos, video, description]":
+			video.setDescription(getChars());
+			
+			break;
+		case "[masters, master, videos, video]":
+			master.getVideos().add(video);
 			
 			break;
 		case "[masters, master]":

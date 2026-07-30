@@ -35,6 +35,7 @@
 		<class>de.tgmz.discogs.domain.Series</class>
 		<class>de.tgmz.discogs.domain.EntityType</class>
 		<class>de.tgmz.discogs.domain.ReleaseExtraArtist</class>
+		<class>de.tgmz.discogs.domain.Video</class>
 
 		<properties>
 			<!-- Database connection settings -->

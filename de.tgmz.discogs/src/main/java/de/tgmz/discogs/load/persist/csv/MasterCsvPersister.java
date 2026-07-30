@@ -15,6 +15,7 @@ import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.Genre;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Style;
+import de.tgmz.discogs.domain.Video;
 
 public class MasterCsvPersister extends AbstractCsvPersister<Master> {
 	public MasterCsvPersister(String target) {
@@ -22,7 +23,8 @@ public class MasterCsvPersister extends AbstractCsvPersister<Master> {
 			, Table.Master
 			, Table.Master_Artist
 			, Table.Genre, Table.Style, Table.Master_Genre, Table.Master_Style
-			, Table.artist_master_all.useCache(500_000));
+			, Table.artist_master_all.useCache(500_000)
+			, Table.Master_Video, Table.Video.useCache(1_000_000));
 	}
 
 	protected int doSave(Master m) throws IOException {
@@ -57,6 +59,22 @@ public class MasterCsvPersister extends AbstractCsvPersister<Master> {
 			pm.get(Table.Master_Style).printRecord(
 				m.getId()
 				, s.getId()
+			);
+		}
+		
+		for (Video v : m.getVideos()) {
+			pm.get(Table.Master_Video).printRecord(
+				m.getId()
+				, v.getId()
+			);
+			
+			
+			pm.get(Table.Video).printRecordUsingCacheOnColumn(2
+				, v.getDuration()
+				, v.isEmbed()
+				, v.getId()
+				, v.getTitle()
+				, v.getDescription()
 			);
 		}
 		

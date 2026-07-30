@@ -29,6 +29,8 @@ public enum Table implements ITable {
 	, artist_master_all(Artist, artist_artist_all)	// Technical dependency: artist_master and artist_artist_all must not run parallel.
 													// They both update Artist which could lead to a deadlock
 	, Master_Artist
+	, Video
+	, Master_Video
 	, Series
 	, Release(Series, Master)
 	, Release_Genre(Genre, Master_Genre)	// Combined logical and technical dependency

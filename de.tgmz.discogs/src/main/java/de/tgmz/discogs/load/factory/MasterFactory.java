@@ -11,18 +11,23 @@ package de.tgmz.discogs.load.factory;
 
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.Master;
+import de.tgmz.discogs.domain.Video;
 import de.tgmz.discogs.load.factory.collections.SetFactory;
 import jakarta.persistence.EntityManager;
 
 public class MasterFactory implements IFactory<Master> {
 	private SetFactory<Artist> sra;
+	private SetFactory<Video> sfv;
 	
 	public MasterFactory() {
-		sra = new SetFactory<>(new ArtistFactory());	}
+		sra = new SetFactory<>(new ArtistFactory());
+		sfv = new SetFactory<>(new BasicEntityFactory<>());
+	}
 	
 	@Override
 	public Master get(EntityManager em, Master draft) {
 		draft.setArtists(sra.replaceAll(em, draft.getArtists()));
+		draft.setVideos(sfv.replaceAll(em, draft.getVideos()));
 		
 		return draft;
 	}

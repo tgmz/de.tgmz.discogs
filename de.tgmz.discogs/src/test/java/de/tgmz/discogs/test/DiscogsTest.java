@@ -50,6 +50,7 @@ import de.tgmz.discogs.domain.Series;
 import de.tgmz.discogs.domain.Style;
 import de.tgmz.discogs.domain.SubTrack;
 import de.tgmz.discogs.domain.Track;
+import de.tgmz.discogs.domain.Video;
 import de.tgmz.discogs.domain.id.ReleaseCompanyKey;
 import de.tgmz.discogs.domain.id.ReleaseExtraArtistKey;
 import de.tgmz.discogs.domain.id.SubTrackId;
@@ -454,6 +455,14 @@ public abstract class DiscogsTest {
 		assertEquals(1, lIdent.size());
 		assertEquals(IdentType.BARCODE, lIdent.getFirst().getType());
 		assertEquals("Text", lIdent.getFirst().getDescription());
+		
+		Video ets = m.getVideos().stream().filter(v -> "Depeche Mode - Halo (Official Video)".equals(v.getTitle())).findAny().orElseThrow();
+		
+		assertEquals("https://www.youtube.com/watch?v=iEH4eqtK8SU", ets.getId());
+		assertTrue(ets.isEmbed());
+		assertEquals(270,  ets.getDuration());
+		assertEquals(177,  ets.getDescription().length());
+		
 	}
 	
 	@Test

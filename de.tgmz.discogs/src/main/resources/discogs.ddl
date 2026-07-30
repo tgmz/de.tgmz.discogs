@@ -29,6 +29,7 @@ create table Master (data_quality smallint check ((data_quality between 0 and 5)
 create table Master_Artist (Master_id integer not null, artists_id integer not null, primary key (Master_id, artists_id))
 create table Master_Genre (Master_id integer not null, genres_id varchar(31) not null, primary key (Master_id, genres_id))
 create table Master_Style (Master_id integer not null, styles_id varchar(31) not null, primary key (Master_id, styles_id))
+create table Master_Video (Master_id integer not null, videos_id varchar(255) not null, primary key (Master_id, videos_id))
 create table Release (_main boolean not null, data_quality smallint check ((data_quality between 0 and 5)), id integer not null, master_id integer, series_id integer, albumArtist varchar(512), country varchar(255), released varchar(255), title varchar(255), primary key (id))
 create table Release_Artist (Release_id integer not null, artists_id integer not null, primary key (Release_id, artists_id))
 create table release_company (company_id integer not null, entityType_id smallint not null, release_id integer not null, constraint ReleaseCompany_pkey primary key (release_id, company_id, entityType_id))
@@ -48,6 +49,7 @@ create table Track (release_id integer not null, sequence smallint not null, tra
 create table Track_Artist (Track_release_id integer not null, Track_sequence smallint not null, artists_id integer not null, constraint Track_Artist_pkey unique (Track_release_id, Track_sequence, artists_id))
 create table Track_ExtraArtist (Track_release_id integer not null, Track_sequence smallint not null, extraArtists_artist_id integer not null, extraArtists_role varchar(255) not null, constraint Track_ExtraArtist_pkey unique (Track_release_id, Track_sequence, extraArtists_role, extraArtists_artist_id))
 create table Track_SubTrack (Track_release_id integer not null, Track_sequence smallint not null, subTracklist_subTrackNumber smallint not null, subTracklist_track_release_id integer not null, subTracklist_track_sequence smallint not null, constraint Track_SubTrack_pkey unique (subTracklist_track_release_id, subTracklist_track_sequence, subTracklist_subTrackNumber))
+create table Video (duration integer not null, embed boolean not null, id varchar(255) not null, title varchar(255), description clob, primary key (id))
 create index Artist_name_idx on Artist (name)
 create index Company_name_idx on Company (name)
 create index Label_name_idx on Label (name)
@@ -76,6 +78,8 @@ alter table if exists Master_Genre add constraint FKsi7jqsjajj0gyi1o1icwka217 fo
 alter table if exists Master_Genre add constraint FKhlqekntv1a4quc5mtd1yuty39 foreign key (Master_id) references Master
 alter table if exists Master_Style add constraint FKith9t44bcfuw7y4reh6jv08pb foreign key (styles_id) references Style
 alter table if exists Master_Style add constraint FKdfuln42s0ie5cpki8p762hrb1 foreign key (Master_id) references Master
+alter table if exists Master_Video add constraint FK416do5hcgn482dggyxehnnuib foreign key (videos_id) references Video
+alter table if exists Master_Video add constraint FKf7s5iulufjxedk2yp2x2jehtd foreign key (Master_id) references Master
 alter table if exists Release add constraint FK8gixt7pw3n2amghs1nemj3mcm foreign key (master_id) references Master
 alter table if exists Release add constraint FK3hr6u3mck4xpt1ya4sftjbohc foreign key (series_id) references Series
 alter table if exists Release_Artist add constraint FKmfjrsxqbuey6t1pvlo2txe2x0 foreign key (artists_id) references Artist
