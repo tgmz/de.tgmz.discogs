@@ -27,9 +27,9 @@ public class DiscogsCsvParallelTest extends DiscogsCsvTest {
 		
 		init();
 		
-		ActionFactory af = ActionFactory.getInstance().forTables(Table.values());
+		ActionFactory af = ActionFactory.getInstance().forTables(dataDir, Table.values());
 
-		ForkJoinTask.invokeAll(af.create(Action.LOAD_NO_PK, Mode.PARALLEL, dataDir.toString()));
+		ForkJoinTask.invokeAll(af.create(Action.LOAD_NO_PK, Mode.PARALLEL));
 		ForkJoinTask.invokeAll(af.create(Action.PRIMARY_KEY, Mode.SEQUENTIAL));
 		ForkJoinTask.invokeAll(af.create(Action.RECONCILE, Mode.DEPENDING));
 		ForkJoinTask.invokeAll(af.create(Action.INDEX, Mode.SUMMUP));

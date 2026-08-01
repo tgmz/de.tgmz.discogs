@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -56,6 +57,7 @@ public final class ActionFactory {
 	private Properties prop;
 	private List<Pattern> pkPattern;
 	private ITable[] tables;
+	private Path root;
 
 	/**
 	 * Private constructor for security reasons
@@ -68,7 +70,8 @@ public final class ActionFactory {
 		tables = new ITable[0];
 	}
 	
-	public ActionFactory forTables(ITable[] tables) {
+	public ActionFactory forTables(Path root, ITable... tables) {
+		this.root = root;
 		this.tables = tables;
 		
 		return this;
@@ -79,17 +82,13 @@ public final class ActionFactory {
 	}
 
 	public List<DatabaseAction> create(Action a) {
-		return create(a, Mode.PARALLEL, null);
+		return create(a, Mode.PARALLEL);
 	}
 	
 	public List<DatabaseAction> create(Action a, Mode m) {
-		return create(a, m, null);
-	}
-	
-	public List<DatabaseAction> create(Action a, Mode m, String root) {
 		List<DatabaseAction> result = new LinkedList<>();
 		
-		Stream.of(tables).forEach(t -> result.add(new DatabaseAction(t, createSql(t, a, root))));
+		Stream.of(tables).forEach(t -> result.add(new DatabaseAction(t, createSql(t, a))));
 		
 		result.removeIf( da -> da.getSqls().isEmpty());
 		
@@ -158,7 +157,7 @@ public final class ActionFactory {
 		return new ArrayList<>(prop.entrySet().stream().filter(e -> ((String) e.getKey()).matches(keyPattern)).toList());
 	}
 	
-	private List<String> createSql(ITable t, Action a, String root) {
+	private List<String> createSql(ITable t, Action a) {
 		List<String> stmts;
 		
 		switch (a) {
