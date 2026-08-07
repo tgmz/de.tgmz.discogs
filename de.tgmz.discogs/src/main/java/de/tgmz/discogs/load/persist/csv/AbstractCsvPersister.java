@@ -36,6 +36,8 @@ public abstract class AbstractCsvPersister<T> implements IPersistable<T> {
 			em.runWithConnection((Connection con) -> {
 				Statement st = con.createStatement();
 				
+				st.setMaxRows(0);	// We're only interested in the matadata
+				
 				for (Table table : tables) {
 					DiscogsCsvPrinter csvp = new DiscogsCsvPrinter(target, table);
 					
