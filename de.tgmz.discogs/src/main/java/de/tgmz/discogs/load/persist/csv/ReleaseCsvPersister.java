@@ -10,12 +10,28 @@
 package de.tgmz.discogs.load.persist.csv;
 
 import java.io.IOException;
+<<<<<<< Upstream, based on 876189c54ead07f4c3091bc3bbcf4fa9f5b5014c
+=======
+import java.math.BigInteger;
+import java.util.HashSet;
+>>>>>>> 3b0034a Add testcase: Release 16267698 has two identical formats
 import java.util.Map.Entry;
+<<<<<<< Upstream, based on 876189c54ead07f4c3091bc3bbcf4fa9f5b5014c
+=======
+import java.util.Set;
+import java.util.UUID;
+>>>>>>> 3b0034a Add testcase: Release 16267698 has two identical formats
 import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+<<<<<<< Upstream, based on 876189c54ead07f4c3091bc3bbcf4fa9f5b5014c
+=======
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
+
+>>>>>>> 3b0034a Add testcase: Release 16267698 has two identical formats
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.ExtraArtist;
 import de.tgmz.discogs.domain.Format;
@@ -263,6 +279,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 				, a.getName()
 		);
 	}
+<<<<<<< Upstream, based on 876189c54ead07f4c3091bc3bbcf4fa9f5b5014c
 	private void save(Release r, Format f) throws IOException {
 		pm.get(Table.Format).printRecord(
 				fid
@@ -270,6 +287,26 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 				, f.getName()
 				, f.getText()
 			);
+=======
+	private void saveFormats(Release r) throws IOException {
+		byte[] sr = BigInteger.valueOf(r.getId()).toByteArray();
+		
+		Set<UUID> rc = new HashSet<>();
+		
+		for (Format f: r.getFormats()) {
+			UUID uuid = UUID.nameUUIDFromBytes(ArrayUtils.addAll(sr, cache.get(f)));
+			
+			if (!rc.add(uuid)) {
+				uuid = UUID.randomUUID();
+			}
+		
+			pm.get(Table.Format).printRecord(
+					f.getQty()
+					, uuid
+					, f.getName()
+					, f.getText()
+				);
+>>>>>>> 3b0034a Add testcase: Release 16267698 has two identical formats
 				
 		pm.get(Table.Release_Format).printRecord(
 				r.getId()

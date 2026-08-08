@@ -336,6 +336,9 @@ public abstract class DiscogsTest {
 														&& "".equals(f.getText())
 														&& 1f == f.getQty())); 
 		
+		Release r3 = em.find(Release.class, 16267698);
+		
+		assertEquals(4, r3.getFormats().size());
 	}
 
 	protected static void extractAndProcess(String resource, DiscogsContentHandler dch) throws IOException {
