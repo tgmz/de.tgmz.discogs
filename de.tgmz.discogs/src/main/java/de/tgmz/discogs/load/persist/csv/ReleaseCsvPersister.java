@@ -10,28 +10,12 @@
 package de.tgmz.discogs.load.persist.csv;
 
 import java.io.IOException;
-<<<<<<< Upstream, based on 876189c54ead07f4c3091bc3bbcf4fa9f5b5014c
-=======
-import java.math.BigInteger;
-import java.util.HashSet;
->>>>>>> 3b0034a Add testcase: Release 16267698 has two identical formats
 import java.util.Map.Entry;
-<<<<<<< Upstream, based on 876189c54ead07f4c3091bc3bbcf4fa9f5b5014c
-=======
-import java.util.Set;
-import java.util.UUID;
->>>>>>> 3b0034a Add testcase: Release 16267698 has two identical formats
 import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-<<<<<<< Upstream, based on 876189c54ead07f4c3091bc3bbcf4fa9f5b5014c
-=======
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
-
->>>>>>> 3b0034a Add testcase: Release 16267698 has two identical formats
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.ExtraArtist;
 import de.tgmz.discogs.domain.Format;
@@ -59,10 +43,10 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 				, Table.Release, Table.Track, Table.SubTrack
 				, Table.Release_Track, Table.Track_SubTrack, Table.Release_Genre, Table.Release_Style, Table.Release_Artist
 				, Table.Series.useCache(120_000)
-				, Table.Track_Artist, Table.release_extraartist, Table.ReleaseExtraArtist_applicableTracks
+				, Table.Track_Artist, Table.ReleaseExtraArtist, Table.ReleaseExtraArtist_applicableTracks
 				, Table.Track_ExtraArtist, Table.SubTrack_ExtraArtist, Table.ExtraArtist
 				, Table.Company.useCache(1_300_000), Table.EntityType.useCache(100)
-				, Table.Release_labels, Table.release_company
+				, Table.Release_labels, Table.ReleaseCompany
 				, Table.Format, Table.Format_descriptions, Table.Release_Format
 				, Table.artist_release_all.useCache(5_000_000)
 				, Table.format_gen
@@ -131,7 +115,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 		}
 		
 		for (ReleaseCompany rc : r.getReleaseCompanies()) {
-			pm.get(Table.release_company).printRecord(
+			pm.get(Table.ReleaseCompany).printRecord(
 				rc.getCompany().getId()
 				, rc.getEntityType().getId()
 				, r.getId()
@@ -244,7 +228,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 	}
 	private void save(ReleaseExtraArtist rea) throws IOException {
 		if (rea.getExtraArtist().getRole() != null) {
-			pm.get(Table.release_extraartist).printRecord(
+			pm.get(Table.ReleaseExtraArtist).printRecord(
 					rea.getExtraArtist().getArtist().getId()
 					, rea.getRelease().getId()
 					, rea.getExtraArtist().getRole()
@@ -279,7 +263,6 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 				, a.getName()
 		);
 	}
-<<<<<<< Upstream, based on 876189c54ead07f4c3091bc3bbcf4fa9f5b5014c
 	private void save(Release r, Format f) throws IOException {
 		pm.get(Table.Format).printRecord(
 				fid
@@ -287,26 +270,6 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 				, f.getName()
 				, f.getText()
 			);
-=======
-	private void saveFormats(Release r) throws IOException {
-		byte[] sr = BigInteger.valueOf(r.getId()).toByteArray();
-		
-		Set<UUID> rc = new HashSet<>();
-		
-		for (Format f: r.getFormats()) {
-			UUID uuid = UUID.nameUUIDFromBytes(ArrayUtils.addAll(sr, cache.get(f)));
-			
-			if (!rc.add(uuid)) {
-				uuid = UUID.randomUUID();
-			}
-		
-			pm.get(Table.Format).printRecord(
-					f.getQty()
-					, uuid
-					, f.getName()
-					, f.getText()
-				);
->>>>>>> 3b0034a Add testcase: Release 16267698 has two identical formats
 				
 		pm.get(Table.Release_Format).printRecord(
 				r.getId()

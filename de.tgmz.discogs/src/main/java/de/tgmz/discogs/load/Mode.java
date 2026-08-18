@@ -12,6 +12,5 @@ package de.tgmz.discogs.load;
 public enum Mode {
 	PARALLEL		// Run all actions parallel in arbitrary order
 	, SEQUENTIAL	// Run one action after another in sequence defined by Table enum
-	, SUMMUP		// Combine all SQLs in one action so they get executed in a single batch 
 	, DEPENDING		// Like parallel but honor dependencies in Table enum
 }

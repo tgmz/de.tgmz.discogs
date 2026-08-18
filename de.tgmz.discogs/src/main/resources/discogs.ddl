@@ -28,13 +28,13 @@ create table Master_Genre (Master_id integer not null, genres_id varchar(31) not
 create table Master_Style (Master_id integer not null, styles_id varchar(31) not null, primary key (Master_id, styles_id))
 create table Release (_main boolean not null, data_quality smallint check ((data_quality between 0 and 5)), id integer not null, master_id integer, series_id integer, albumArtist varchar(512), country varchar(255), released varchar(255), title varchar(255), primary key (id))
 create table Release_Artist (Release_id integer not null, artists_id integer not null, primary key (Release_id, artists_id))
-create table release_company (company_id integer not null, entityType_id smallint not null, release_id integer not null, constraint ReleaseCompany_pkey primary key (release_id, company_id, entityType_id))
-create table release_extraartist (artist_id integer not null, release_id integer not null, role_id varchar(255) not null, constraint ReleaseExtraArtist_pkey primary key (release_id, role_id, artist_id))
 create table Release_Format (Release_id integer not null, formats_id integer not null, primary key (formats_id))
 create table Release_Genre (Release_id integer not null, genres_id varchar(31) not null, primary key (Release_id, genres_id))
 create table Release_labels (Release_id integer not null, labels_KEY integer not null, catno varchar(255), primary key (Release_id, labels_KEY))
 create table Release_Style (Release_id integer not null, styles_id varchar(31) not null, primary key (Release_id, styles_id))
 create table Release_Track (Release_id integer not null, tracklist_release_id integer not null, tracklist_sequence smallint not null, unique (tracklist_release_id, tracklist_sequence))
+create table ReleaseCompany (company_id integer not null, entityType_id smallint not null, release_id integer not null, constraint ReleaseCompany_pkey primary key (release_id, company_id, entityType_id))
+create table ReleaseExtraArtist (artist_id integer not null, release_id integer not null, role_id varchar(255) not null, constraint ReleaseExtraArtist_pkey primary key (release_id, role_id, artist_id))
 create table ReleaseExtraArtist_applicableTracks (ReleaseExtraArtist_artist_id integer not null, ReleaseExtraArtist_release_id integer not null, ReleaseExtraArtist_role_id varchar(255) not null, applicableTracks varchar(255), unique (ReleaseExtraArtist_artist_id, ReleaseExtraArtist_release_id, ReleaseExtraArtist_role_id, applicableTracks))
 create table Series (id integer not null, catno varchar(255), name varchar(255), primary key (id))
 create table Style (id varchar(31) not null, primary key (id))
@@ -76,11 +76,6 @@ alter table if exists Release add constraint FK8gixt7pw3n2amghs1nemj3mcm foreign
 alter table if exists Release add constraint FK3hr6u3mck4xpt1ya4sftjbohc foreign key (series_id) references Series
 alter table if exists Release_Artist add constraint FKmfjrsxqbuey6t1pvlo2txe2x0 foreign key (artists_id) references Artist
 alter table if exists Release_Artist add constraint FKgqgy8p1cuooxlyu04229f7u3c foreign key (Release_id) references Release
-alter table if exists release_company add constraint FKk6wp52ra2vpoe1jnjpcrj6xk4 foreign key (company_id) references Company
-alter table if exists release_company add constraint FKfv3a65ahflhg1yawuic29xep2 foreign key (entityType_id) references EntityType
-alter table if exists release_company add constraint FKk98bga9nq6hg4993smgrg7k0b foreign key (release_id) references Release
-alter table if exists release_extraartist add constraint FKjffyepfgws7c89dr06w3x62rm foreign key (role_id, artist_id) references ExtraArtist
-alter table if exists release_extraartist add constraint FKdd4opcokani01m9acirod2hqx foreign key (release_id) references Release
 alter table if exists Release_Format add constraint FK7xusesury62xvm0sb24xw66y8 foreign key (formats_id) references Format
 alter table if exists Release_Format add constraint FKmqmurqv4284ssyx79dofa8oln foreign key (Release_id) references Release
 alter table if exists Release_Genre add constraint FK4vks82y2nynvveo0kftbgbrnr foreign key (genres_id) references Genre
@@ -91,7 +86,12 @@ alter table if exists Release_Style add constraint FKkfpgqf0qfpjub3px2h8w05rlf f
 alter table if exists Release_Style add constraint FKvwwi9puhw46ahpjpm6uwho6v foreign key (Release_id) references Release
 alter table if exists Release_Track add constraint FKln5kw8ndcxd48ele1bgnc38un foreign key (tracklist_release_id, tracklist_sequence) references Track
 alter table if exists Release_Track add constraint FKbdrgn76mq2leno9i4rtsnj3io foreign key (Release_id) references Release
-alter table if exists ReleaseExtraArtist_applicableTracks add constraint FKpudemcxynsvkgqrtt8wlalnsv foreign key (ReleaseExtraArtist_release_id, ReleaseExtraArtist_role_id, ReleaseExtraArtist_artist_id) references release_extraartist
+alter table if exists ReleaseCompany add constraint FKajay9cuemxly79edjubbob5mo foreign key (company_id) references Company
+alter table if exists ReleaseCompany add constraint FKkbbda4s5kpln0701770b0hcx5 foreign key (entityType_id) references EntityType
+alter table if exists ReleaseCompany add constraint FK1n7oo5bny9sqcturto3hcae2y foreign key (release_id) references Release
+alter table if exists ReleaseExtraArtist add constraint FKtvxxbpv7tuqr3lg7y2wp5xam foreign key (role_id, artist_id) references ExtraArtist
+alter table if exists ReleaseExtraArtist add constraint FKfme91jq80b289g20f2gafy3ie foreign key (release_id) references Release
+alter table if exists ReleaseExtraArtist_applicableTracks add constraint FKq2f2iwf4877lk8vqg8yphlt7q foreign key (ReleaseExtraArtist_release_id, ReleaseExtraArtist_role_id, ReleaseExtraArtist_artist_id) references ReleaseExtraArtist
 alter table if exists SubTrack add constraint FK37x3j7dpttbgr1vdupcupws7m foreign key (track_release_id, track_sequence) references Track
 alter table if exists SubTrack_ExtraArtist add constraint FK4qevs97g0hgmvpcteswu413wk foreign key (extraArtists_role, extraArtists_artist_id) references ExtraArtist
 alter table if exists SubTrack_ExtraArtist add constraint FKf8dfg74wmcsquqmi4lv1cddvh foreign key (SubTrack_track_release_id, SubTrack_track_sequence, SubTrack_subTrackNumber) references SubTrack

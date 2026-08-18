@@ -12,66 +12,52 @@ package de.tgmz.discogs.load;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Properties;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.StringJoiner;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.tgmz.discogs.load.persist.csv.ITable;
-import io.github.classgraph.ClassGraph;
-import io.github.classgraph.ScanResult;
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.statement.alter.Alter;
+import net.sf.jsqlparser.statement.create.index.CreateIndex;
+import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
+import net.sf.jsqlparser.statement.create.table.CreateTable;
+import net.sf.jsqlparser.statement.create.table.Index;
 public final class ActionFactory {
 	private static final Logger LOG = LoggerFactory.getLogger(ActionFactory.class);
 	
-	private static final String BASE_PATTERN = "^(create table.*)(,)( %s \\([\\w\\s,]+\\))(.*)$";
-	
-	// The different types of primary keys used in discogs.ddl
-	private static final List<String> PK_TYPE = List.of(
-		"constraint \\w+ primary key"	// Named primary key, used with @EmbeddedId
-		, "constraint \\w+ unique"		// Named unique, used with @*ToMany when target uses @EmbeddedId
-		, "primary key"					// Anonymous primary key, used with @Id
-		, "unique"						// Anonymous unique, used with @ElementCollection
-	);
-	
-	private static final Pattern DDL_PATTERN = Pattern.compile("^.*\\.ddl$"); 
-		
 	private static final ActionFactory INSTANCE = new ActionFactory();
 	
-	private List<String> ddl;
 	private Properties prop;
-	private List<Pattern> pkPattern;
 	private ITable[] tables;
-	private Path root;
+	private String root;
 
 	/**
 	 * Private constructor for security reasons
 	 */
 	private ActionFactory() {
-		pkPattern = new LinkedList<>();
-		
-		PK_TYPE.forEach(s -> pkPattern.add(Pattern.compile(String.format(BASE_PATTERN, s))));
-		
 		tables = new ITable[0];
 	}
 	
-	public ActionFactory forTables(Path root, ITable... tables) {
+	public ActionFactory forRoot(String root) {
 		this.root = root;
+		
+		return this;
+	}
+
+	public ActionFactory forTables(ITable... tables) {
 		this.tables = tables;
 		
 		return this;
@@ -82,7 +68,13 @@ public final class ActionFactory {
 	}
 
 	public List<DatabaseAction> create(Action a) {
-		return create(a, Mode.PARALLEL);
+		switch (a) {
+		case LOAD, LOAD_NO_PK, RECONCILE:
+			return create(a, Mode.PARALLEL);
+		case CONSTRAINT, INDEX, PRIMARY_KEY:
+		default:
+			return create(a, Mode.SEQUENTIAL);
+		}
 	}
 	
 	public List<DatabaseAction> create(Action a, Mode m) {
@@ -107,40 +99,12 @@ public final class ActionFactory {
 			}
 			
 			break;
-		case SUMMUP:
-			List<String> combinedSql = new LinkedList<>();
-			
-			result.forEach(da -> combinedSql.addAll(da.getSqls()));
-			
-			result.clear();
-			result.add(new DatabaseAction(null, combinedSql));
-			
-			break;
 		case PARALLEL:
 		default:
 			break;
 		}
 		
 		return result;
-	}
-	private List<String> getDdl() {
-		if (ddl == null) {
-			Set<String> ddl0 = new TreeSet<>();	// Avoid duplicates lines in case a DDL is multiple times in classpath
-			
-			try (ScanResult scanResult = new ClassGraph().scan()) {
-				for (URI uri : scanResult.getResourcesMatchingPattern(DDL_PATTERN).getURIs()) {
-					LOG.info("Loaded DDL from {}", uri);
-					
-					ddl0.addAll(IOUtils.toString(uri, StandardCharsets.UTF_8).lines().toList());
-				}
-			} catch (IOException e) {
-				LOG.error("Cannot get DDL", e);
-			}
-			
-			ddl = new LinkedList<>(ddl0);
-		}
-		
-		return ddl;
 	}
 	private List<Entry<Object, Object>> getProperties(String keyPattern) {
 		if (prop == null) {
@@ -162,17 +126,15 @@ public final class ActionFactory {
 		
 		switch (a) {
 		case INDEX:
-			stmts = getDdl().stream().filter(l -> l.matches("^create index \\w+ on " + t.toString() + " .*$")).toList();
+			stmts = getIndex(t);
 			
 			break;
 		case CONSTRAINT:
-			stmts = getDdl().stream().filter(l -> l.startsWith("alter table if exists " + t.toString() + " ")).toList();
+			stmts = getConstraint(t);
 			
 			break;
 		case PRIMARY_KEY:
-			stmts = new LinkedList<>();
-
-			Optional.ofNullable(getPrimaryKey(t)).ifPresent(stmts::add);
+			stmts = getPrimaryKey(t);
 			
 			break;
 		case RECONCILE:
@@ -202,7 +164,7 @@ public final class ActionFactory {
 				File csv = new File(String.format("%s/%s.csv", root, t));
 				
 				if (csv.exists()) {
-					stmts.add(String.format("%s AS SELECT * FROM CSVREAD('%s')", getCreate(t, noPk), csv.toString()));
+					stmts.add(String.format("%s AS SELECT %s FROM CSVREAD('%s')", getCreate(t, noPk), getColumnList(t), csv.toString()));
 				} else {
 					stmts.add(getCreate(t, noPk));
 				}
@@ -215,42 +177,110 @@ public final class ActionFactory {
 		
 		return stmts;
 	}
+
+	private List<String> getIndex(ITable t) {
+		List<String> result = new LinkedList<>();
+		
+		try {
+			for (String s : DdlFactory.getInstance().getDdl(l -> Strings.CI.startsWith(l, "create index"))) {
+				CreateIndex ci = (CreateIndex) CCJSqlParserUtil.parse(s);
+				
+				if (t.toString().equals(ci.getTable().getName())) {
+					result.add(s);
+				}
+			}
+		} catch (JSQLParserException e) {
+			LOG.warn("Cannot get index", e);
+		}
+		
+		return result;
+	}
+
+	private List<String> getConstraint(ITable t) {
+		List<String> result = new LinkedList<>();
+		
+		try {
+			for (String s : DdlFactory.getInstance().getDdl(l -> Strings.CI.startsWith(l, "alter table"))) {
+				Alter ci = (Alter) CCJSqlParserUtil.parse(s);
+				
+				if (t.toString().equals(ci.getTable().getName())) {
+					result.add(s);
+				}
+			}
+		} catch (JSQLParserException e) {
+			LOG.warn("Cannot get alter", e);
+		}
+		return result;
+	}
 	
 	private String getCreate(ITable t, boolean noPk) {
-		String s = getDdl().stream().filter(l -> l.startsWith("create table " + t.toString() + " ")).findFirst().orElseThrow();
-
+		String s = DdlFactory.getInstance().getDdl(l -> Strings.CI.startsWith(l, "create table " + t.toString() + " ")).getFirst();
+	
 		if (noPk) {
-			for (Pattern p : pkPattern) {
-				Matcher m = p.matcher(s);
-		
-				if (m.matches()) {
-					return m.group(1) + m.group(4);
+			try {
+				List<Index> indexes = ((CreateTable) CCJSqlParserUtil.parse(s)).getIndexes();
+			
+				if (indexes != null) {
+					for (Index idx : indexes) {
+						if (Strings.CI.containsAny(idx.getType(), "primary key", "unique")) {
+							s = Strings.CI.remove(s, ", " + idx.toString());
+						}
+					}
 				}
+			} catch (JSQLParserException e) {
+				LOG.error("Cannot get primary key", e);
 			}
 		}
 		
 		return s;
 	}
 	
-	private String getPrimaryKey(ITable t) {
-		String s = getDdl().stream().filter(l -> l.startsWith("create table " + t.toString() + " ")).findFirst().orElseThrow();
-
-		for (Pattern p : pkPattern) {
-			Matcher m = p.matcher(s);
+	private List<String> getPrimaryKey(ITable t) {
+		List<String> idxs = new LinkedList<>();
 		
-			if (m.matches()) {
-				return "ALTER TABLE " + t.toString() + " ADD" + m.group(3);
+		try {
+			List<Index> indexes = ((CreateTable) CCJSqlParserUtil.parse(getCreate(t, false))).getIndexes();
+			
+			if (indexes != null) {
+				for (Index idx : indexes) {
+					if (Strings.CI.containsAny(idx.getType(), "primary key", "unique")) {
+						idxs.add(String.format("ALTER TABLE %s ADD %s", t, idx));
+					}
+				}
 			}
+
+		} catch (JSQLParserException e) {
+			LOG.error("Cannot get primary key", e);
 		}
-		
-		return null;
+
+		return idxs;
 	}
 	
 	private List<String> getInit(ITable t) {
 		String t0 = t.toString();
 		
-		return getDdl().stream().filter(l -> l.startsWith("update " + t0 + " ")
-										|| l.startsWith("insert into " + t0 + " ")
-										|| l.startsWith("insert into " + t0 + "(")).toList();
+		Predicate<String> p0 = l -> Strings.CI.startsWith(l, "update " + t0 + " ");
+		Predicate<String> p1 = l -> Strings.CI.startsWith(l, "insert into " + t0 + " ");
+		Predicate<String> p2 = l -> Strings.CI.startsWith(l, "insert into " + t0 + "(");
+		
+		return DdlFactory.getInstance().getDdl(p0.or(p1).or(p2));
+	}
+	
+	private String getColumnList(ITable t) {
+		String s = getCreate(t, false);
+
+		try {
+			List<ColumnDefinition> cds = ((CreateTable) CCJSqlParserUtil.parse(s)).getColumnDefinitions();
+			
+			StringJoiner sj = new StringJoiner(",");
+			
+			cds.forEach(cd -> sj.add(cd.getColumnName()));
+			
+			return sj.toString();
+		} catch (JSQLParserException e) {
+			LOG.warn("Cannot get column list, returning default", e);
+		}
+		
+		return "*";
 	}
 }

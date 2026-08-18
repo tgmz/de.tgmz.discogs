@@ -10,56 +10,49 @@
 package de.tgmz.discogs.load.persist.csv;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.tgmz.discogs.database.DatabaseService;
+import de.tgmz.discogs.load.DdlFactory;
 import de.tgmz.discogs.load.persist.IPersistable;
-import jakarta.persistence.EntityManager;
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
+import net.sf.jsqlparser.statement.create.table.CreateTable;
 
 public abstract class AbstractCsvPersister<T> implements IPersistable<T> {
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractCsvPersister.class);
-	private static final String SQL_COLS = "SELECT * FROM %s";
 	protected Map<Table, DiscogsCsvPrinter> pm;
 
 	protected AbstractCsvPersister(String target, Table... tables) {
 		pm = new TreeMap<>();
 		
-		try (EntityManager em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager()) {
-			em.runWithConnection((Connection con) -> {
-				Statement st = con.createStatement();
+		for (Table table : tables) {
+			String s = DdlFactory.getInstance().getDdl(l -> Strings.CI.startsWith(l, String.format("create table %s ", table))).getFirst();
+
+			try {
+				DiscogsCsvPrinter csvp = new DiscogsCsvPrinter(target, table);
+
+				List<ColumnDefinition> cds = ((CreateTable) CCJSqlParserUtil.parse(s)).getColumnDefinitions();
+
+				int i = 0;
+				Object[] cols = new String[cds.size()];
 				
-				st.setMaxRows(0);	// We're only interested in the matadata
-				
-				for (Table table : tables) {
-					DiscogsCsvPrinter csvp = new DiscogsCsvPrinter(target, table);
-					
-					Object[] cols;
-					
-					try {
-						ResultSetMetaData rsmd = st.executeQuery(String.format(SQL_COLS, table)).getMetaData();
-					
-						cols = new String[rsmd.getColumnCount()];
-					
-						for (int i = 0; i < rsmd.getColumnCount(); ++i) {
-							cols[i] = rsmd.getColumnName(i + 1);
-						}
-					} catch (SQLException e) {
-						cols = new String[] {"ID", "NAME"};
-					}
-					
-					csvp.printRecord(cols);
-					
-					pm.put(table, csvp);
+				for (ColumnDefinition cd : cds) {
+					cols[i++] = cd.getColumnName();
 				}
-			});
+					
+				csvp.printRecord(cols);
+					
+				pm.put(table, csvp);
+			} catch (JSQLParserException | IOException e) {
+				LOG.warn("Cannot get column list", e);
+			}
 		}
 	}
 	

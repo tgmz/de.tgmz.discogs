@@ -12,8 +12,7 @@ package de.tgmz.discogs.test;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.concurrent.ForkJoinTask;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -23,7 +22,6 @@ import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.load.Action;
 import de.tgmz.discogs.load.ActionFactory;
 import de.tgmz.discogs.load.ArtistContentHandler;
-import de.tgmz.discogs.load.DatabaseAction;
 import de.tgmz.discogs.load.DiscogsContentHandler;
 import de.tgmz.discogs.load.LabelContentHandler;
 import de.tgmz.discogs.load.MasterContentHandler;
@@ -42,23 +40,21 @@ public class DiscogsCsvTest extends DiscogsTest {
 		
 		init();
 		
-		ActionFactory af = ActionFactory.getInstance().forTables(dataDir, Table.values());
+		ActionFactory af = ActionFactory.getInstance().forRoot(dataDir.toString()).forTables(Table.values());
 
-		List<DatabaseAction> l = new LinkedList<>(af.create(Action.LOAD, Mode.PARALLEL));
-		l.addAll(af.create(Action.RECONCILE));
-		l.addAll(af.create(Action.INDEX));
-		l.addAll(af.create(Action.CONSTRAINT));
-		
-		for (Table t : Table.values()) {
-			l.stream().filter(da -> da.getTable() == t).forEach(da -> da.compute());
-		}
+		ForkJoinTask.invokeAll(af.create(Action.LOAD_NO_PK));
+		ForkJoinTask.invokeAll(af.create(Action.PRIMARY_KEY));
+		ForkJoinTask.invokeAll(af.create(Action.LOAD, Mode.SEQUENTIAL));
+		ForkJoinTask.invokeAll(af.create(Action.RECONCILE));
+		ForkJoinTask.invokeAll(af.create(Action.CONSTRAINT));
+		ForkJoinTask.invokeAll(af.create(Action.INDEX));
 	}
 	
 	@AfterClass
 	public static void teardownOnce() throws IOException {
 		DiscogsContentHandler dch = new ReleaseContentHandler();
 		
-		dch.setSaveThreshold(1);
+		dch.setSaveThreshold(Integer.MAX_VALUE);
 		extractAndProcess("discogs_releases.xml.gz", dch);
 		DiscogsTest.teardownOnce();
 	}

@@ -25,9 +25,8 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
 @Entity
-@Table(name = "release_extraartist"
-	, indexes = {
-		@Index(columnList = "release_id,role_id,artist_id", name = "ReleaseExtraArtist_pkey", unique = true),
+@Table(indexes = {
+	@Index(columnList = "release_id,role_id,artist_id", name = "ReleaseExtraArtist_pkey", unique = true),
 })
 public class ReleaseExtraArtist implements IIdentifiable<ReleaseExtraArtistKey> {
 	@Transient

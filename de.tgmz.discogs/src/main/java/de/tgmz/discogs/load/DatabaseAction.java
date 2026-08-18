@@ -67,7 +67,7 @@ public class DatabaseAction extends RecursiveAction {
 				LOG.info("{}: {} rows were affected in {}", table, String.format("%,d", affected), LogUtil.formatDuration(start, System.currentTimeMillis()));
 			}
 		} catch (SQLException e) {
-			LOG.error("Execution failed: {}", e.getMessage());
+			LOG.error("{}: Execution failed: {}", table, e.getMessage());
 		}
 	}
 	
@@ -75,7 +75,7 @@ public class DatabaseAction extends RecursiveAction {
 		// Wait for predecessors to finish
 		try {
 			for (RecursiveAction ra : predecessors) {
-				LOG.debug("Await {} ({})", ra, ra.state());
+				LOG.debug("{}: Await {} ({})", table, ra, ra.state());
 			
 				ra.get();
 			}

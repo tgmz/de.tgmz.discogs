@@ -9,6 +9,7 @@
 **********************************************************************/
 package de.tgmz.discogs.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.MappedSuperclass;
@@ -23,6 +24,7 @@ public abstract class PrimaryEntity extends AtomicEntity<Integer> {
 	@Transient
 	private static final long serialVersionUID = -2201861486429131211L;
 	@Enumerated(EnumType.ORDINAL)
+	@Column(columnDefinition = "smallint")	// Hibernate generates "tinyint" which is not supported on postgres
 	private DataQuality data_quality;
 
 	protected PrimaryEntity() {
