@@ -30,10 +30,12 @@
 		<class>de.tgmz.discogs.domain.Label</class>
 		<class>de.tgmz.discogs.domain.Company</class>
 		<class>de.tgmz.discogs.domain.ReleaseCompany</class>
+		<class>de.tgmz.discogs.domain.FormatName</class>
 		<class>de.tgmz.discogs.domain.Format</class>
 		<class>de.tgmz.discogs.domain.Series</class>
 		<class>de.tgmz.discogs.domain.EntityType</class>
 		<class>de.tgmz.discogs.domain.ReleaseExtraArtist</class>
+		<class>de.tgmz.discogs.domain.Identifier</class>
 
 		<properties>
 			<!-- Database connection settings -->

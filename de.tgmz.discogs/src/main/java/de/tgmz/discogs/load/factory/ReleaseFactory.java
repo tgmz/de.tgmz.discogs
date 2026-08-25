@@ -11,6 +11,7 @@ package de.tgmz.discogs.load.factory;
 
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.ExtraArtist;
+import de.tgmz.discogs.domain.Format;
 import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
@@ -28,11 +29,13 @@ public class ReleaseFactory implements IFactory<Release> {
 	private SetFactory<ReleaseCompany> rcsf;		// ReleaseCompanySetFactory
 	private MapFactory<Label, String> lmf;			// LabelMapFactory
 	private SetFactory<ReleaseExtraArtist> reasf;	// ReleaseExtraArtistSetFactory
+	private SetFactory<Format> fsf;					// FormatSetFactory
 	
 	public ReleaseFactory() {
 		asf = new SetFactory<>(new ArtistFactory());
 		easf = new SetFactory<>(new ExtraArtistFactory());
 		rcsf = new SetFactory<>(new ReleaseCompanyFactory());
+		fsf = new SetFactory<>(new FormatFactory());
 		
 		lmf = new MapFactory<>(new BasicEntityFactory<>());
 		
@@ -62,6 +65,8 @@ public class ReleaseFactory implements IFactory<Release> {
 		}
 		
 		draft.setReleaseCompanies(rcsf.replaceAll(em, draft.getReleaseCompanies()));
+		
+		draft.setFormats(fsf.replaceAll(em, draft.getFormats()));
 		
 		return draft;
 	}

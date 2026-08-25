@@ -42,10 +42,10 @@ public class DiscogsCsvTest extends DiscogsTest {
 		
 		ActionFactory af = ActionFactory.getInstance().forRoot(dataDir.toString()).forTables(Table.values());
 
+		ForkJoinTask.invokeAll(af.create(Action.LOAD, Mode.SEQUENTIAL));
 		ForkJoinTask.invokeAll(af.create(Action.LOAD_NO_PK));
 		ForkJoinTask.invokeAll(af.create(Action.PRIMARY_KEY));
-		ForkJoinTask.invokeAll(af.create(Action.LOAD, Mode.SEQUENTIAL));
-		ForkJoinTask.invokeAll(af.create(Action.RECONCILE));
+		ForkJoinTask.invokeAll(af.create(Action.RECONCILE, Mode.DEPENDING));
 		ForkJoinTask.invokeAll(af.create(Action.CONSTRAINT));
 		ForkJoinTask.invokeAll(af.create(Action.INDEX));
 	}

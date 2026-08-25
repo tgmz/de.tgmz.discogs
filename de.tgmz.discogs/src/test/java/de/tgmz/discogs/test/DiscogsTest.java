@@ -39,6 +39,8 @@ import de.tgmz.discogs.domain.DataQuality;
 import de.tgmz.discogs.domain.ExtraArtist;
 import de.tgmz.discogs.domain.Format;
 import de.tgmz.discogs.domain.Genre;
+import de.tgmz.discogs.domain.IdentType;
+import de.tgmz.discogs.domain.Identifier;
 import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Release;
@@ -198,7 +200,7 @@ public abstract class DiscogsTest {
 		
 		Format format = formats.stream().findFirst().orElseThrow();
 		
-		assertEquals("CD", format.getName());
+		assertEquals("CD", format.getName().getId());
 		assertEquals(1, format.getQty().intValue());
 		assertTrue(format.getDescriptions().contains("Compilation"));
 		assertTrue(format.getDescriptions().contains("Remastered"));
@@ -308,6 +310,18 @@ public abstract class DiscogsTest {
 	}
 
 	@Test
+	public void testIdentifier() {
+		Release r = em.find(Release.class, 3636);
+		
+		assertEquals(24, r.getIdentifiers().size());
+		
+		List<Identifier> mscv1d2 = r.getIdentifiers().stream().filter(i -> IdentType.MASTERING_SID_CODE.equals(i.getType()) 
+																	&& "Variation 1, Disc 2".equals(i.getDescription())).toList();
+		
+		assertEquals(2, mscv1d2.size());
+		assertTrue(mscv1d2.stream().allMatch(i -> "[unknown]".equals(i.getValue())));
+	}
+	@Test
 	public void testFormat() {
 		Release r0 = em.find(Release.class, 22838444);
 		
@@ -315,7 +329,7 @@ public abstract class DiscogsTest {
 		
 		Format f0 = r0.getFormats().stream().findFirst().orElseThrow();
 		
-		assertEquals("File", f0.getName());
+		assertEquals("File", f0.getName().getId());
 		assertEquals("Anti-release", f0.getText());
 		assertEquals(Float.POSITIVE_INFINITY, f0.getQty().floatValue(), 0f);
 		
@@ -325,14 +339,14 @@ public abstract class DiscogsTest {
 		
 		assertEquals(3, r1.getFormats().size());
 		
-		Format f1 = r1.getFormats().stream().filter(f -> "CD".equals(f.getName())).findFirst().orElseThrow();
+		Format f1 = r1.getFormats().stream().filter(f -> "CD".equals(f.getName().getId())).findFirst().orElseThrow();
 		assertEquals(41, f1.getQty().floatValue(), 0);
 		
 		Release r2 = em.find(Release.class, 2723);
 		
 		assertEquals("Out There And Back", r2.getTitle());
 		assertEquals(2, r2.getFormats().size());
-		assertTrue(r2.getFormats().stream().allMatch(f -> "CD".equals(f.getName())
+		assertTrue(r2.getFormats().stream().allMatch(f -> "CD".equals(f.getName().getId())
 														&& "".equals(f.getText())
 														&& 1f == f.getQty())); 
 		
@@ -449,6 +463,12 @@ public abstract class DiscogsTest {
 		assertEquals("Mark Ellis", mbf.getArtist().getRealname());
 		
 		assertEquals("9 26081-2", r.getLabels().get(l));
+
+		List<Identifier> lIdent = r.getIdentifiers().stream().filter(i -> "0 7599-26081-2 1".equals(i.getValue())).toList();
+		
+		assertEquals(1, lIdent.size());
+		assertEquals(IdentType.BARCODE, lIdent.getFirst().getType());
+		assertEquals("Text", lIdent.getFirst().getDescription());
 	}
 	
 	@Test

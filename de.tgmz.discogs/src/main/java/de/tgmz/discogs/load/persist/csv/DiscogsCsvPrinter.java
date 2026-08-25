@@ -38,8 +38,7 @@ public class DiscogsCsvPrinter {
 	}
 	
 	public void printRecordUsingCache(Object... values) throws IOException {
-		if (!(values[0] instanceof Number n)
-			|| cache.add(n)) {
+		if (cache.add((Number) values[0])) {
 			p.printRecord(values);
 		}
 	}

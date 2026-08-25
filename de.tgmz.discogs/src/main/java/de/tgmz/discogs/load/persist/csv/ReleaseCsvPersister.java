@@ -20,6 +20,7 @@ import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.ExtraArtist;
 import de.tgmz.discogs.domain.Format;
 import de.tgmz.discogs.domain.Genre;
+import de.tgmz.discogs.domain.Identifier;
 import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Release;
 import de.tgmz.discogs.domain.ReleaseCompany;
@@ -33,6 +34,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 	private static final Logger LOG = LoggerFactory.getLogger(ReleaseCsvPersister.class);
 	private Predicate<Release> filter;
 	private int fid = 1;
+	private int iid = 1;
 
 	public ReleaseCsvPersister(String target) {
 		this (target, c -> true);
@@ -47,9 +49,9 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 				, Table.Track_ExtraArtist, Table.SubTrack_ExtraArtist, Table.ExtraArtist
 				, Table.Company.useCache(1_300_000), Table.EntityType.useCache(100)
 				, Table.Release_labels, Table.ReleaseCompany
-				, Table.Format, Table.Format_descriptions, Table.Release_Format
+				, Table.Format, Table.Format_descriptions, Table.Release_Format, Table.FormatName, Table.format_gen
+				, Table.Identifier, Table.Release_Identifier, Table.identifier_gen
 				, Table.artist_release_all.useCache(5_000_000)
-				, Table.format_gen
 				, Table.label_release_all.useCache(1_500_000)
 		);
 		
@@ -102,10 +104,6 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 			);
 		}
 		
-		for (Artist a : r.getArtists()) {
-			save(r, a);
-		}
-		
 		for (Entry<Label, String> e : r.getLabels().entrySet()) {
 			pm.get(Table.Release_labels).printRecord(
 				r.getId()
@@ -114,22 +112,18 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 			);
 		}
 		
-		for (ReleaseCompany rc : r.getReleaseCompanies()) {
-			pm.get(Table.ReleaseCompany).printRecord(
-				rc.getCompany().getId()
-				, rc.getEntityType().getId()
-				, r.getId()
-			);
+		saveComplexAttributes(r);
+		
+		return 1;
+	}
 
-			pm.get(Table.Company).printRecordUsingCache(
-				rc.getCompany().getId()
-				, rc.getCompany().getName()
-			);
-				
-			pm.get(Table.EntityType).printRecordUsingCache(
-				rc.getEntityType().getId()
-				, rc.getEntityType().getName()	
-			);
+	private void saveComplexAttributes(Release r) throws IOException {
+		for (Artist a : r.getArtists()) {
+			save(r, a);
+		}
+		
+		for (ReleaseCompany rc : r.getReleaseCompanies()) {
+			save(r, rc);
 		}
 		
 		for (ReleaseExtraArtist rea : r.getReleaseExtraArtists()) {
@@ -140,11 +134,31 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 			save(r, f);
 		}
 		
+		for (Identifier i : r.getIdentifiers()) {
+			save(r, i);
+		}
+		
 		for (Track t : r.getUnfilteredTracklist()) {
 			save(t);
 		}
-		
-		return 1;
+	}
+
+	private void save(Release r, ReleaseCompany rc) throws IOException {
+		pm.get(Table.ReleaseCompany).printRecord(
+			rc.getCompany().getId()
+			, rc.getEntityType().getId()
+			, r.getId()
+		);
+
+		pm.get(Table.Company).printRecordUsingCache(
+			rc.getCompany().getId()
+			, rc.getCompany().getName()
+		);
+			
+		pm.get(Table.EntityType).printRecordUsingCache(
+			rc.getEntityType().getId()
+			, rc.getEntityType().getName()	
+		);
 	}
 	private void save(Track t) throws IOException {
 		pm.get(Table.Track).printRecord(
@@ -263,11 +277,12 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 				, a.getName()
 		);
 	}
+	
 	private void save(Release r, Format f) throws IOException {
 		pm.get(Table.Format).printRecord(
 				fid
 				, f.getQty()
-				, f.getName()
+				, f.getName().getId()
 				, f.getText()
 			);
 				
@@ -284,6 +299,21 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 		}
 			
 		++fid;
+	}
+	private void save(Release r, Identifier i) throws IOException {
+		pm.get(Table.Identifier).printRecord(
+				i.getType().ordinal()
+				, iid
+				, i.getDescription()
+				, i.getValue()
+			);
+				
+		pm.get(Table.Release_Identifier).printRecord(
+				r.getId()
+				, iid
+			);
+					
+		++iid;
 	}
 }
  

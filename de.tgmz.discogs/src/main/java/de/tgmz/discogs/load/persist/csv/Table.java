@@ -42,8 +42,12 @@ public enum Table implements ITable {
 	, ReleaseCompany
 	, format_gen
 	, Format
+	, FormatName
 	, Format_descriptions
 	, Release_Format
+	, identifier_gen
+	, Identifier
+	, Release_Identifier
 	, ExtraArtist
 	, ReleaseExtraArtist
 	, ReleaseExtraArtist_applicableTracks
