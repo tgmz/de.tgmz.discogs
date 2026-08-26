@@ -84,7 +84,8 @@ public class Track implements IIdentifiable<TrackId> {
 		
 		id.setRelease(r);
 	}
-	
+
+	@Override
 	public TrackId getId() {
 		return id;
 	}

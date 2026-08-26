@@ -467,7 +467,7 @@ public abstract class DiscogsTest {
 		List<Identifier> lIdent = r.getIdentifiers().stream().filter(i -> "0 7599-26081-2 1".equals(i.getValue())).toList();
 		
 		assertEquals(1, lIdent.size());
-		assertEquals(IdentType.BARCODE, lIdent.getFirst().getType());
+		assertEquals("Barcode", lIdent.getFirst().getType().getName());
 		assertEquals("Text", lIdent.getFirst().getDescription());
 	}
 	

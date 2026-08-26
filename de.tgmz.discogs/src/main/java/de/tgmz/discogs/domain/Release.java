@@ -164,10 +164,6 @@ public class Release extends Discogs {
 		this.formats = formats;
 	}
 	
-	public void setIdentifiers(Set<Identifier> identifiers) {
-		this.identifiers = identifiers;
-	}
-	
 	/**
 	 * Compute the amount of information of this release
 	 * @return A measure for the amount of information this release carries
