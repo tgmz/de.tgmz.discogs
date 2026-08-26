@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 public class DiscogsCsvPrinter {
 	@SuppressWarnings("unused")
 	private static final Logger LOG = LoggerFactory.getLogger(DiscogsCsvPrinter.class);
-	private Set<Number> cache;
+	private Set<String> cache;
 	private CSVPrinter p;
 	
 	public DiscogsCsvPrinter(String target, Table table) throws IOException {
@@ -37,10 +37,14 @@ public class DiscogsCsvPrinter {
 		p = new CSVPrinter(new BufferedWriter(new FileWriter(target + File.separator + table.toString() + ".csv", StandardCharsets.UTF_8)), CSVFormat.POSTGRESQL_CSV);
 	}
 	
-	public void printRecordUsingCache(Object... values) throws IOException {
-		if (cache.add((Number) values[0])) {
+	public void printRecordUsingCacheWithColumn(int idCol, Object... values) throws IOException {
+		if (cache.add(String.valueOf(values[idCol]))) {
 			p.printRecord(values);
 		}
+	}
+	
+	public void printRecordUsingCache(Object... values) throws IOException {
+		printRecordUsingCacheWithColumn(0, values);
 	}
 	
 	public void printRecord(Object... values) throws IOException {
