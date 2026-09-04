@@ -59,7 +59,12 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 	}
 	
 	protected int doSave(Release r) throws IOException {
-		if (!filter.test(r)) return 0;
+		if (!filter.test(r)) {
+			fid += r.getFormats().size();
+			iid += r.getIdentifiers().size();
+			
+			return 0;
+		}
 		
 		Series ser = r.getSeries();
 		

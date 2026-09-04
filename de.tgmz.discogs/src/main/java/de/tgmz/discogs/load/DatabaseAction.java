@@ -63,8 +63,14 @@ public class DatabaseAction extends RecursiveAction {
 
 			int affected = IntStream.of(stmt.executeBatch()).sum();
 			
-			if (affected > 0 && LOG.isInfoEnabled()) {
-				LOG.info("{}: {} rows were affected in {}", table, String.format("%,d", affected), LogUtil.formatDuration(start, System.currentTimeMillis()));
+			if (LOG.isInfoEnabled()) {
+				String duration = LogUtil.formatDuration(start, System.currentTimeMillis());
+				
+				if (affected > 0) {
+					LOG.info("{}: {} rows were affected in {}", table, String.format("%,d", affected), duration);
+				} else {
+					LOG.info("Done {} ({})", table, duration);
+				}
 			}
 		} catch (SQLException e) {
 			LOG.error("{}: Execution failed: {}", table, e.getMessage());
