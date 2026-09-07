@@ -50,6 +50,7 @@ create table Track_Artist (Track_release_id integer not null, Track_sequence sma
 create table Track_ExtraArtist (Track_release_id integer not null, Track_sequence smallint not null, extraArtists_artist_id integer not null, extraArtists_role varchar(255) not null, constraint Track_ExtraArtist_pkey unique (Track_release_id, Track_sequence, extraArtists_role, extraArtists_artist_id))
 create table Track_SubTrack (Track_release_id integer not null, Track_sequence smallint not null, subTracklist_subTrackNumber smallint not null, subTracklist_track_release_id integer not null, subTracklist_track_sequence smallint not null, constraint Track_SubTrack_pkey unique (subTracklist_track_release_id, subTracklist_track_sequence, subTracklist_subTrackNumber))
 create index Artist_name_idx on Artist (name)
+create index Artist_variations_name_idx on Artist_variations (variations)
 create index Company_name_idx on Company (name)
 create index Label_name_idx on Label (name)
 create index Master_title_idx on Master (title)
