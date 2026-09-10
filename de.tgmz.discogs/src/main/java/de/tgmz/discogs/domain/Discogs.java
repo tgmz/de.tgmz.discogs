@@ -9,6 +9,7 @@
 **********************************************************************/
 package de.tgmz.discogs.domain;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -54,7 +55,7 @@ public abstract class Discogs extends PrimaryEntity {
 	 * The artists involved.
 	 * @return the artists
 	 */
-	public Set<Artist> getArtists() {
+	public Collection<Artist> getArtists() {
 		return artists;
 	}
 
@@ -72,7 +73,7 @@ public abstract class Discogs extends PrimaryEntity {
 	 * The genres e.g. &apos;Electronic&apos;
 	 * @return the genres
 	 */
-	public Set<Genre> getGenres() {
+	public Collection<Genre> getGenres() {
 		return genres;
 	}
 
@@ -80,14 +81,10 @@ public abstract class Discogs extends PrimaryEntity {
 	 * The styles e.g. &apos;Synth-pop&apos;
 	 * @return the styles
 	 */
-	public Set<Style> getStyles() {
+	public Collection<Style> getStyles() {
 		return styles;
 	}
 
-	public void setGenres(Set<Genre> genres) {
-		this.genres = genres;
-	}
-	
 	public void setTitle(String title) {
 		this.title = title;
 	}
@@ -96,12 +93,8 @@ public abstract class Discogs extends PrimaryEntity {
 		this.albumArtist = StringUtils.left(albumArtist, 512);
 	}
 
-	public void setArtists(Set<Artist> artists) {
-		this.artists = artists;
-	}
-
-	public void setStyles(Set<Style> styles) {
-		this.styles = styles;
+	public void setArtists(Collection<Artist> artists) {
+		this.artists = new HashSet<>(artists);
 	}
 
 	@Override

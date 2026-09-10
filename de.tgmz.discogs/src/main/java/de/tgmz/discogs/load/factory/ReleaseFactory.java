@@ -20,26 +20,26 @@ import de.tgmz.discogs.domain.ReleaseExtraArtist;
 import de.tgmz.discogs.domain.SubTrack;
 import de.tgmz.discogs.domain.Track;
 import de.tgmz.discogs.load.factory.collections.MapFactory;
-import de.tgmz.discogs.load.factory.collections.SetFactory;
+import de.tgmz.discogs.load.factory.collections.CollectionFactory;
 import jakarta.persistence.EntityManager;
 
 public class ReleaseFactory implements IFactory<Release> {
-	private SetFactory<Artist> asf;					// ArtistSetFactory
-	private SetFactory<ExtraArtist> easf;			// ExtraArtistSetFactory
-	private SetFactory<ReleaseCompany> rcsf;		// ReleaseCompanySetFactory
+	private CollectionFactory<Artist> asf;					// ArtistSetFactory
+	private CollectionFactory<ExtraArtist> easf;			// ExtraArtistSetFactory
+	private CollectionFactory<ReleaseCompany> rcsf;		// ReleaseCompanySetFactory
 	private MapFactory<Label, String> lmf;			// LabelMapFactory
-	private SetFactory<ReleaseExtraArtist> reasf;	// ReleaseExtraArtistSetFactory
-	private SetFactory<Format> fsf;					// FormatSetFactory
+	private CollectionFactory<ReleaseExtraArtist> reasf;	// ReleaseExtraArtistSetFactory
+	private CollectionFactory<Format> fsf;					// FormatSetFactory
 	
 	public ReleaseFactory() {
-		asf = new SetFactory<>(new ArtistFactory());
-		easf = new SetFactory<>(new ExtraArtistFactory());
-		rcsf = new SetFactory<>(new ReleaseCompanyFactory());
-		fsf = new SetFactory<>(new FormatFactory());
+		asf = new CollectionFactory<>(new ArtistFactory());
+		easf = new CollectionFactory<>(new ExtraArtistFactory());
+		rcsf = new CollectionFactory<>(new ReleaseCompanyFactory());
+		fsf = new CollectionFactory<>(new FormatFactory());
 		
 		lmf = new MapFactory<>(new BasicEntityFactory<>());
 		
-		reasf = new SetFactory<>(new ReleaseExtraArtistFactory());
+		reasf = new CollectionFactory<>(new ReleaseExtraArtistFactory());
 	}
 	
 	@Override

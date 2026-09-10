@@ -24,6 +24,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -194,7 +195,7 @@ public abstract class DiscogsTest {
 		assertEquals("Wiener Philharmoniker", ea.getArtist().getName());
 		assertEquals("Orchestra", ea.getRole());
 		
-		Set<Format> formats = r.getFormats();
+		Collection<Format> formats = r.getFormats();
 		
 		assertEquals(1, formats.size());
 		
@@ -453,7 +454,7 @@ public abstract class DiscogsTest {
 		assertEquals("6:12", t.getDuration());
 		assertTrue(t.getArtists().isEmpty());
 		
-		Set<ExtraArtist> eas = t.getExtraArtists();
+		Collection<ExtraArtist> eas = t.getExtraArtists();
 		
 		// Mixed By Flood
 		ExtraArtist mbf = eas.stream().filter(x -> x.getArtist() != null && 20661 == x.getArtist().getId()).findAny().orElseThrow();

@@ -9,8 +9,8 @@
 **********************************************************************/
 package de.tgmz.discogs.load.factory.collections;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collection;
+import java.util.LinkedList;
 
 import de.tgmz.discogs.load.factory.IFactory;
 import jakarta.persistence.EntityManager;
@@ -19,22 +19,22 @@ import jakarta.persistence.EntityManager;
  * Utilityclass to replace all elements of a java.util.Set
  * @param <T> the type of the sets element
  */
-public class SetFactory<T> {
+public class CollectionFactory<T> {
 	private IFactory<T> factory;
 	
-	public SetFactory(IFactory<T> factory) {
+	public CollectionFactory(IFactory<T> factory) {
 		this.factory = factory;
 	}
 
-	public Set<T> replaceAll(EntityManager em, Set<T> param) {
-		Set<T> s = new HashSet<>();
+	public Collection<T> replaceAll(EntityManager em, Collection<T> param) {
+		Collection<T> s = new LinkedList<>();
 		
 		param.forEach(t -> addIfNotNull(em, s, t));
 		
 		return s;
 	}
 	
-	private void addIfNotNull(EntityManager em, Set<T> s, T t) {
+	private void addIfNotNull(EntityManager em, Collection<T> s, T t) {
 		T t0 = factory.get(em, t);
 		
 		if (t0 != null) {

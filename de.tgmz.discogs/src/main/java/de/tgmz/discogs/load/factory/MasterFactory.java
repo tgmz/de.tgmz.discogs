@@ -11,14 +11,14 @@ package de.tgmz.discogs.load.factory;
 
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.Master;
-import de.tgmz.discogs.load.factory.collections.SetFactory;
+import de.tgmz.discogs.load.factory.collections.CollectionFactory;
 import jakarta.persistence.EntityManager;
 
 public class MasterFactory implements IFactory<Master> {
-	private SetFactory<Artist> sra;
+	private CollectionFactory<Artist> sra;
 	
 	public MasterFactory() {
-		sra = new SetFactory<>(new ArtistFactory());	}
+		sra = new CollectionFactory<>(new ArtistFactory());	}
 	
 	@Override
 	public Master get(EntityManager em, Master draft) {

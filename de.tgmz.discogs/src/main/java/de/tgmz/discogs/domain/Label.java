@@ -9,6 +9,7 @@
 **********************************************************************/
 package de.tgmz.discogs.domain;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -54,7 +55,7 @@ public class Label extends PrimaryEntity {
 		return parentLabel;
 	}
 	
-	public Set<Label> getSubLabels() {
+	public Collection<Label> getSubLabels() {
 		return subLabels;
 	}
 
@@ -66,8 +67,8 @@ public class Label extends PrimaryEntity {
 		this.parentLabel = parentLabel;
 	}
 
-	public void setSubLabels(Set<Label> subLabels) {
-		this.subLabels = subLabels;
+	public void setSubLabels(Collection<Label> subLabels) {
+		this.subLabels = new HashSet<>(subLabels);
 	}
 
 	@Override

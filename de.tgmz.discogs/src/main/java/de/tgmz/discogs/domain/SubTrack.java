@@ -9,6 +9,7 @@
 **********************************************************************/
 package de.tgmz.discogs.domain;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -44,8 +45,7 @@ public class SubTrack implements IIdentifiable<SubTrackId> {
 	private String title;
 	private String position;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-	@JoinTable(name = "SubTrack_ExtraArtist"
-	, indexes = {
+	@JoinTable(name = "SubTrack_ExtraArtist", indexes = {
 		@Index(columnList = "SubTrack_track_release_id,SubTrack_track_sequence,SubTrack_subTrackNumber,extraArtists_role,extraArtists_artist_id", name = "SubTrack_ExtraArtist_pkey", unique = true),
 	})
 	private Set<ExtraArtist> extraArtists;
@@ -80,7 +80,7 @@ public class SubTrack implements IIdentifiable<SubTrackId> {
 		return position;
 	}
 
-	public Set<ExtraArtist> getExtraArtists() {
+	public Collection<ExtraArtist> getExtraArtists() {
 		return extraArtists;
 	}
 
@@ -104,8 +104,8 @@ public class SubTrack implements IIdentifiable<SubTrackId> {
 		this.position = position;
 	}
 
-	public void setExtraArtists(Set<ExtraArtist> extraArtists) {
-		this.extraArtists = extraArtists;
+	public void setExtraArtists(Collection<ExtraArtist> extraArtists) {
+		this.extraArtists = new HashSet<>(extraArtists);
 	}
 	
 	public void setDuration(String duration) {

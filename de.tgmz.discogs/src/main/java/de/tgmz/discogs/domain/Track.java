@@ -9,6 +9,7 @@
 **********************************************************************/
 package de.tgmz.discogs.domain;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -52,20 +53,17 @@ public class Track implements IIdentifiable<TrackId> {
 	private String position;
 	private String duration;
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
-	@JoinTable(name = "Track_Artist"
-	, indexes = {
+	@JoinTable(name = "Track_Artist", indexes = {
 		@Index(columnList = "Track_release_id,Track_sequence,artists_id", name = "Track_Artist_pkey", unique = true),
 	})
 	private Set<Artist> artists;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-	@JoinTable(name = "Track_ExtraArtist"
-	, indexes = {
+	@JoinTable(name = "Track_ExtraArtist", indexes = {
 		@Index(columnList = "Track_release_id,Track_sequence,extraArtists_role,extraArtists_artist_id", name = "Track_ExtraArtist_pkey", unique = true),
 	})
 	private Set<ExtraArtist> extraArtists;
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinTable(name = "Track_SubTrack"
-	, indexes = {
+	@JoinTable(name = "Track_SubTrack", indexes = {
 		@Index(columnList = "subTracklist_track_release_id,subTracklist_track_sequence,subTracklist_subTrackNumber", name = "Track_SubTrack_pkey", unique = true),
 	})
 	@OrderBy(value = "subTrackNumber")
@@ -106,11 +104,11 @@ public class Track implements IIdentifiable<TrackId> {
 		return duration;
 	}
 
-	public Set<Artist> getArtists() {
+	public Collection<Artist> getArtists() {
 		return artists;
 	}
 
-	public Set<ExtraArtist> getExtraArtists() {
+	public Collection<ExtraArtist> getExtraArtists() {
 		return extraArtists;
 	}
 
@@ -146,12 +144,12 @@ public class Track implements IIdentifiable<TrackId> {
 		this.duration = duration;
 	}
 
-	public void setExtraArtists(Set<ExtraArtist> extraArtists) {
-		this.extraArtists = extraArtists;
+	public void setExtraArtists(Collection<ExtraArtist> extraArtists) {
+		this.extraArtists = new HashSet<>(extraArtists);
 	}
 
-	public void setArtists(Set<Artist> artists) {
-		this.artists = artists;
+	public void setArtists(Collection<Artist> artists) {
+		this.artists = new HashSet<>(artists);
 	}
 
 	public void setSequence(short sequence) {

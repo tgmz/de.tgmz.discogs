@@ -15,13 +15,13 @@ import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.load.factory.BasicEntityFactory;
 import de.tgmz.discogs.load.factory.IFactory;
-import de.tgmz.discogs.load.factory.collections.SetFactory;
+import de.tgmz.discogs.load.factory.collections.CollectionFactory;
 import jakarta.persistence.EntityManager;
 
 public class LabelPersistable extends AbstractDefaultPersistable<Label> {
 	private Predicate<Label> filter;
 	private IFactory<Label> lf;
-	private SetFactory<Label> lsf;
+	private CollectionFactory<Label> lsf;
 	
 	public LabelPersistable() {
 		this(x -> true);
@@ -31,7 +31,7 @@ public class LabelPersistable extends AbstractDefaultPersistable<Label> {
 		this.filter = filter;
 		
 		lf = new BasicEntityFactory<>();
-		lsf = new SetFactory<>(lf);
+		lsf = new CollectionFactory<>(lf);
 	}
 
 	@Override

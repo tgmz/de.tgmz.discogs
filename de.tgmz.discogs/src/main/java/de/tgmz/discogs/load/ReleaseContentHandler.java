@@ -11,6 +11,7 @@ package de.tgmz.discogs.load;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -287,8 +288,8 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 				releaseExtraArtist.setRelease(r);
 				releaseExtraArtist.setExtraArtist(releaseExtraArtist.getExtraArtist());
 				
-				Set<ReleaseExtraArtist> reas0 = r.getReleaseExtraArtists(); 
-				Set<ReleaseExtraArtist> reas1 = splitExtraArtists(releaseExtraArtist);
+				Collection<ReleaseExtraArtist> reas0 = r.getReleaseExtraArtists(); 
+				Collection<ReleaseExtraArtist> reas1 = splitExtraArtists(releaseExtraArtist);
 				
 				r.setReleaseExtraArtists(mergeReleaseExtraArtists(reas0, reas1));
 			}
@@ -450,7 +451,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	 * Engineer [Additional], Mixed By – Biff Dawes (tracks: 22), Tchad Blake (tracks: 7)
 	 * The second entry is splitted and overwrites the first one and the applicable tracks 4 and 17 are lost. 
 	 */
-	private Set<ReleaseExtraArtist> mergeReleaseExtraArtists(Set<ReleaseExtraArtist> reas0, Set<ReleaseExtraArtist> reas1) {
+	private Set<ReleaseExtraArtist> mergeReleaseExtraArtists(Collection<ReleaseExtraArtist> reas0, Collection<ReleaseExtraArtist> reas1) {
 		Set<ReleaseExtraArtist> result = new HashSet<>();
 
 		for (ReleaseExtraArtist rea0 : reas0) {

@@ -10,18 +10,18 @@
 package de.tgmz.discogs.load.factory;
 
 import de.tgmz.discogs.domain.Artist;
-import de.tgmz.discogs.load.factory.collections.SetFactory;
+import de.tgmz.discogs.load.factory.collections.CollectionFactory;
 import jakarta.persistence.EntityManager;
 
 public class ArtistFactory implements IFactory<Artist> {
 	private EntityManager em;
 	private BasicEntityFactory<Artist> baf;
-	private SetFactory<Artist> saf;
+	private CollectionFactory<Artist> saf;
 	
 	public ArtistFactory() {
 		baf = new BasicEntityFactory<>();
 		
-		saf = new SetFactory<>(baf);
+		saf = new CollectionFactory<>(baf);
 	}
 	
 	@Override

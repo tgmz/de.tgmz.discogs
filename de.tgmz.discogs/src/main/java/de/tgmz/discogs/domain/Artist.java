@@ -9,6 +9,7 @@
 **********************************************************************/
 package de.tgmz.discogs.domain;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
@@ -88,15 +89,15 @@ public class Artist extends PrimaryEntity {
 		return variations;
 	}
 
-	public Set<Artist> getMembers() {
+	public Collection<Artist> getMembers() {
 		return members;
 	}
 
-	public Set<Artist> getAliases() {
+	public Collection<Artist> getAliases() {
 		return aliases;
 	}
 	
-	public Set<Artist> getGroups() {
+	public Collection<Artist> getGroups() {
 		return groups;
 	}
 	
@@ -112,16 +113,16 @@ public class Artist extends PrimaryEntity {
 		this.variations = variations;
 	}
 	
-	public void setMembers(Set<Artist> members) {
-		this.members = members;
+	public void setMembers(Collection<Artist> members) {
+		this.members = new HashSet<>(members);
 	}
 	
-	public void setAliases(Set<Artist> aliases) {
-		this.aliases = aliases;
+	public void setAliases(Collection<Artist> aliases) {
+		this.aliases = new HashSet<>(aliases);
 	}
 
-	public void setGroups(Set<Artist> groups) {
-		this.groups = groups;
+	public void setGroups(Collection<Artist> groups) {
+		this.groups = new HashSet<>(groups);
 	}
 	
 	@Override

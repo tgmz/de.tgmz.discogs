@@ -9,6 +9,7 @@
 **********************************************************************/
 package de.tgmz.discogs.domain;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -56,9 +57,9 @@ public class Release extends Discogs {
 	@OneToMany(mappedBy = "release", cascade = CascadeType.ALL)
 	private Set<ReleaseCompany> releaseCompanies;
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private Set<Format> formats;
+	private List<Format> formats;
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private Set<Identifier> identifiers;
+	private List<Identifier> identifiers;
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	private Series series;
 
@@ -69,8 +70,8 @@ public class Release extends Discogs {
 		releaseExtraArtists = new HashSet<>();
 		labels = new HashMap<>();
 		releaseCompanies = new HashSet<>();
-		formats = new HashSet<>();
-		identifiers = new HashSet<>();
+		formats = new LinkedList<>();
+		identifiers = new LinkedList<>();
 	}
 	
 	/**
@@ -101,11 +102,11 @@ public class Release extends Discogs {
 		return labels;
 	}
 
-	public Set<Format> getFormats() {
+	public List<Format> getFormats() {
 		return formats;
 	}
 
-	public Set<Identifier> getIdentifiers() {
+	public List<Identifier> getIdentifiers() {
 		return identifiers;
 	}
 
@@ -113,7 +114,7 @@ public class Release extends Discogs {
 		return master;
 	}
 
-	public Set<ReleaseCompany> getReleaseCompanies() {
+	public Collection<ReleaseCompany> getReleaseCompanies() {
 		return releaseCompanies;
 	}
 
@@ -137,7 +138,7 @@ public class Release extends Discogs {
 		this.master = master;
 	}
 
-	public Set<ReleaseExtraArtist> getReleaseExtraArtists() {
+	public Collection<ReleaseExtraArtist> getReleaseExtraArtists() {
 		return releaseExtraArtists;
 	}
 
@@ -148,20 +149,20 @@ public class Release extends Discogs {
 		this.labels = labels;
 	}
 
-	public void setReleaseExtraArtists(Set<ReleaseExtraArtist> releaseExtraArtists) {
-		this.releaseExtraArtists = releaseExtraArtists;
+	public void setReleaseExtraArtists(Collection<ReleaseExtraArtist> releaseExtraArtists) {
+		this.releaseExtraArtists = new HashSet<>(releaseExtraArtists);
 	}
 	
 	public void setSeries(Series series) {
 		this.series = series;
 	}
 
-	public void setReleaseCompanies(Set<ReleaseCompany> releaseCompanies) {
-		this.releaseCompanies = releaseCompanies;
+	public void setReleaseCompanies(Collection<ReleaseCompany> releaseCompanies) {
+		this.releaseCompanies = new HashSet<>(releaseCompanies);
 	}
 	
-	public void setFormats(Set<Format> formats) {
-		this.formats = formats;
+	public void setFormats(Collection<Format> formats) {
+		this.formats = new LinkedList<>(formats);
 	}
 	
 	/**
