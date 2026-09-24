@@ -213,7 +213,7 @@ public final class ActionFactory {
 		return result;
 	}
 	
-	private String getCreate(ITable t, boolean noPk) {
+	private static String getCreate(ITable t, boolean noPk) {
 		String s = DdlFactory.getInstance().getDdl(l -> Strings.CI.startsWith(l, "create table " + t.toString() + " ")).getFirst();
 	
 		if (noPk) {
@@ -266,13 +266,13 @@ public final class ActionFactory {
 		return DdlFactory.getInstance().getDdl(p0.or(p1).or(p2));
 	}
 	
-	private String getColumnList(ITable t) {
+	public static String getColumnList(ITable t) {
 		String s = getCreate(t, false);
 
 		try {
 			List<ColumnDefinition> cds = ((CreateTable) CCJSqlParserUtil.parse(s)).getColumnDefinitions();
 			
-			StringJoiner sj = new StringJoiner(",");
+			StringJoiner sj = new StringJoiner(", ");
 			
 			cds.forEach(cd -> sj.add(cd.getColumnName()));
 			
