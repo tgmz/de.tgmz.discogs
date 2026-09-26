@@ -156,6 +156,22 @@ public abstract class DiscogsTest {
 		assertEquals(Set.of("22", "4", "17", "21", "1", "2", "8", "9", "14", "5", "12", "10", "13", "19"), mbbd.getApplicableTracks());
 	}
 	@Test
+	public void testAmarok() {
+		Release r = em.find(Release.class, 1208645);
+		
+		assertEquals("Amarok", r.getTitle());
+		assertEquals("Mike Oldfield", r.getAlbumArtist());
+		
+		// Mike Oldfield
+		ReleaseExtraArtist mo = r.getReleaseExtraArtists()
+		.stream()
+		.filter(rea -> rea.getExtraArtist().getRole().length() == 255)
+		.findFirst()
+		.orElseThrow();
+		
+		assertEquals(18666, mo.getExtraArtist().getArtist().getId().intValue());
+	}
+	@Test
 	public void test3DoorsDown() {
 		Release r = em.find(Release.class, 34334509L);
 		
