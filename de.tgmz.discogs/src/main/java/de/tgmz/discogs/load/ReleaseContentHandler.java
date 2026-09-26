@@ -488,7 +488,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 				continue;
 			}
 			
-			result.add(temp);
+			result.add(StringUtils.left(temp, 255));
 			
 			sj = new StringJoiner(", ");
 		}
