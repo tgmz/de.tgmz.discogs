@@ -9,22 +9,26 @@
 **********************************************************************/
 package de.tgmz.discogs.domain;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
-import de.tgmz.discogs.domain.id.SubTrackId;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.TableGenerator;
 import jakarta.persistence.Transient;
 
 /**
@@ -32,44 +36,45 @@ import jakarta.persistence.Transient;
  */
 @Entity
 @Table(indexes = {
-	@Index(columnList = "track_release_id,track_sequence,subTrackNumber", name = "SubTrack_pkey", unique = true),
 	@Index(columnList = "title", name = "SubTrack_title_idx"), 
 })
 
-public class SubTrack implements IIdentifiable<SubTrackId> {
+public class SubTrack implements Serializable {
 	@Transient
 	private static final long serialVersionUID = 5772183040087284559L;
-	@EmbeddedId
-	private SubTrackId id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "subtrack_gen")
+	@TableGenerator(name = "subtrack_gen", allocationSize = 1, initialValue = 1)
+	private long id;
 	@Column(length = 512)
 	private String title;
 	private String position;
+	private short subTrackNumber;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	@JoinTable(name = "SubTrack_ExtraArtist", indexes = {
-		@Index(columnList = "SubTrack_track_release_id,SubTrack_track_sequence,SubTrack_subTrackNumber,extraArtists_role,extraArtists_artist_id", name = "SubTrack_ExtraArtist_pkey", unique = true),
+		@Index(columnList = "SubTrack_id, extraArtists_artist_id, extraArtists_role_id", name = "SubTrack_ExtraArtist_pkey", unique = true),
 	})
 	private Set<ExtraArtist> extraArtists;
 	private String duration;
+	@ManyToOne
+	private Track track;
 
 	public SubTrack() {
-		id = new SubTrackId();
-		
 		extraArtists = new HashSet<>();
 	}
 
-	public SubTrack(Track t) {
+	public SubTrack(Track track) {
 		this();
 		
-		id.setTrack(t);
+		this.track = track;
 	}
-	
-	@Override
-	public SubTrackId getId() {
+
+	public long getId() {
 		return id;
 	}
 	
 	public short getSubTrackNumber() {
-		return id.getSubTrackNumber();
+		return subTrackNumber;
 	}
 
 	public String getTitle() {
@@ -88,12 +93,8 @@ public class SubTrack implements IIdentifiable<SubTrackId> {
 		return duration;
 	}
 	
-	public void setId(SubTrackId id) {
-		this.id = id;
-	}
-
 	public void setSubTrackNumber(short subTrackNumber) {
-		this.id.setSubTrackNumber(subTrackNumber);
+		this.subTrackNumber = subTrackNumber;
 	}
 
 	public void setTitle(String name) {

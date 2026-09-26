@@ -9,6 +9,7 @@
 **********************************************************************/
 package de.tgmz.discogs.domain;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -20,18 +21,21 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.math.NumberUtils;
 
-import de.tgmz.discogs.domain.id.TrackId;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
+import jakarta.persistence.TableGenerator;
 import jakarta.persistence.Transient;
 
 /**
@@ -39,52 +43,50 @@ import jakarta.persistence.Transient;
  */
 @Entity
 @Table(indexes = {
-	@Index(columnList = "release_id,sequence", name = "Track_pkey", unique = true),
 	@Index(columnList = "title", name = "Track_title_idx"), 
 })
-public class Track implements IIdentifiable<TrackId> {
+public class Track implements Serializable {
 	@Transient
 	private static final long serialVersionUID = 5684918391708831387L;
-	@EmbeddedId
-	private TrackId id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "track_gen")
+	@TableGenerator(name = "track_gen", allocationSize = 1, initialValue = 1)
+	private long id;
 	private short trackNumber;
+	private short sequence;
 	@Column(length = 512)
 	private String title;
 	private String position;
 	private String duration;
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
 	@JoinTable(name = "Track_Artist", indexes = {
-		@Index(columnList = "Track_release_id,Track_sequence,artists_id", name = "Track_Artist_pkey", unique = true),
+		@Index(columnList = "Track_id, artists_id", name = "Track_Artist_pkey", unique = true),
 	})
 	private Set<Artist> artists;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	@JoinTable(name = "Track_ExtraArtist", indexes = {
-		@Index(columnList = "Track_release_id,Track_sequence,extraArtists_role,extraArtists_artist_id", name = "Track_ExtraArtist_pkey", unique = true),
+		@Index(columnList = "Track_id, extraArtists_artist_id, extraArtists_role_id", name = "Track_ExtraArtist_pkey", unique = true),
 	})
 	private Set<ExtraArtist> extraArtists;
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinTable(name = "Track_SubTrack", indexes = {
-		@Index(columnList = "subTracklist_track_release_id,subTracklist_track_sequence,subTracklist_subTrackNumber", name = "Track_SubTrack_pkey", unique = true),
-	})
 	@OrderBy(value = "subTrackNumber")
 	private List<SubTrack> subTracklist;
+	@ManyToOne
+	private Release release;
 
 	public Track() {
-		id = new TrackId();
-		
 		subTracklist = new LinkedList<>();
 		artists = new HashSet<>();
 		extraArtists = new HashSet<>();
 	}
 	
-	public Track(Release r) {
+	public Track(Release release) {
 		this();
 		
-		id.setRelease(r);
+		this.release = release;
 	}
 
-	@Override
-	public TrackId getId() {
+	public long getId() {
 		return id;
 	}
 
@@ -117,11 +119,11 @@ public class Track implements IIdentifiable<TrackId> {
 	}
 
 	public short getSequence() {
-		return id.getSequence();
+		return sequence;
 	}
 
-	public void setId(TrackId id) {
-		this.id = id;
+	public Release getRelease() {
+		return release;
 	}
 
 	public void setTrackNumber(short trackNumber) {
@@ -153,7 +155,7 @@ public class Track implements IIdentifiable<TrackId> {
 	}
 
 	public void setSequence(short sequence) {
-		this.id.setSequence(sequence);
+		this.sequence = sequence;
 	}
 
 	/**

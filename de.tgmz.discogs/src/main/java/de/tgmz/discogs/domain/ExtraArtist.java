@@ -11,56 +11,70 @@ package de.tgmz.discogs.domain;
 
 import java.util.Objects;
 
-import de.tgmz.discogs.domain.id.ExtraArtistId;
+import de.tgmz.discogs.domain.id.ExtraArtistKey;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
 @Entity
 @Table(indexes = {
-	@Index(columnList = "role,artist_id", name = "ExtraArtist_pkey", unique = true),
+	@Index(columnList = "role_id,artist_id", name = "ExtraArtist_pkey", unique = true),
 })
-public class ExtraArtist implements IIdentifiable<ExtraArtistId> { 
+public class ExtraArtist implements IIdentifiable<ExtraArtistKey> { 
 	@Transient
 	private static final long serialVersionUID = 2296552658329482485L;
+	
 	@EmbeddedId
-	private ExtraArtistId id;
+	private ExtraArtistKey id;
+	
+	@ManyToOne
+	@MapsId("artistId")
+	@JoinColumn(name = "artist_id")
+	private Artist artist;
+	
 	
 	public ExtraArtist() {
-		id = new ExtraArtistId();
+		id = new ExtraArtistKey();
+		
+		artist = new Artist();
 	}
 
 	public ExtraArtist(String role, Artist artist) {
 		this();
 		
-		this.id.setRole(role);
-		this.id.setArtist(artist);
+		this.id.setRoleId(role);
+		this.setArtist(artist);
 	}
 
-	public ExtraArtistId getId() {
+	@Override
+	public ExtraArtistKey getId() {
 		return id;
 	}
 
-	public void setId(ExtraArtistId id) {
+	public void setId(ExtraArtistKey id) {
 		this.id = id;
 	}
 
 	public Artist getArtist() {
-		return id.getArtist();
+		return artist;
 	}
 
 	public void setArtist(Artist artist) {
-		this.id.setArtist(artist);
+		this.artist = artist;
+		this.id.setArtistId(artist.getId());
 	}
 
 	public String getRole() {
-		return id.getRole();
+		return id.getRoleId();
 	}
 
 	public void setRole(String role) {
-		this.id.setRole(role);
+		this.id.setRoleId(role);
 	}
 
 	@Override
