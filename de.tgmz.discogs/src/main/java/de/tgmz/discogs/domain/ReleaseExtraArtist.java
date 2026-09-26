@@ -42,7 +42,7 @@ public class ReleaseExtraArtist implements IIdentifiable<ReleaseExtraArtistKey> 
 	
 	@ManyToOne
 	@MapsId("extraArtistId")
-	@JoinColumn(name = "role_id", referencedColumnName = "role")
+	@JoinColumn(name = "role_id", referencedColumnName = "role_id")
 	@JoinColumn(name = "artist_id", referencedColumnName = "artist_id")
 	private ExtraArtist extraArtist;
 	

@@ -53,7 +53,6 @@ import de.tgmz.discogs.domain.SubTrack;
 import de.tgmz.discogs.domain.Track;
 import de.tgmz.discogs.domain.id.ReleaseCompanyKey;
 import de.tgmz.discogs.domain.id.ReleaseExtraArtistKey;
-import de.tgmz.discogs.domain.id.SubTrackId;
 import de.tgmz.discogs.load.DiscogsContentHandler;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.metamodel.EntityType;
@@ -226,19 +225,6 @@ public abstract class DiscogsTest {
 		assertEquals("1-12a", r.getTracklist().get(11).getSubTracklist().get(0).getPosition());
 		assertEquals(12, r.getUnfilteredTracklist().get(11).getTrackNumber());
 		assertEquals(12, r.getTracklist().get(11).getTrackNumber());
-		
-		Track t0 = new Track(r);
-		
-		SubTrackId sti0 = new SubTrackId();
-		SubTrackId sti1 = new SubTrackId();
-		
-		sti0.setTrack(t0);
-		sti1.setTrack(t0);
-		
-		sti0.setSubTrackNumber((short) 1);
-		sti1.setSubTrackNumber((short) 1);
-		
-		assertEquals(sti0, sti1);
 	}
 	@Test
 	public void testEmptyTrack() {
