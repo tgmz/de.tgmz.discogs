@@ -35,8 +35,6 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 	private Predicate<Release> filter;
 	private int fid = 1;
 	private int iid = 1;
-	private int tid = 1;
-	private int sid = 1;
 
 	public ReleaseCsvPersister(String target) {
 		this (target, c -> true);
@@ -44,7 +42,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 	
 	public ReleaseCsvPersister(String target, Predicate<Release> filter) {
 		super(target
-				, Table.Release, Table.Track, Table.SubTrack, Table.track_gen, Table.subtrack_gen
+				, Table.Release, Table.Track, Table.SubTrack
 				, Table.Release_Track, Table.Track_SubTrack, Table.Release_Genre, Table.Release_Style, Table.Release_Artist
 				, Table.Series.useCache(120_000)
 				, Table.Track_Artist, Table.ReleaseExtraArtist, Table.ReleaseExtraArtist_applicableTracks
@@ -64,9 +62,6 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 		if (!filter.test(r)) {
 			fid += r.getFormats().size();
 			iid += r.getIdentifiers().size();
-			tid += r.getUnfilteredTracklist().size();
-			
-			r.getUnfilteredTracklist().forEach(t -> sid += t.getSubTracklist().size());
 			
 			return 0;
 		}
@@ -175,21 +170,22 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 				t.getRelease().getId()
 				, t.getSequence()
 				, t.getTrackNumber()
-				, tid
 				, t.getTitle()
 				, t.getDuration()
 				, t.getPosition()
 			);
-			
+		
 		pm.get(Table.Release_Track).printRecord(
 			t.getRelease().getId()
-			, tid
+			, t.getRelease().getId()
+			, t.getSequence()
 		);
 
 		for (Artist a : t.getArtists()) {
 			pm.get(Table.Track_Artist).printRecord(
-					a.getId()
-					, tid
+					t.getRelease().getId()
+					, t.getSequence()
+					, a.getId()
 				);
 
 			pm.get(Table.artist_release_all).printRecordUsingCache(
@@ -200,8 +196,9 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 			
 		for (ExtraArtist ea : t.getExtraArtists()) {
 			pm.get(Table.Track_ExtraArtist).printRecord(
-					ea.getArtist().getId()
-					, tid
+					t.getRelease().getId()
+					, t.getSequence()
+					, ea.getArtist().getId()
 					, ea.getRole()
 				);
 		
@@ -214,28 +211,31 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 		for (SubTrack st : t.getSubTracklist()) {
 			save(st);
 		}
-		
-		++tid;
 	}
 	private void save(SubTrack st) throws IOException {
 		pm.get(Table.SubTrack).printRecord(
-				st.getSubTrackNumber()
-				, sid
-				, tid
+				st.getId().getReleaseId()
+				, st.getId().getSequenceId()
+				, st.getSubTrackNumber()
 				, st.getTitle()
 				, st.getDuration()
 				, st.getPosition()
 			);
 
 		pm.get(Table.Track_SubTrack).printRecord(
-			tid
-			, sid
+			st.getId().getReleaseId()
+			, st.getId().getSequenceId()
+			, st.getId().getReleaseId()
+			, st.getId().getSequenceId()
+			, st.getSubTrackNumber()
 		);
 				
 		for (ExtraArtist ea : st.getExtraArtists()) {
 			pm.get(Table.SubTrack_ExtraArtist).printRecord(
-					ea.getArtist().getId()
-					, sid
+					st.getId().getReleaseId()
+					, st.getId().getSequenceId()
+					, st.getSubTrackNumber()
+					, ea.getArtist().getId()
 					, ea.getRole()
 			);
 					
@@ -244,8 +244,6 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 					, ea.getArtist().getName()
 			);
 		}
-		
-		++sid;
 	}
 	private void save(ReleaseExtraArtist rea) throws IOException {
 		if (rea.getExtraArtist().getRole() != null) {
