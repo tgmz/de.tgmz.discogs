@@ -51,8 +51,11 @@ import de.tgmz.discogs.domain.Series;
 import de.tgmz.discogs.domain.Style;
 import de.tgmz.discogs.domain.SubTrack;
 import de.tgmz.discogs.domain.Track;
+import de.tgmz.discogs.domain.id.ExtraArtistKey;
 import de.tgmz.discogs.domain.id.ReleaseCompanyKey;
 import de.tgmz.discogs.domain.id.ReleaseExtraArtistKey;
+import de.tgmz.discogs.domain.id.SubTrackKey;
+import de.tgmz.discogs.domain.id.TrackKey;
 import de.tgmz.discogs.load.DiscogsContentHandler;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.metamodel.EntityType;
@@ -273,8 +276,8 @@ public abstract class DiscogsTest {
 
 	@Test
 	public void testEqualsHashcode() {
-		for (Class<?> clz : List.of(Genre.class, Style.class, Company.class
-				, EntityType.class, Series.class, ReleaseCompanyKey.class, ReleaseExtraArtistKey.class)) {
+		for (Class<?> clz : List.of(Genre.class, Style.class, Company.class, EntityType.class, Series.class
+				, ReleaseCompanyKey.class, ExtraArtistKey.class, ReleaseExtraArtistKey.class, TrackKey.class, SubTrackKey.class)) {
 			EqualsVerifier.forClass(clz)
 			.suppress(Warning.SURROGATE_KEY)
 			.verify();

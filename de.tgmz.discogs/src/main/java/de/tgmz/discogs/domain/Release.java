@@ -42,7 +42,7 @@ public class Release extends Discogs {
 	@Transient
 	private static final long serialVersionUID = -8124211768010344837L;
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@OrderBy(value = "sequence")
+	@OrderBy(value = "sequence_id")
 	private List<Track> tracklist;
 	private boolean _main;
 	@ManyToOne

@@ -51,12 +51,10 @@ public enum Table implements ITable {
 	, ExtraArtist
 	, ReleaseExtraArtist
 	, ReleaseExtraArtist_applicableTracks
-	, track_gen
 	, Track
 	, Track_Artist
 	, Track_ExtraArtist
 	, Release_Track
-	, subtrack_gen
 	, SubTrack
 	, SubTrack_ExtraArtist
 	, Track_SubTrack
