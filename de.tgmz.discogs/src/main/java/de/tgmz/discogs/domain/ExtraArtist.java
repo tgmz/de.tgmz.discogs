@@ -23,7 +23,7 @@ import jakarta.persistence.Transient;
 
 @Entity
 @Table(indexes = {
-	@Index(columnList = "role_id,artist_id", name = "ExtraArtist_pkey", unique = true),
+	@Index(columnList = "role_id,detail_id,artist_id", name = "ExtraArtist_pkey", unique = true),
 })
 public class ExtraArtist implements IIdentifiable<ExtraArtistKey> { 
 	@Transient
@@ -44,10 +44,11 @@ public class ExtraArtist implements IIdentifiable<ExtraArtistKey> {
 		artist = new Artist();
 	}
 
-	public ExtraArtist(String role, Artist artist) {
+	public ExtraArtist(String role, String detail, Artist artist) {
 		this();
 		
 		this.id.setRoleId(role);
+		this.id.setDetailId(detail);
 		this.setArtist(artist);
 	}
 
@@ -75,6 +76,14 @@ public class ExtraArtist implements IIdentifiable<ExtraArtistKey> {
 
 	public void setRole(String role) {
 		this.id.setRoleId(role);
+	}
+
+	public String getDetail() {
+		return id.getDetailId();
+	}
+
+	public void setDetail(String detail) {
+		this.id.setDetailId(detail);
 	}
 
 	@Override

@@ -19,6 +19,7 @@ import java.util.StringJoiner;
 import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -419,8 +420,9 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			LOG.warn("Empty role for {}", draft);
 			return result;
 		}
-		
-		splitRoles(allRoles).forEach(singleRole -> result.add(new ExtraArtist(singleRole, draft.getArtist())));
+
+		// srp: SingleRolePair
+		splitRoles(allRoles).forEach(srp -> result.add(new ExtraArtist(srp.getLeft(), srp.getRight(), draft.getArtist())));
 		
 		return result;
 	}
@@ -435,10 +437,10 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			return result;
 		}
 		
-		for (String singleRole : splitRoles(allRoles)) {
+		for (Pair<String, String> singleRole : splitRoles(allRoles)) {
 			ReleaseExtraArtist rea = new ReleaseExtraArtist();
 			
-			rea.setExtraArtist(new ExtraArtist(singleRole, draft.getExtraArtist().getArtist()));
+			rea.setExtraArtist(new ExtraArtist(singleRole.getLeft(), singleRole.getRight(), draft.getExtraArtist().getArtist()));
 			rea.setRelease(draft.getRelease());
 			rea.getApplicableTracks().addAll(draft.getApplicableTracks());
 			
@@ -478,8 +480,13 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 		
 		return result;
 	}
-	private Set<String> splitRoles(String allRoles) {
+	private Set<Pair<String,String>> splitRoles(String allRoles) {
 		String[] split = allRoles.split(",\\s+");	// Split around commas
+		
+		if (split.length == 1) {
+			// No split occurred. Simply return a singleton of credit and detail
+			return Set.of(splitSingleRole(allRoles));
+		}
 		
 		Predicate<String> p;
 		// Determine if a role is mistakenly split.
@@ -495,9 +502,10 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 			p =	P_FALLBACK;
 		}
 		
-		Set<String> result = new HashSet<>();
+		Set<Pair<String,String>> result = new HashSet<>();
 		
 		StringJoiner sj = new StringJoiner(", ");
+		
 		for (String singleRole : split) {
 			sj.add(singleRole);
 			
@@ -507,11 +515,31 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 				continue;	// Join again
 			}
 			
-			result.add(StringUtils.left(temp, 255));
-			
+			result.add(splitSingleRole(temp));
+
 			sj = new StringJoiner(", ");
 		}
 
 		return result;
+	}
+	
+	/**
+	 * Splitup a role into credit and detail
+	 */
+	private Pair<String,String> splitSingleRole(String singleRole) {
+		String role;
+		String detail;
+		
+		int idx = singleRole.indexOf('[');
+		
+		if (idx > -1) {
+			role = singleRole.substring(0, idx).strip();
+			detail = StringUtils.left(singleRole.substring(idx).strip(), 255);
+		} else {
+			role = singleRole;
+			detail = "";
+		}
+
+		return Pair.of(role, detail);
 	}
 }

@@ -209,7 +209,7 @@ public abstract class DiscogsTest {
 		Release r = em.find(Release.class, 2324L);
 		
 		// Mixed by GusGus
-		ReleaseExtraArtist mbgg = em.find(ReleaseExtraArtist.class, new ReleaseExtraArtistKey(r.getId(), "Mixed By", 231513));
+		ReleaseExtraArtist mbgg = em.find(ReleaseExtraArtist.class, new ReleaseExtraArtistKey(r.getId(), "Mixed By", "", 231513));
 		
 		// "1 to 4, 6 to 11"
 		Set<String> applicableTracks = mbgg.getApplicableTracks();
@@ -302,8 +302,8 @@ public abstract class DiscogsTest {
 		
 		String mixedBy = "Mixed By";
 		
-		ExtraArtist ea0 = new ExtraArtist(mixedBy, a0);
-		ExtraArtist ea1 = new ExtraArtist(mixedBy, a1);
+		ExtraArtist ea0 = new ExtraArtist(mixedBy, "", a0);
+		ExtraArtist ea1 = new ExtraArtist(mixedBy, "", a1);
 
 		// Ensure that ExtraArtists are equal iff the artists _ids_ and roles are equal
 		assertEquals(ea0, ea1);

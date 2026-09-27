@@ -49,7 +49,7 @@ public class SubTrack implements Serializable {
 	private String position;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	@JoinTable(name = "SubTrack_ExtraArtist", indexes = {
-		@Index(columnList = "SubTrack_release_id, SubTrack_sequence_id, SubTrack_subtracknumber_id, extraArtists_artist_id, extraArtists_role_id", name = "SubTrack_ExtraArtist_pkey", unique = true),
+		@Index(columnList = "SubTrack_release_id, SubTrack_sequence_id, SubTrack_subtracknumber_id, extraArtists_artist_id, extraArtists_role_id, extraArtists_detail_id", name = "SubTrack_ExtraArtist_pkey", unique = true),
 	})
 	private Set<ExtraArtist> extraArtists;
 	private String duration;

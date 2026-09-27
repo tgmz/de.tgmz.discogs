@@ -23,21 +23,27 @@ public final class ExtraArtistKey implements Serializable {
 	
 	@Column(name = "role_id")
 	private String roleId;
+	@Column(name = "detail_id")
+	private String detailId;
 	@Column(name = "artist_id")
 	private int artistId;
 	
 	public ExtraArtistKey() {
-		this(null, 0);
+		this(null, null, 0);
 	}
 	
-	public ExtraArtistKey(String roleId, int artistId) {
+	public ExtraArtistKey(String roleId, String detailId, int artistId) {
 		super();
 		setRoleId(roleId);
+		setDetailId(detailId);
 		setArtistId(artistId);
 	}
 
 	public String getRoleId() {
 		return roleId;
+	}
+	public String getDetailId() {
+		return detailId;
 	}
 	public void setArtistId(int artistId) {
 		this.artistId = artistId;
@@ -45,22 +51,30 @@ public final class ExtraArtistKey implements Serializable {
 	public void setRoleId(String roleId) {
 		this.roleId = roleId;
 	}
+	public void setDetailId(String detailId) {
+		this.detailId = detailId;
+	}
+
 	@Override
 	public int hashCode() {
-		return Objects.hash(artistId, roleId);
+		return Objects.hash(Integer.valueOf(artistId), detailId, roleId);
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!(obj instanceof ExtraArtistKey))
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
 			return false;
 		ExtraArtistKey other = (ExtraArtistKey) obj;
-		return artistId == other.artistId && Objects.equals(roleId, other.roleId);
+		return artistId == other.artistId && Objects.equals(detailId, other.detailId)
+				&& Objects.equals(roleId, other.roleId);
 	}
 
 	@Override
 	public String toString() {
-		return "ReleaseExtraArtistKey [artistId=" + artistId + ", roleId=" + roleId + "]";
+		return "ExtraArtistKey [roleId=" + roleId + ", detailId=" + detailId + ", artistId=" + artistId + "]";
 	}
 }
