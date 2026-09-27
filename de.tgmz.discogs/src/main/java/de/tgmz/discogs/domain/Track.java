@@ -62,7 +62,7 @@ public class Track implements Serializable {
 	private Set<Artist> artists;
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	@JoinTable(name = "Track_ExtraArtist", indexes = {
-		@Index(columnList = "Track_release_id, Track_sequence_id, extraArtists_artist_id, extraArtists_role_id, extraArtists_detail_id", name = "Track_ExtraArtist_pkey", unique = true),
+		@Index(columnList = "Track_release_id, Track_sequence_id, extraArtists_artist_id, extraArtists_credit_id, extraArtists_detail_id", name = "Track_ExtraArtist_pkey", unique = true),
 	})
 	private Set<ExtraArtist> extraArtists;
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
