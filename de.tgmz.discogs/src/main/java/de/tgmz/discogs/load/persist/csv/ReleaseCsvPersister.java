@@ -199,6 +199,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 					t.getRelease().getId()
 					, t.getSequence()
 					, ea.getArtist().getId()
+					, ea.getDetail()
 					, ea.getRole()
 				);
 		
@@ -236,6 +237,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 					, st.getId().getSequenceId()
 					, st.getSubTrackNumber()
 					, ea.getArtist().getId()
+					, ea.getDetail()
 					, ea.getRole()
 			);
 					
@@ -250,13 +252,16 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 			pm.get(Table.ReleaseExtraArtist).printRecord(
 					rea.getExtraArtist().getArtist().getId()
 					, rea.getRelease().getId()
+					, rea.getExtraArtist().getDetail()
 					, rea.getExtraArtist().getRole()
 					);
+			
 			
 			for (String at : rea.getApplicableTracks()) {
 				pm.get(Table.ReleaseExtraArtist_applicableTracks).printRecord(
 					rea.getExtraArtist().getArtist().getId()
 					, rea.getRelease().getId()
+					, rea.getExtraArtist().getDetail()
 					, rea.getExtraArtist().getRole()
 					, at
 				);
