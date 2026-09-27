@@ -25,22 +25,28 @@ public final class ReleaseExtraArtistKey implements Serializable {
 	private int releaseId;
 	@Column(name = "role_id")
 	private String roleId;
+	@Column(name = "detail_id")
+	private String detailId;
 	@Column(name = "artist_id")
 	private int artistId;
 	
 	public ReleaseExtraArtistKey() {
-		this(0, null, 0);
+		this(0, null, null, 0);
 	}
 	
-	public ReleaseExtraArtistKey(int releaseId, String roleId, int artistId) {
+	public ReleaseExtraArtistKey(int releaseId, String roleId, String detailId, int artistId) {
 		super();
 		setReleaseId(releaseId);
 		setRoleId(roleId);
+		setDetailId(detailId);
 		setArtistId(artistId);
 	}
 
 	public String getRoleId() {
 		return roleId;
+	}
+	public String getDetailId() {
+		return detailId;
 	}
 	public void setReleaseId(int releaseId) {
 		this.releaseId = releaseId;
@@ -51,22 +57,31 @@ public final class ReleaseExtraArtistKey implements Serializable {
 	public void setRoleId(String roleId) {
 		this.roleId = roleId;
 	}
+	public void setDetailId(String detailId) {
+		this.detailId = detailId;
+	}
+
 	@Override
 	public int hashCode() {
-		return Objects.hash(artistId, releaseId, roleId);
+		return Objects.hash(Integer.valueOf(artistId), detailId, Integer.valueOf(releaseId), roleId);
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!(obj instanceof ReleaseExtraArtistKey))
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
 			return false;
 		ReleaseExtraArtistKey other = (ReleaseExtraArtistKey) obj;
-		return artistId == other.artistId && releaseId == other.releaseId && Objects.equals(roleId, other.roleId);
+		return artistId == other.artistId && Objects.equals(detailId, other.detailId) && releaseId == other.releaseId
+				&& Objects.equals(roleId, other.roleId);
 	}
 
 	@Override
 	public String toString() {
-		return "ReleaseExtraArtistKey [releaseId=" + releaseId + ", artistId=" + artistId + ", roleId=" + roleId + "]";
+		return "ReleaseExtraArtistKey [releaseId=" + releaseId + ", roleId=" + roleId + ", detailId=" + detailId
+				+ ", artistId=" + artistId + "]";
 	}
 }

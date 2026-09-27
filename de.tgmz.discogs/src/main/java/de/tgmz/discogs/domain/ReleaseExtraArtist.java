@@ -26,7 +26,7 @@ import jakarta.persistence.Transient;
 
 @Entity
 @Table(indexes = {
-	@Index(columnList = "release_id,role_id,artist_id", name = "ReleaseExtraArtist_pkey", unique = true),
+	@Index(columnList = "release_id,role_id,detail_id,artist_id", name = "ReleaseExtraArtist_pkey", unique = true),
 })
 public class ReleaseExtraArtist implements IIdentifiable<ReleaseExtraArtistKey> {
 	@Transient
@@ -43,6 +43,7 @@ public class ReleaseExtraArtist implements IIdentifiable<ReleaseExtraArtistKey> 
 	@ManyToOne
 	@MapsId("extraArtistId")
 	@JoinColumn(name = "role_id", referencedColumnName = "role_id")
+	@JoinColumn(name = "detail_id", referencedColumnName = "detail_id")
 	@JoinColumn(name = "artist_id", referencedColumnName = "artist_id")
 	private ExtraArtist extraArtist;
 	
@@ -77,6 +78,7 @@ public class ReleaseExtraArtist implements IIdentifiable<ReleaseExtraArtistKey> 
 		this.extraArtist = extraArtist;
 		this.id.setArtistId(extraArtist.getArtist().getId());
 		this.id.setRoleId(extraArtist.getRole());
+		this.id.setDetailId(extraArtist.getDetail());
 	}
 
 	@Override
