@@ -46,6 +46,11 @@ import de.tgmz.discogs.load.persist.ReleasePersistable;
 
 public class ReleaseContentHandler extends DiscogsContentHandler {
 	protected static final Logger LOG = LoggerFactory.getLogger(ReleaseContentHandler.class);
+	
+	// Predicates to determine if a role is mistakenly split.
+	private static final Predicate<String> P_DEFAULT = s -> StringUtils.countMatches(s, '[') > StringUtils.countMatches(s, ']'); 
+	private static final Predicate<String> P_FALLBACK = s -> s.contains("[") && !s.contains("]"); 
+	
 	private List<String> bandArtists;
 	private List<String> bandJoins;
 	private short sequence;
@@ -474,25 +479,39 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 		return result;
 	}
 	private Set<String> splitRoles(String allRoles) {
+		String[] split = allRoles.split(",\\s+");	// Split around commas
+		
+		Predicate<String> p;
+		// Determine if a role is mistakenly split.
+		// By default we join roles which contain a comma between square brackets and handle
+		// special roles like "Photography By [Photos] [PP. 4, 8, 10, 16]" (Do NOT split here!)
+		// If the role itself is in error because a terminating ']' is missing we fall back and ignore this special case
+		
+		if (StringUtils.countMatches(allRoles, '[') == StringUtils.countMatches(allRoles, ']')) {
+			// Default: We join until the _number_ of square brackets match
+			p =	P_DEFAULT;
+		} else {
+			// Failsafe: A terminating ']' is missing.
+			p =	P_FALLBACK;
+		}
+		
 		Set<String> result = new HashSet<>();
 		
 		StringJoiner sj = new StringJoiner(", ");
-		
-		for (String split : allRoles.split(",\\s+")) {
-			sj.add(split);
+		for (String singleRole : split) {
+			sj.add(singleRole);
 			
 			String temp = sj.toString().strip();
 			
-			// Join roles which contain a comma between square brackets and were therefore mistakenly split
-			if (temp.contains("[") && !temp.contains("]")) {
-				continue;
+			if (p.test(temp)) { 
+				continue;	// Join again
 			}
 			
 			result.add(StringUtils.left(temp, 255));
 			
 			sj = new StringJoiner(", ");
 		}
-		
+
 		return result;
 	}
 }

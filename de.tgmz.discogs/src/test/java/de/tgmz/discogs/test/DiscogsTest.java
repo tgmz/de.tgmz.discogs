@@ -172,6 +172,31 @@ public abstract class DiscogsTest {
 		assertEquals(18666, mo.getExtraArtist().getArtist().getId().intValue());
 	}
 	@Test
+	public void testTourist() {
+		Release r = em.find(Release.class, 1226);
+		
+		assertEquals("Tourist", r.getTitle());
+		assertEquals("St Germain", r.getAlbumArtist());
+		
+		// Ludovic Navarre
+		// Erroneous role: a terminating ] is missing 
+		ReleaseExtraArtist ln = getExtraArtist(r, 841, "Written-By [All Tracks Written By, Producer [All Tracks Produced By]");
+		
+		assertEquals("Ludovic Navarre", ln.getExtraArtist().getArtist().getName());
+	}
+	@Test
+	public void testMarqueeMoon() {
+		Release r = em.find(Release.class, 1762347);
+		
+		assertEquals("Marquee Moon", r.getTitle());
+		assertEquals("Television", r.getAlbumArtist());
+		
+		// Godlis
+		ReleaseExtraArtist godlis = getExtraArtist(r, 2155469, "Photography By [Photos] [PP. 4, 8, 10, 16]");
+		
+		assertEquals("Godlis", godlis.getExtraArtist().getArtist().getName());
+	}
+	@Test
 	public void test3DoorsDown() {
 		Release r = em.find(Release.class, 34334509L);
 		
