@@ -165,7 +165,7 @@ public abstract class DiscogsTest {
 		// Mike Oldfield
 		ReleaseExtraArtist mo = r.getReleaseExtraArtists()
 		.stream()
-		.filter(rea -> rea.getExtraArtist().getRole().length() == 255)
+		.filter(rea -> rea.getExtraArtist().getDetail().length() == 255)
 		.findFirst()
 		.orElseThrow();
 		
@@ -180,7 +180,7 @@ public abstract class DiscogsTest {
 		
 		// Ludovic Navarre
 		// Erroneous role: a terminating ] is missing 
-		ReleaseExtraArtist ln = getExtraArtist(r, 841, "Written-By [All Tracks Written By, Producer [All Tracks Produced By]");
+		ReleaseExtraArtist ln = getExtraArtist(r, 841, "Written-By", "[All Tracks Written By, Producer [All Tracks Produced By]");
 		
 		assertEquals("Ludovic Navarre", ln.getExtraArtist().getArtist().getName());
 	}
@@ -192,7 +192,7 @@ public abstract class DiscogsTest {
 		assertEquals("Television", r.getAlbumArtist());
 		
 		// Godlis
-		ReleaseExtraArtist godlis = getExtraArtist(r, 2155469, "Photography By [Photos] [PP. 4, 8, 10, 16]");
+		ReleaseExtraArtist godlis = getExtraArtist(r, 2155469, "Photography By", "[Photos] [PP. 4, 8, 10, 16]");
 		
 		assertEquals("Godlis", godlis.getExtraArtist().getArtist().getName());
 	}
@@ -257,7 +257,7 @@ public abstract class DiscogsTest {
 		assertEquals("Purple Rain", r.getTitle());
 
 		// Assert that subRole is not splitted by ","
-		ReleaseExtraArtist prb = getExtraArtist(r, 28795, "Remastered By [LP Remastered, 2015]");
+		ReleaseExtraArtist prb = getExtraArtist(r, 28795, "Remastered By", "[LP Remastered, 2015]");
 		
 		assertEquals("Prince", prb.getExtraArtist().getArtist().getName());
 	}
@@ -525,9 +525,16 @@ public abstract class DiscogsTest {
 	}
 	
 	private ReleaseExtraArtist getExtraArtist(Release r, int artistId, String role) {
+		return getExtraArtist(r, artistId, role, "");
+	}
+	
+	private ReleaseExtraArtist getExtraArtist(Release r, int artistId, String role, String detail) {
 		return r.getReleaseExtraArtists()
 			.stream()
-			.filter(rea -> rea.getExtraArtist().getArtist().getId() == artistId && role.equals(rea.getExtraArtist().getRole()))
+			.filter(rea -> rea.getExtraArtist().getArtist().getId() == artistId 
+							&& role.equals(rea.getExtraArtist().getRole())
+							&& detail.equals(rea.getExtraArtist().getDetail())
+					)
 			.findFirst()
 			.orElseThrow();
 	}
