@@ -38,7 +38,7 @@ create table Release_Identifier (Release_id integer not null, identifiers_id int
 create table Release_labels (Release_id integer not null, labels_KEY integer not null, catno varchar(255), primary key (Release_id, labels_KEY))
 create table Release_Style (Release_id integer not null, styles_id varchar(31) not null, primary key (Release_id, styles_id))
 create table Release_Track (Release_id integer not null, tracklist_release_id integer not null, tracklist_sequence_id smallint not null, unique (tracklist_release_id, tracklist_sequence_id))
-create table ReleaseCompany (company_id integer not null, entityType_id smallint not null, release_id integer not null, constraint ReleaseCompany_pkey primary key (release_id, company_id, entityType_id))
+create table ReleaseCompany (company_id integer not null, entityType_id smallint not null, release_id integer not null, constraint ReleaseCompany_pkey primary key (entityType_id, company_id, release_id))
 create table ReleaseExtraArtist (artist_id integer not null, release_id integer not null, role_id varchar(255) not null, constraint ReleaseExtraArtist_pkey primary key (release_id, role_id, artist_id))
 create table ReleaseExtraArtist_applicableTracks (ReleaseExtraArtist_artist_id integer not null, ReleaseExtraArtist_release_id integer not null, ReleaseExtraArtist_role_id varchar(255) not null, applicableTracks varchar(255), unique (ReleaseExtraArtist_artist_id, ReleaseExtraArtist_release_id, ReleaseExtraArtist_role_id, applicableTracks))
 create table Series (id integer not null, catno varchar(255), name varchar(255), primary key (id))
