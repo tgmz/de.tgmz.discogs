@@ -23,8 +23,8 @@ public final class ReleaseExtraArtistKey implements Serializable {
 	
 	@Column(name = "release_id")
 	private int releaseId;
-	@Column(name = "role_id")
-	private String roleId;
+	@Column(name = "credit_id")
+	private String creditId;
 	@Column(name = "detail_id")
 	private String detailId;
 	@Column(name = "artist_id")
@@ -34,28 +34,22 @@ public final class ReleaseExtraArtistKey implements Serializable {
 		this(0, null, null, 0);
 	}
 	
-	public ReleaseExtraArtistKey(int releaseId, String roleId, String detailId, int artistId) {
+	public ReleaseExtraArtistKey(int releaseId, String creditId, String detailId, int artistId) {
 		super();
 		setReleaseId(releaseId);
-		setRoleId(roleId);
+		setCreditId(creditId);
 		setDetailId(detailId);
 		setArtistId(artistId);
 	}
 
-	public String getRoleId() {
-		return roleId;
-	}
-	public String getDetailId() {
-		return detailId;
-	}
 	public void setReleaseId(int releaseId) {
 		this.releaseId = releaseId;
 	}
 	public void setArtistId(int artistId) {
 		this.artistId = artistId;
 	}
-	public void setRoleId(String roleId) {
-		this.roleId = roleId;
+	public void setCreditId(String creditId) {
+		this.creditId = creditId;
 	}
 	public void setDetailId(String detailId) {
 		this.detailId = detailId;
@@ -63,7 +57,7 @@ public final class ReleaseExtraArtistKey implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(Integer.valueOf(artistId), detailId, Integer.valueOf(releaseId), roleId);
+		return Objects.hash(Integer.valueOf(artistId), detailId, Integer.valueOf(releaseId), creditId);
 	}
 
 	@Override
@@ -76,12 +70,12 @@ public final class ReleaseExtraArtistKey implements Serializable {
 			return false;
 		ReleaseExtraArtistKey other = (ReleaseExtraArtistKey) obj;
 		return artistId == other.artistId && Objects.equals(detailId, other.detailId) && releaseId == other.releaseId
-				&& Objects.equals(roleId, other.roleId);
+				&& Objects.equals(creditId, other.creditId);
 	}
 
 	@Override
 	public String toString() {
-		return "ReleaseExtraArtistKey [releaseId=" + releaseId + ", roleId=" + roleId + ", detailId=" + detailId
+		return "ReleaseExtraArtistKey [releaseId=" + releaseId + ", creditId=" + creditId + ", detailId=" + detailId
 				+ ", artistId=" + artistId + "]";
 	}
 }

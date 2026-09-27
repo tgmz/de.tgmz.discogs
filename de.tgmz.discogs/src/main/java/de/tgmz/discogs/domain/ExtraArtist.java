@@ -23,7 +23,7 @@ import jakarta.persistence.Transient;
 
 @Entity
 @Table(indexes = {
-	@Index(columnList = "role_id,detail_id,artist_id", name = "ExtraArtist_pkey", unique = true),
+	@Index(columnList = "credit_id,detail_id,artist_id", name = "ExtraArtist_pkey", unique = true),
 })
 public class ExtraArtist implements IIdentifiable<ExtraArtistKey> { 
 	@Transient
@@ -36,7 +36,9 @@ public class ExtraArtist implements IIdentifiable<ExtraArtistKey> {
 	@MapsId("artistId")
 	@JoinColumn(name = "artist_id")
 	private Artist artist;
-	
+
+	@Transient
+	private String role;	// Use this field for temporarily storing the role before it is split into credit and detail
 	
 	public ExtraArtist() {
 		id = new ExtraArtistKey();
@@ -44,10 +46,10 @@ public class ExtraArtist implements IIdentifiable<ExtraArtistKey> {
 		artist = new Artist();
 	}
 
-	public ExtraArtist(String role, String detail, Artist artist) {
+	public ExtraArtist(String credit, String detail, Artist artist) {
 		this();
 		
-		this.id.setRoleId(role);
+		this.id.setCreditId(credit);
 		this.id.setDetailId(detail);
 		this.setArtist(artist);
 	}
@@ -70,22 +72,22 @@ public class ExtraArtist implements IIdentifiable<ExtraArtistKey> {
 		this.id.setArtistId(artist.getId());
 	}
 
-	public String getRole() {
-		return id.getRoleId();
-	}
-
-	public void setRole(String role) {
-		this.id.setRoleId(role);
+	public String getCredit() {
+		return id.getCreditId();
 	}
 
 	public String getDetail() {
 		return id.getDetailId();
 	}
 
-	public void setDetail(String detail) {
-		this.id.setDetailId(detail);
+	public String getRole() {
+		return role;
 	}
 
+	public void setRole(String rrole) {
+		this.role = rrole;
+	}
+	
 	@Override
 	public int hashCode() {
 		return Objects.hash(id);
@@ -107,5 +109,5 @@ public class ExtraArtist implements IIdentifiable<ExtraArtistKey> {
 	public String toString() {
 		return "ExtraArtist [id=" + id + "]";
 	}
-	
+
 }

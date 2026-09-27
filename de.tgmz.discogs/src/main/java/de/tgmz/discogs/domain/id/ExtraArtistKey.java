@@ -21,8 +21,8 @@ public final class ExtraArtistKey implements Serializable {
 	@Transient
 	private static final long serialVersionUID = 5444222193660844182L;
 	
-	@Column(name = "role_id")
-	private String roleId;
+	@Column(name = "credit_id")
+	private String creditId;
 	@Column(name = "detail_id")
 	private String detailId;
 	@Column(name = "artist_id")
@@ -32,15 +32,15 @@ public final class ExtraArtistKey implements Serializable {
 		this(null, null, 0);
 	}
 	
-	public ExtraArtistKey(String roleId, String detailId, int artistId) {
+	public ExtraArtistKey(String creditId, String detailId, int artistId) {
 		super();
-		setRoleId(roleId);
+		setCreditId(creditId);
 		setDetailId(detailId);
 		setArtistId(artistId);
 	}
 
-	public String getRoleId() {
-		return roleId;
+	public String getCreditId() {
+		return creditId;
 	}
 	public String getDetailId() {
 		return detailId;
@@ -48,8 +48,8 @@ public final class ExtraArtistKey implements Serializable {
 	public void setArtistId(int artistId) {
 		this.artistId = artistId;
 	}
-	public void setRoleId(String roleId) {
-		this.roleId = roleId;
+	public void setCreditId(String creditId) {
+		this.creditId = creditId;
 	}
 	public void setDetailId(String detailId) {
 		this.detailId = detailId;
@@ -57,7 +57,7 @@ public final class ExtraArtistKey implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(Integer.valueOf(artistId), detailId, roleId);
+		return Objects.hash(Integer.valueOf(artistId), detailId, creditId);
 	}
 
 	@Override
@@ -70,11 +70,11 @@ public final class ExtraArtistKey implements Serializable {
 			return false;
 		ExtraArtistKey other = (ExtraArtistKey) obj;
 		return artistId == other.artistId && Objects.equals(detailId, other.detailId)
-				&& Objects.equals(roleId, other.roleId);
+				&& Objects.equals(creditId, other.creditId);
 	}
 
 	@Override
 	public String toString() {
-		return "ExtraArtistKey [roleId=" + roleId + ", detailId=" + detailId + ", artistId=" + artistId + "]";
+		return "ExtraArtistKey [creditId=" + creditId + ", detailId=" + detailId + ", artistId=" + artistId + "]";
 	}
 }

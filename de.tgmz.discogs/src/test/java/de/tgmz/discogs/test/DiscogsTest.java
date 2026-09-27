@@ -236,7 +236,7 @@ public abstract class DiscogsTest {
 		ExtraArtist ea = st.getExtraArtists().stream().filter(ea0 -> ea0.getArtist().getId() == 754974).findFirst().orElseThrow();
 		
 		assertEquals("Wiener Philharmoniker", ea.getArtist().getName());
-		assertEquals("Orchestra", ea.getRole());
+		assertEquals("Orchestra", ea.getCredit());
 		
 		Collection<Format> formats = r.getFormats();
 		
@@ -489,7 +489,7 @@ public abstract class DiscogsTest {
 		// Mixed By Flood
 		ExtraArtist mbf = eas.stream().filter(x -> x.getArtist() != null && 20661 == x.getArtist().getId()).findAny().orElseThrow();
 		
-		assertEquals("Mixed By", mbf.getRole());
+		assertEquals("Mixed By", mbf.getCredit());
 		assertEquals("Flood", mbf.getArtist().getName());
 		assertEquals("Mark Ellis", mbf.getArtist().getRealname());
 		
@@ -532,7 +532,7 @@ public abstract class DiscogsTest {
 		return r.getReleaseExtraArtists()
 			.stream()
 			.filter(rea -> rea.getExtraArtist().getArtist().getId() == artistId 
-							&& role.equals(rea.getExtraArtist().getRole())
+							&& role.equals(rea.getExtraArtist().getCredit())
 							&& detail.equals(rea.getExtraArtist().getDetail())
 					)
 			.findFirst()
