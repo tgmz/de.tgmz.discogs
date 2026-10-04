@@ -32,7 +32,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
-import de.tgmz.discogs.domain.PrimaryEntity;
 import de.tgmz.discogs.load.persist.IPersistable;
 
 public class DiscogsContentHandler extends DefaultHandler {
@@ -49,7 +48,7 @@ public class DiscogsContentHandler extends DefaultHandler {
 	protected String path;
 	protected int id;
 	@SuppressWarnings("rawtypes")
-	private IPersistable persister;
+	protected IPersistable persister;
 
 	public DiscogsContentHandler() {
 		try {
@@ -186,9 +185,5 @@ public class DiscogsContentHandler extends DefaultHandler {
 
 	public void setSaveThreshold(int saveThreshold) {
 		this.saveThreshold = saveThreshold;
-	}
-	
-	public void setPersister(IPersistable<? extends PrimaryEntity> persister) {
-		this.persister = persister;
 	}
 }

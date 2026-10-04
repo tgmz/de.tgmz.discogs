@@ -17,7 +17,7 @@ import org.xml.sax.Attributes;
 
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.DataQuality;
-import de.tgmz.discogs.load.persist.ArtistPersistable;
+import de.tgmz.discogs.load.factory.PersisterFactory;
 
 public class ArtistContentHandler extends DiscogsContentHandler {
 	@SuppressWarnings("unused")
@@ -34,7 +34,7 @@ public class ArtistContentHandler extends DiscogsContentHandler {
 	public ArtistContentHandler(Predicate<Artist> filter) {
 		super();
 		
-		setPersister(new ArtistPersistable(filter));
+		persister = PersisterFactory.getInstance().create(Artist.class, filter);
 	}
 
 	@Override

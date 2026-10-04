@@ -19,10 +19,6 @@ public class MasterPersistable extends AbstractDefaultPersistable<Master> {
 	private Predicate<Master> filter;
 	private IFactory<Master> mf;
 	
-	public MasterPersistable() {
-		this(x -> true);
-	}
-
 	public MasterPersistable(Predicate<Master> filter) {
 		this.filter = filter;
 		

@@ -10,18 +10,23 @@
 package de.tgmz.discogs.load.persist.csv;
 
 import java.io.IOException;
+import java.util.function.Predicate;
 
 import de.tgmz.discogs.domain.Artist;
 
 public class ArtistCsvPersister extends AbstractCsvPersister<Artist> {
-	public ArtistCsvPersister(String target) {
-		super(target
-			,Table.Artist
+	public ArtistCsvPersister(Predicate<Artist> filter) {
+		super(filter
+			, Table.Artist
 			, Table.artist_aliases, Table.artist_groups, Table.artist_members
 			, Table.Artist_variations, Table.artist_artist_all.useCache(1_000_000));
 	}
 	
 	protected int doSave(Artist a) throws IOException {
+		if (!getFilter().test(a)) {
+			return 0;
+		}
+		
 		pm.get(Table.Artist).printRecord(
 			a.getDataQuality().ordinal()
 			, a.getId()

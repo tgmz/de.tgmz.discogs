@@ -23,10 +23,6 @@ public class LabelPersistable extends AbstractDefaultPersistable<Label> {
 	private IFactory<Label> lf;
 	private CollectionFactory<Label> lsf;
 	
-	public LabelPersistable() {
-		this(x -> true);
-	}
-
 	public LabelPersistable(Predicate<Label> filter) {
 		this.filter = filter;
 		

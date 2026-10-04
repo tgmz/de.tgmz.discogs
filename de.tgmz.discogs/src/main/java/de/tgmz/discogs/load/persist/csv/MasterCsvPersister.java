@@ -10,6 +10,7 @@
 package de.tgmz.discogs.load.persist.csv;
 
 import java.io.IOException;
+import java.util.function.Predicate;
 
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.Genre;
@@ -17,8 +18,8 @@ import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Style;
 
 public class MasterCsvPersister extends AbstractCsvPersister<Master> {
-	public MasterCsvPersister(String target) {
-		super(target
+	public MasterCsvPersister(Predicate<Master> filter) {
+		super(filter
 			, Table.Master
 			, Table.Master_Artist
 			, Table.Genre, Table.Style, Table.Master_Genre, Table.Master_Style
@@ -26,6 +27,10 @@ public class MasterCsvPersister extends AbstractCsvPersister<Master> {
 	}
 
 	protected int doSave(Master m) throws IOException {
+		if (!getFilter().test(m)) {
+			return 0;
+		}
+		
 		pm.get(Table.Master).printRecord(
 			m.getDataQuality().ordinal()
 			, m.getId()

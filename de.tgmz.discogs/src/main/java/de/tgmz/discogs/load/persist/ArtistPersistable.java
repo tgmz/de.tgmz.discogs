@@ -18,10 +18,6 @@ import de.tgmz.discogs.load.factory.IFactory;
 public class ArtistPersistable extends AbstractDefaultPersistable<Artist> {
 	private Predicate<Artist> filter;
 	
-	public ArtistPersistable() {
-		this(x -> true);
-	}
-
 	public ArtistPersistable(Predicate<Artist> filter) {
 		this.filter = filter;
 	}

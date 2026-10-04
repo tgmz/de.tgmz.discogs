@@ -16,36 +16,29 @@ import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
-import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.DataQuality;
 import de.tgmz.discogs.domain.Genre;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Style;
-import de.tgmz.discogs.load.persist.MasterPersistable;
-import jakarta.persistence.EntityManager;
+import de.tgmz.discogs.load.factory.PersisterFactory;
 
 public class MasterContentHandler extends DiscogsContentHandler {
+	@SuppressWarnings("unused")
 	private static final Logger LOG = LoggerFactory.getLogger(MasterContentHandler.class);
 	private int artistId;
 	private String artistName;
 	private Master master;
 	private List<String> artistNames;
 	private List<String> joins;
-	private long artistsBefore;
 
 	public MasterContentHandler() {
 		this (x -> true);
 	}
 	
 	public MasterContentHandler(Predicate<Master> filter) {
-		try (EntityManager em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager()) {
-			artistsBefore = (long) em.createNativeQuery("SELECT COALESCE(COUNT(*), 0) FROM Artist").getSingleResult();
-		}
-		
-		setPersister(new MasterPersistable(filter));
+		persister = PersisterFactory.getInstance().create(Master.class, filter);
 	}
 
 	@Override
@@ -130,18 +123,5 @@ public class MasterContentHandler extends DiscogsContentHandler {
 		}
 		
 		super.endElement(uri, localName, qName);
-	}
-	
-	@Override
-	public void endDocument() throws SAXException {
-		if (LOG.isInfoEnabled()) {
-			try (EntityManager em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager()) {
-				long artistsAfter = (long) em.createNativeQuery("SELECT COALESCE(COUNT(*), 0) FROM Artist").getSingleResult();
-				
-				LOG.info("{} artists added", String.format("%,d", artistsAfter - artistsBefore));
-			}
-		}
-		
-		super.endDocument();
 	}
 }
