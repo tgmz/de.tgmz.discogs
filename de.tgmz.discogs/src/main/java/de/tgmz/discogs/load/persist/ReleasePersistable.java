@@ -19,10 +19,6 @@ public class ReleasePersistable extends AbstractDefaultPersistable<Release> {
 	private Predicate<Release> filter;
 	private IFactory<Release> rf;
 	
-	public ReleasePersistable() {
-		this(x -> true);
-	}
-	
 	public ReleasePersistable(Predicate<Release> filter) {
 		this.filter = filter;
 		

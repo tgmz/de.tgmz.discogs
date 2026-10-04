@@ -32,16 +32,11 @@ import de.tgmz.discogs.domain.Track;
 
 public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 	private static final Logger LOG = LoggerFactory.getLogger(ReleaseCsvPersister.class);
-	private Predicate<Release> filter;
 	private int fid = 1;
 	private int iid = 1;
 
-	public ReleaseCsvPersister(String target) {
-		this (target, c -> true);
-	}
-	
-	public ReleaseCsvPersister(String target, Predicate<Release> filter) {
-		super(target
+	public ReleaseCsvPersister(Predicate<Release> filter) {
+		super(filter
 				, Table.Release, Table.Track, Table.SubTrack
 				, Table.Release_Track, Table.Track_SubTrack, Table.Release_Genre, Table.Release_Style, Table.Release_Artist
 				, Table.Series.useCache(120_000)
@@ -54,12 +49,10 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 				, Table.artist_release_all.useCache(5_000_000)
 				, Table.label_release_all.useCache(1_500_000)
 		);
-		
-		this.filter = filter;
 	}
 	
 	protected int doSave(Release r) throws IOException {
-		if (!filter.test(r)) {
+		if (!getFilter().test(r)) {
 			fid += r.getFormats().size();
 			iid += r.getIdentifiers().size();
 			

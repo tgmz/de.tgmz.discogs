@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.function.Predicate;
 
 import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
@@ -28,15 +29,18 @@ import net.sf.jsqlparser.statement.create.table.CreateTable;
 public abstract class AbstractCsvPersister<T> implements IPersistable<T> {
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractCsvPersister.class);
 	protected Map<Table, DiscogsCsvPrinter> pm;
+	private Predicate<T> filter;
 
-	protected AbstractCsvPersister(String target, Table... tables) {
+	protected AbstractCsvPersister(Predicate<T> filter, Table... tables) {
+		this.filter = filter;
+		
 		pm = new TreeMap<>();
 		
 		for (Table table : tables) {
 			String s = DdlFactory.getInstance().getDdl(l -> Strings.CI.startsWith(l, String.format("create table %s ", table))).getFirst();
 
 			try {
-				DiscogsCsvPrinter csvp = new DiscogsCsvPrinter(target, table);
+				DiscogsCsvPrinter csvp = new DiscogsCsvPrinter(System.getProperty("DISCOGS_CSV_TARGET"), table);
 
 				List<ColumnDefinition> cds = ((CreateTable) CCJSqlParserUtil.parse(s)).getColumnDefinitions();
 
@@ -79,6 +83,10 @@ public abstract class AbstractCsvPersister<T> implements IPersistable<T> {
 		}
 		
 		return 0;
+	}
+
+	protected Predicate<T> getFilter() {
+		return filter;
 	}
 	
 	protected abstract int doSave(T l) throws IOException;

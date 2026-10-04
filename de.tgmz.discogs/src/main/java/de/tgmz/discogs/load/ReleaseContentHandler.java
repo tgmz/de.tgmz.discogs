@@ -43,7 +43,7 @@ import de.tgmz.discogs.domain.Series;
 import de.tgmz.discogs.domain.Style;
 import de.tgmz.discogs.domain.SubTrack;
 import de.tgmz.discogs.domain.Track;
-import de.tgmz.discogs.load.persist.ReleasePersistable;
+import de.tgmz.discogs.load.factory.PersisterFactory;
 
 public class ReleaseContentHandler extends DiscogsContentHandler {
 	protected static final Logger LOG = LoggerFactory.getLogger(ReleaseContentHandler.class);
@@ -75,7 +75,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	public ReleaseContentHandler(Predicate<Release> filter) {
 		super();
 		
-		setPersister(new ReleasePersistable(filter));
+		persister = PersisterFactory.getInstance().create(Release.class, filter);
 	}
 	
 	@Override

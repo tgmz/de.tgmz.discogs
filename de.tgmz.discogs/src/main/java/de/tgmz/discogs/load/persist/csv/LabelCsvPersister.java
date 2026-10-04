@@ -10,17 +10,22 @@
 package de.tgmz.discogs.load.persist.csv;
 
 import java.io.IOException;
+import java.util.function.Predicate;
 
 import de.tgmz.discogs.domain.Label;
 
 public class LabelCsvPersister extends AbstractCsvPersister<Label> {
-	public LabelCsvPersister(String target) {
-		super(target
+	public LabelCsvPersister(Predicate<Label> filter) {
+		super(filter
 			, Table.Label
 			, Table.Label_Label
 			, Table.label_label_all.useCache(300_000));
 	}
 	protected int doSave(Label l) throws IOException {
+		if (!getFilter().test(l)) {
+			return 0;
+		}
+		
 		Label pl = l.getParentLabel();
 		
 		Integer pls = pl != null ? pl.getId() : null;  
