@@ -15,7 +15,7 @@ import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.load.factory.ArtistFactory;
 import de.tgmz.discogs.load.factory.IFactory;
 
-public class ArtistPersistable extends AbstractDefaultPersistable<Artist> {
+public class ArtistPersistable extends AbstractJakartaPersistable<Artist> {
 	private Predicate<Artist> filter;
 	
 	public ArtistPersistable(Predicate<Artist> filter) {

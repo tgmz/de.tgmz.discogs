@@ -16,16 +16,17 @@ import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.DataQuality;
 import de.tgmz.discogs.domain.Genre;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Style;
+import de.tgmz.discogs.load.persist.PersisterException;
 import de.tgmz.discogs.load.persist.PersisterFactoryImpl;
 
-public class MasterContentHandler extends DiscogsContentHandler {
-	@SuppressWarnings("unused")
+public class MasterContentHandler extends DiscogsContentHandler<Master> {
 	private static final Logger LOG = LoggerFactory.getLogger(MasterContentHandler.class);
 	private int artistId;
 	private String artistName;
@@ -38,7 +39,20 @@ public class MasterContentHandler extends DiscogsContentHandler {
 	}
 	
 	public MasterContentHandler(Predicate<Master> filter) {
-		persister = PersisterFactoryImpl.getInstance().create(Master.class, filter);
+		super(filter);
+	}
+
+	@Override
+	public void startDocument() throws SAXException {
+		super.startDocument();
+
+		try {
+			persister = PersisterFactoryImpl.getInstance().create(Master.class, filter);
+		} catch (PersisterException e) {
+			LOG.error("Cannot get a persister", e);
+			
+			throw new SAXException(e);
+		}
 	}
 
 	@Override

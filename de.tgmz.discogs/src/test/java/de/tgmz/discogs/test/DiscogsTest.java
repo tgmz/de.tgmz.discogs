@@ -386,7 +386,7 @@ public abstract class DiscogsTest {
 		assertEquals(4, r3.getFormats().size());
 	}
 
-	protected static void extractAndProcess(String resource, DiscogsContentHandler dch) throws IOException {
+	protected static void extractAndProcess(String resource, DiscogsContentHandler<?> dch) throws IOException {
 		URL aUrl = null;
 		
 		try (DiscogsFileHandler dfh = new DiscogsFileHandler()) {

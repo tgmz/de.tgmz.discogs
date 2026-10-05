@@ -7,7 +7,7 @@
 *
 * SPDX-License-Identifier: EPL-2.0
 **********************************************************************/
-package de.tgmz.discogs.load.persist.jakarta;
+package de.tgmz.discogs.load.persist;
 
 public interface IPersistable<T> {
 	int save(int threshold, T o);

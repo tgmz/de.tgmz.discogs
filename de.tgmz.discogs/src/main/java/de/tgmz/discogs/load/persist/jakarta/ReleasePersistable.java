@@ -15,7 +15,7 @@ import de.tgmz.discogs.domain.Release;
 import de.tgmz.discogs.load.factory.IFactory;
 import de.tgmz.discogs.load.factory.ReleaseFactory;
 
-public class ReleasePersistable extends AbstractDefaultPersistable<Release> {
+public class ReleasePersistable extends AbstractJakartaPersistable<Release> {
 	private Predicate<Release> filter;
 	private IFactory<Release> rf;
 	

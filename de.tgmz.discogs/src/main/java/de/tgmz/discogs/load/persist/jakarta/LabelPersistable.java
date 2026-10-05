@@ -18,7 +18,7 @@ import de.tgmz.discogs.load.factory.IFactory;
 import de.tgmz.discogs.load.factory.collections.CollectionFactory;
 import jakarta.persistence.EntityManager;
 
-public class LabelPersistable extends AbstractDefaultPersistable<Label> {
+public class LabelPersistable extends AbstractJakartaPersistable<Label> {
 	private Predicate<Label> filter;
 	private IFactory<Label> lf;
 	private CollectionFactory<Label> lsf;
