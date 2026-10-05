@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.tgmz.discogs.load.DdlFactory;
-import de.tgmz.discogs.load.persist.IPersistable;
+import de.tgmz.discogs.load.persist.jakarta.IPersistable;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;

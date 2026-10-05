@@ -7,31 +7,28 @@
 *
 * SPDX-License-Identifier: EPL-2.0
 **********************************************************************/
-package de.tgmz.discogs.load.persist;
+package de.tgmz.discogs.load.persist.jakarta;
 
 import java.util.function.Predicate;
 
-import de.tgmz.discogs.domain.Release;
+import de.tgmz.discogs.domain.Artist;
+import de.tgmz.discogs.load.factory.ArtistFactory;
 import de.tgmz.discogs.load.factory.IFactory;
-import de.tgmz.discogs.load.factory.ReleaseFactory;
 
-public class ReleasePersistable extends AbstractDefaultPersistable<Release> {
-	private Predicate<Release> filter;
-	private IFactory<Release> rf;
+public class ArtistPersistable extends AbstractDefaultPersistable<Artist> {
+	private Predicate<Artist> filter;
 	
-	public ReleasePersistable(Predicate<Release> filter) {
+	public ArtistPersistable(Predicate<Artist> filter) {
 		this.filter = filter;
-		
-		rf = new ReleaseFactory();
 	}
 
 	@Override
-	public IFactory<Release> getFactory() {
-		return rf;
+	public IFactory<Artist> getFactory() {
+		return new ArtistFactory();
 	}
 
 	@Override
-	public Predicate<Release> getFilter() {
+	public Predicate<Artist> getFilter() {
 		return filter;
 	}
 }

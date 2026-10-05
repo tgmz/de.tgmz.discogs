@@ -1,5 +1,5 @@
 /*********************************************************************
-* Copyright (c) 04.01.2026 Thomas Zierer
+* Copyright (c) 04.10.2026 Thomas Zierer
 *
 * This program and the accompanying materials are made
 * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
 *
 * SPDX-License-Identifier: EPL-2.0
 **********************************************************************/
-package de.tgmz.discogs.load.factory;
+package de.tgmz.discogs.load.persist;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -21,27 +21,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.tgmz.discogs.domain.PrimaryEntity;
-import de.tgmz.discogs.load.persist.IPersistable;
+import de.tgmz.discogs.load.persist.jakarta.IPersistable;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ScanResult;
 
-public final class PersisterFactory implements IPersisterFactory {
-	private static final Logger LOG = LoggerFactory.getLogger(PersisterFactory.class);
+public final class PersisterFactoryImpl implements IPersisterFactory {
+	private static final Logger LOG = LoggerFactory.getLogger(PersisterFactoryImpl.class);
 
-	private static PersisterFactory instance = new PersisterFactory();
+	private static PersisterFactoryImpl instance = new PersisterFactoryImpl();
 
 	private Map<String, Class<?>> persisters;
 
 	/**
 	 * Private constructor for security reasons
 	 */
-	private PersisterFactory() {
+	private PersisterFactoryImpl() {
 		persisters = new HashMap<>();
 		
-		String persisterPackage = System.getProperty("DISCOGS_CSV_TARGET") == null 
-				? "de.tgmz.discogs.load.persist" 
-				: "de.tgmz.discogs.load.persist.csv";
+		String persisterPackage = this.getClass().getPackageName() +  
+				(System.getProperty("DISCOGS_CSV_TARGET") != null ? ".csv" : ".jakarta");
 		
 		try (ScanResult scanResult = new ClassGraph().acceptPackagesNonRecursive(persisterPackage).scan()) {
 			for (ClassInfo ci : scanResult.getClassesImplementing(IPersistable.class).filter(x -> !x.isAbstract())) {
@@ -56,7 +55,7 @@ public final class PersisterFactory implements IPersisterFactory {
 	
 	public static IPersisterFactory getInstance() {
 		if (instance == null) {
-			instance = new PersisterFactory();
+			instance = new PersisterFactoryImpl();
 		}
 		
 		return instance;

@@ -22,7 +22,7 @@ import de.tgmz.discogs.domain.DataQuality;
 import de.tgmz.discogs.domain.Genre;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Style;
-import de.tgmz.discogs.load.factory.PersisterFactory;
+import de.tgmz.discogs.load.persist.PersisterFactoryImpl;
 
 public class MasterContentHandler extends DiscogsContentHandler {
 	@SuppressWarnings("unused")
@@ -38,7 +38,7 @@ public class MasterContentHandler extends DiscogsContentHandler {
 	}
 	
 	public MasterContentHandler(Predicate<Master> filter) {
-		persister = PersisterFactory.getInstance().create(Master.class, filter);
+		persister = PersisterFactoryImpl.getInstance().create(Master.class, filter);
 	}
 
 	@Override

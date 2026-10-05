@@ -32,7 +32,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
-import de.tgmz.discogs.load.persist.IPersistable;
+import de.tgmz.discogs.load.persist.jakarta.IPersistable;
 
 public class DiscogsContentHandler extends DefaultHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(DiscogsContentHandler.class);
