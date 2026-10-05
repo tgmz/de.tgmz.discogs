@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.tgmz.discogs.domain.PrimaryEntity;
-import de.tgmz.discogs.load.persist.jakarta.IPersistable;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ScanResult;
@@ -29,9 +28,9 @@ import io.github.classgraph.ScanResult;
 public final class PersisterFactoryImpl implements IPersisterFactory {
 	private static final Logger LOG = LoggerFactory.getLogger(PersisterFactoryImpl.class);
 
-	private static PersisterFactoryImpl instance = new PersisterFactoryImpl();
+	private static PersisterFactoryImpl instance;
 
-	private Map<String, Class<?>> persisters;
+	private Map<String, Class<IPersistable<?>>> persisters;
 
 	/**
 	 * Private constructor for security reasons
@@ -44,7 +43,7 @@ public final class PersisterFactoryImpl implements IPersisterFactory {
 		
 		try (ScanResult scanResult = new ClassGraph().acceptPackagesNonRecursive(persisterPackage).scan()) {
 			for (ClassInfo ci : scanResult.getClassesImplementing(IPersistable.class).filter(x -> !x.isAbstract())) {
-				Entry<String, Class<?>> cp = computePersistable(ci);
+				Entry<String, Class<IPersistable<?>>> cp = computePersistable(ci);
 								
 				if (cp != null) {
 					persisters.put(cp.getKey(), cp.getValue());
@@ -62,44 +61,37 @@ public final class PersisterFactoryImpl implements IPersisterFactory {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <T> IPersistable<T> create(Class<T> persistableClass, Predicate<T> filter) {
+	public <T> IPersistable<T> create(Class<T> persistableClass, Predicate<T> filter) throws PersisterException {
 		Class<?> clz = persisters.get(persistableClass.getCanonicalName());
+
+		if (clz == null) {
+			throw new PersisterException(String.format("No persistable defined for %s", persistableClass));
+		}
 		
 		try {
 			return (IPersistable<T>) clz.getDeclaredConstructor(Predicate.class).newInstance(filter);
 		} catch (ReflectiveOperationException e) {
-			LOG.error("Cannot create peristable for {}", persistableClass, e);
+			throw new PersisterException(String.format("Cannot create persistable for %s", persistableClass), e);
 		}
-		
-		return null;
 	}
 	
 	public static void reset() {
 		instance = null;
 	}
 	
-	private Map.Entry<String, Class<?>> computePersistable(ClassInfo ci) {
-		Class<?> clz = ci.loadClass();
-		
-		do {
-			if (clz.getGenericSuperclass() instanceof ParameterizedType pt) {
-				for (Type t : pt.getActualTypeArguments()) {
-					String s = t.getTypeName();
+	private Map.Entry<String, Class<IPersistable<?>>> computePersistable(ClassInfo ci) {
+		@SuppressWarnings("unchecked") //Safe: We know from the filtering in CTR that ci implements IPersistable
+		Class<IPersistable<?>> clz = (Class<IPersistable<?>>) ci.loadClass();
 
-					try {
-						if (PrimaryEntity.class.isAssignableFrom(Class.forName(s))) {
-							LOG.info("Using {} for persisting {}", clz, s);
+		if (clz.getGenericSuperclass() instanceof ParameterizedType pt) {
+			for (Type t : pt.getActualTypeArguments()) {
+				if (t instanceof Class<?> pe && PrimaryEntity.class.isAssignableFrom(pe)) {
+					LOG.info("Using {} for persisting {}", clz, pe);
 						
-							return new AbstractMap.SimpleEntry<>(s, clz);
-						}
-					} catch (ClassNotFoundException e) {
-						LOG.error("Persistable class not found", e);
-					}
+					return new AbstractMap.SimpleEntry<>(pe.getName(), clz);
 				}
 			}
-			
-			clz = clz.getSuperclass();
-		} while (clz != Object.class);
+		}
 		
 		return null;
 	}

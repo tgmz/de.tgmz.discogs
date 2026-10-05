@@ -31,7 +31,7 @@ public class DiscogsJakartaTest extends DiscogsTest {
 	public static void setupOnce() throws IOException {
 		DiscogsTest.setupOnce();
 		
-		DiscogsContentHandler dch;
+		DiscogsContentHandler<?> dch;
 		
 		dch = new ArtistContentHandler();
 		extractAndProcess("discogs_artists.xml.gz", dch);

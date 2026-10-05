@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,9 +33,10 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
-import de.tgmz.discogs.load.persist.jakarta.IPersistable;
+import de.tgmz.discogs.domain.PrimaryEntity;
+import de.tgmz.discogs.load.persist.IPersistable;
 
-public class DiscogsContentHandler extends DefaultHandler {
+public class DiscogsContentHandler<T extends PrimaryEntity> extends DefaultHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(DiscogsContentHandler.class);
 	private static final Pattern PA = Pattern.compile("^(.*)(\\s?\\(\\d+\\))$");
 	protected static final int DEFAULT_LENGTH = 255;
@@ -47,10 +49,12 @@ public class DiscogsContentHandler extends DefaultHandler {
 	private StringBuilder chars;
 	protected String path;
 	protected int id;
-	@SuppressWarnings("rawtypes")
-	protected IPersistable persister;
+	protected IPersistable<T> persister;
+	protected Predicate<T> filter;
 
-	public DiscogsContentHandler() {
+	public DiscogsContentHandler(Predicate<T> filter) {
+		this.filter = filter;
+		
 		try {
 			SAXParserFactory spf = SAXParserFactory.newInstance();
 			spf.setNamespaceAware(false);
@@ -152,7 +156,7 @@ public class DiscogsContentHandler extends DefaultHandler {
 	
 	@SuppressWarnings("unchecked")
 	public void save(Object o) {
-		saved += persister.save(saveThreshold, o);
+		saved += persister.save(saveThreshold, (T) o);
 		
 		if (++count % logThreshold == 0 && LOG.isInfoEnabled()) {
 			LOG.info("{}/{} ({}). {}", String.format("%,d", saved), String.format("%,d", count), String.format("%f%%", (float) saved / count * 100), o);

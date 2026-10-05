@@ -19,6 +19,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.tgmz.discogs.domain.Artist;
+import de.tgmz.discogs.domain.Release;
 import de.tgmz.discogs.load.Action;
 import de.tgmz.discogs.load.ActionFactory;
 import de.tgmz.discogs.load.ArtistContentHandler;
@@ -53,7 +54,7 @@ public class DiscogsCsvTest extends DiscogsTest {
 		
 		PersisterFactoryImpl.reset();		
 		
-		DiscogsContentHandler dch = new ReleaseContentHandler();
+		DiscogsContentHandler<Release> dch = new ReleaseContentHandler();
 		
 		dch.setSaveThreshold(Integer.MAX_VALUE);
 		extractAndProcess("discogs_releases.xml.gz", dch);
@@ -69,7 +70,7 @@ public class DiscogsCsvTest extends DiscogsTest {
 	protected static void init() throws IOException {
 		System.setProperty("DISCOGS_CSV_TARGET", dataDir.toString());
 		
-		DiscogsContentHandler dch;
+		DiscogsContentHandler<?> dch;
 		
 		dch = new ArtistContentHandler();
 		extractAndProcess("discogs_artists.xml.gz", dch);

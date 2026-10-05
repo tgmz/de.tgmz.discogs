@@ -23,6 +23,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.Company;
@@ -43,9 +44,10 @@ import de.tgmz.discogs.domain.Series;
 import de.tgmz.discogs.domain.Style;
 import de.tgmz.discogs.domain.SubTrack;
 import de.tgmz.discogs.domain.Track;
+import de.tgmz.discogs.load.persist.PersisterException;
 import de.tgmz.discogs.load.persist.PersisterFactoryImpl;
 
-public class ReleaseContentHandler extends DiscogsContentHandler {
+public class ReleaseContentHandler extends DiscogsContentHandler<Release> {
 	protected static final Logger LOG = LoggerFactory.getLogger(ReleaseContentHandler.class);
 	
 	// Predicates to determine if a role is mistakenly split.
@@ -73,9 +75,21 @@ public class ReleaseContentHandler extends DiscogsContentHandler {
 	}
 	
 	public ReleaseContentHandler(Predicate<Release> filter) {
-		super();
+		super(filter);
 		
-		persister = PersisterFactoryImpl.getInstance().create(Release.class, filter);
+	}
+	
+	@Override
+	public void startDocument() throws SAXException {
+		super.startDocument();
+
+		try {
+			persister = PersisterFactoryImpl.getInstance().create(Release.class, filter);
+		} catch (PersisterException e) {
+			LOG.error("Cannot get a persister", e);
+			
+			throw new SAXException(e);
+		}
 	}
 	
 	@Override
