@@ -1,5 +1,5 @@
 /*********************************************************************
-* Copyright (c) 09.07.2025 Thomas Zierer
+* Copyright (c) 04.10.2026 Thomas Zierer
 *
 * This program and the accompanying materials are made
 * available under the terms of the Eclipse Public License 2.0
@@ -9,8 +9,10 @@
 **********************************************************************/
 package de.tgmz.discogs.load.persist;
 
-public interface IPersistable<T> {
-	int save(int threshold, T o);
-	
-	int flush();
+import java.util.function.Predicate;
+
+import de.tgmz.discogs.load.persist.jakarta.IPersistable;
+
+public interface IPersisterFactory {
+	<T> IPersistable<T> create(Class<T> persistableClass, Predicate<T> filter);
 }

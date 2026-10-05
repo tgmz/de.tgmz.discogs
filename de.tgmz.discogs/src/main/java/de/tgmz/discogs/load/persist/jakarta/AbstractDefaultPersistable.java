@@ -7,7 +7,7 @@
 *
 * SPDX-License-Identifier: EPL-2.0
 **********************************************************************/
-package de.tgmz.discogs.load.persist;
+package de.tgmz.discogs.load.persist.jakarta;
 
 import java.util.LinkedList;
 import java.util.List;

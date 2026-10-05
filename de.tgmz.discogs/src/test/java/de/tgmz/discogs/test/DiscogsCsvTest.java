@@ -27,7 +27,7 @@ import de.tgmz.discogs.load.LabelContentHandler;
 import de.tgmz.discogs.load.MasterContentHandler;
 import de.tgmz.discogs.load.Mode;
 import de.tgmz.discogs.load.ReleaseContentHandler;
-import de.tgmz.discogs.load.factory.PersisterFactory;
+import de.tgmz.discogs.load.persist.PersisterFactoryImpl;
 import de.tgmz.discogs.load.persist.csv.Table;
 
 public class DiscogsCsvTest extends DiscogsTest {
@@ -51,7 +51,7 @@ public class DiscogsCsvTest extends DiscogsTest {
 	public static void teardownOnce() throws IOException {
 		System.clearProperty("DISCOGS_CSV_TARGET");
 		
-		PersisterFactory.reset();		
+		PersisterFactoryImpl.reset();		
 		
 		DiscogsContentHandler dch = new ReleaseContentHandler();
 		

@@ -17,7 +17,7 @@ import org.xml.sax.Attributes;
 
 import de.tgmz.discogs.domain.DataQuality;
 import de.tgmz.discogs.domain.Label;
-import de.tgmz.discogs.load.factory.PersisterFactory;
+import de.tgmz.discogs.load.persist.PersisterFactoryImpl;
 
 public class LabelContentHandler extends DiscogsContentHandler {
 	@SuppressWarnings("unused")
@@ -30,7 +30,7 @@ public class LabelContentHandler extends DiscogsContentHandler {
 	}
 
 	public LabelContentHandler(Predicate<Label> filter) {
-		persister = PersisterFactory.getInstance().create(Label.class, filter);
+		persister = PersisterFactoryImpl.getInstance().create(Label.class, filter);
 	}
 
 	@Override
