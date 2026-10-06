@@ -14,8 +14,8 @@ import java.util.function.Predicate;
 
 import de.tgmz.discogs.domain.Artist;
 
-public class ArtistCsvPersister extends AbstractCsvPersister<Artist> {
-	public ArtistCsvPersister(Predicate<Artist> filter) {
+public class ArtistPersister extends AbstractCsvPersister<Artist> {
+	public ArtistPersister(Predicate<Artist> filter) {
 		super(filter
 			, Table.Artist
 			, Table.artist_aliases, Table.artist_groups, Table.artist_members

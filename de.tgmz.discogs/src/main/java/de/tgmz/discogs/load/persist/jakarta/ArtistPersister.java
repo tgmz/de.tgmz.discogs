@@ -11,28 +11,24 @@ package de.tgmz.discogs.load.persist.jakarta;
 
 import java.util.function.Predicate;
 
-import de.tgmz.discogs.domain.Master;
+import de.tgmz.discogs.domain.Artist;
+import de.tgmz.discogs.load.factory.ArtistFactory;
 import de.tgmz.discogs.load.factory.IFactory;
-import de.tgmz.discogs.load.factory.MasterFactory;
 
-public class MasterPersistable extends AbstractJakartaPersistable<Master> {
-	private Predicate<Master> filter;
-	private IFactory<Master> mf;
+public class ArtistPersister extends AbstractJakartaPersistable<Artist> {
+	private Predicate<Artist> filter;
 	
-	public MasterPersistable(Predicate<Master> filter) {
+	public ArtistPersister(Predicate<Artist> filter) {
 		this.filter = filter;
-		
-		mf = new MasterFactory();
-	}
-	
-	@Override
-	public IFactory<Master> getFactory() {
-		return mf;
 	}
 
 	@Override
-	public Predicate<Master> getFilter() {
+	public IFactory<Artist> getFactory() {
+		return new ArtistFactory();
+	}
+
+	@Override
+	public Predicate<Artist> getFilter() {
 		return filter;
 	}
-
 }

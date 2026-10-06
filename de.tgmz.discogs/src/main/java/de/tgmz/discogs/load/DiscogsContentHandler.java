@@ -34,7 +34,7 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
 import de.tgmz.discogs.domain.PrimaryEntity;
-import de.tgmz.discogs.load.persist.IPersistable;
+import de.tgmz.discogs.load.persist.IPersister;
 
 public class DiscogsContentHandler<T extends PrimaryEntity> extends DefaultHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(DiscogsContentHandler.class);
@@ -49,7 +49,7 @@ public class DiscogsContentHandler<T extends PrimaryEntity> extends DefaultHandl
 	private StringBuilder chars;
 	protected String path;
 	protected int id;
-	protected IPersistable<T> persister;
+	protected IPersister<T> persister;
 	protected Predicate<T> filter;
 
 	public DiscogsContentHandler(Predicate<T> filter) {

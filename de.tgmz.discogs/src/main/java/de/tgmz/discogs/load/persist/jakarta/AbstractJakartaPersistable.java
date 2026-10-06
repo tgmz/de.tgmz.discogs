@@ -20,12 +20,12 @@ import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Discogs;
 import de.tgmz.discogs.domain.Release;
 import de.tgmz.discogs.load.factory.IFactory;
-import de.tgmz.discogs.load.persist.IPersistable;
+import de.tgmz.discogs.load.persist.IPersister;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.PersistenceException;
 
-public abstract class AbstractJakartaPersistable<T> implements IPersistable<T> {
+public abstract class AbstractJakartaPersistable<T> implements IPersister<T> {
 	static final Logger LOG = LoggerFactory.getLogger(AbstractJakartaPersistable.class);
 	
 	private List<T> cache = new LinkedList<>();

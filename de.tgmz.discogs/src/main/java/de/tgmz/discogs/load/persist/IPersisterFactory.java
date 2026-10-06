@@ -14,5 +14,5 @@ import java.util.function.Predicate;
 import de.tgmz.discogs.domain.PrimaryEntity;
 
 public interface IPersisterFactory {
-	<T extends PrimaryEntity> IPersistable<T> create(Class<T> entityClass, Predicate<T> filter) throws PersisterException;
+	<T extends PrimaryEntity> IPersister<T> create(Class<T> entityClass, Predicate<T> filter) throws PersisterException;
 }

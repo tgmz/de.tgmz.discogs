@@ -20,13 +20,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.tgmz.discogs.load.DdlFactory;
-import de.tgmz.discogs.load.persist.IPersistable;
+import de.tgmz.discogs.load.persist.IPersister;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 import net.sf.jsqlparser.statement.create.table.CreateTable;
 
-public abstract class AbstractCsvPersister<T> implements IPersistable<T> {
+public abstract class AbstractCsvPersister<T> implements IPersister<T> {
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractCsvPersister.class);
 	protected Map<Table, DiscogsCsvPrinter> pm;
 	private Predicate<T> filter;

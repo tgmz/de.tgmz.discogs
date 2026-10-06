@@ -18,12 +18,12 @@ import de.tgmz.discogs.load.factory.IFactory;
 import de.tgmz.discogs.load.factory.collections.CollectionFactory;
 import jakarta.persistence.EntityManager;
 
-public class LabelPersistable extends AbstractJakartaPersistable<Label> {
+public class LabelPersister extends AbstractJakartaPersistable<Label> {
 	private Predicate<Label> filter;
 	private IFactory<Label> lf;
 	private CollectionFactory<Label> lsf;
 	
-	public LabelPersistable(Predicate<Label> filter) {
+	public LabelPersister(Predicate<Label> filter) {
 		this.filter = filter;
 		
 		lf = new BasicEntityFactory<>();
