@@ -9,7 +9,7 @@
 **********************************************************************/
 package de.tgmz.discogs.load.persist;
 
-public interface IPersistable<T> {
+public interface IPersister<T> {
 	int save(int threshold, T o);
 	
 	int flush();

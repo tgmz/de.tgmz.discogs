@@ -21,19 +21,11 @@ import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.PrimaryEntity;
 import de.tgmz.discogs.domain.Release;
-import de.tgmz.discogs.load.persist.csv.ArtistCsvPersister;
-import de.tgmz.discogs.load.persist.csv.LabelCsvPersister;
-import de.tgmz.discogs.load.persist.csv.MasterCsvPersister;
-import de.tgmz.discogs.load.persist.csv.ReleaseCsvPersister;
-import de.tgmz.discogs.load.persist.jakarta.ArtistPersistable;
-import de.tgmz.discogs.load.persist.jakarta.LabelPersistable;
-import de.tgmz.discogs.load.persist.jakarta.MasterPersistable;
-import de.tgmz.discogs.load.persist.jakarta.ReleasePersistable;
 
 public final class PersisterFactoryImpl implements IPersisterFactory {
 	private static final Logger LOG = LoggerFactory.getLogger(PersisterFactoryImpl.class);
 
-	private static final Map<Class<? extends PrimaryEntity>, Class<? extends IPersistable<?>>> PERSISTERS = new HashMap<>();
+	private static final Map<Class<? extends PrimaryEntity>, Class<? extends IPersister<?>>> PERSISTERS = new HashMap<>();
 
 	private static final PersisterFactoryImpl INSTANCE = new PersisterFactoryImpl();
 
@@ -49,7 +41,7 @@ public final class PersisterFactoryImpl implements IPersisterFactory {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <T extends PrimaryEntity> IPersistable<T> create(Class<T> entityClass, Predicate<T> filter) throws PersisterException {
+	public <T extends PrimaryEntity> IPersister<T> create(Class<T> entityClass, Predicate<T> filter) throws PersisterException {
 		Class<?> persitableClass = PERSISTERS.get(entityClass);
 
 		if (persitableClass == null) {
@@ -57,7 +49,7 @@ public final class PersisterFactoryImpl implements IPersisterFactory {
 		}
 		
 		try {
-			return (IPersistable<T>) persitableClass.getDeclaredConstructor(Predicate.class).newInstance(filter);
+			return (IPersister<T>) persitableClass.getDeclaredConstructor(Predicate.class).newInstance(filter);
 		} catch (ReflectiveOperationException e) {
 			throw new PersisterException(String.format("Cannot create persistable for %s", entityClass), e);
 		}
@@ -67,15 +59,15 @@ public final class PersisterFactoryImpl implements IPersisterFactory {
 		PERSISTERS.clear();
 		
 		if (System.getProperty("DISCOGS_CSV_TARGET") != null) {
-			PERSISTERS.put(Artist.class, ArtistCsvPersister.class);
-			PERSISTERS.put(Label.class, LabelCsvPersister.class);
-			PERSISTERS.put(Master.class, MasterCsvPersister.class);
-			PERSISTERS.put(Release.class, ReleaseCsvPersister.class);
+			PERSISTERS.put(Artist.class,  de.tgmz.discogs.load.persist.csv.ArtistPersister.class);
+			PERSISTERS.put(Label.class,   de.tgmz.discogs.load.persist.csv.LabelCsvPersister.class);
+			PERSISTERS.put(Master.class,  de.tgmz.discogs.load.persist.csv.MasterCsvPersister.class);
+			PERSISTERS.put(Release.class, de.tgmz.discogs.load.persist.csv.ReleaseCsvPersister.class);
 		} else {
-			PERSISTERS.put(Artist.class, ArtistPersistable.class);
-			PERSISTERS.put(Label.class, LabelPersistable.class);
-			PERSISTERS.put(Master.class, MasterPersistable.class);
-			PERSISTERS.put(Release.class, ReleasePersistable.class);
+			PERSISTERS.put(Artist.class,  de.tgmz.discogs.load.persist.jakarta.ArtistPersister.class);
+			PERSISTERS.put(Label.class,   de.tgmz.discogs.load.persist.jakarta.LabelPersister.class);
+			PERSISTERS.put(Master.class,  de.tgmz.discogs.load.persist.jakarta.MasterPersister.class);
+			PERSISTERS.put(Release.class, de.tgmz.discogs.load.persist.jakarta.ReleasePersister.class);
 		}
 		
 		PERSISTERS.forEach((x,y) -> LOG.info("Using {} for persisting {}", y, x));
