@@ -12,10 +12,10 @@ package de.tgmz.discogs.test;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import de.tgmz.discogs.domain.Artist;
+import de.tgmz.discogs.domain.PrimaryEntity;
 import de.tgmz.discogs.load.persist.IPersistable;
 import de.tgmz.discogs.load.persist.PersisterException;
 import de.tgmz.discogs.load.persist.PersisterFactoryImpl;
@@ -25,9 +25,8 @@ import de.tgmz.discogs.load.persist.jakarta.ArtistPersistable;
 public class PersisterFactoryTest {
 	private static final String CSV_PROP = "DISCOGS_CSV_TARGET";
 
-	@Before
-	public void setup() {
-		PersisterFactoryImpl.reset();
+	@SuppressWarnings("serial")
+	private static class InvalidEntity extends PrimaryEntity {
 	}
 	
 	@After
@@ -37,6 +36,8 @@ public class PersisterFactoryTest {
 	
 	@Test
 	public void testJakarta() throws PersisterException {
+		PersisterFactoryImpl.reload();
+		
 		IPersistable<Artist> ip = PersisterFactoryImpl.getInstance().create(Artist.class, x -> true);
 		
 		assertTrue(ip instanceof ArtistPersistable);
@@ -46,6 +47,8 @@ public class PersisterFactoryTest {
 	public void testCsv() throws PersisterException {
 		System.setProperty(CSV_PROP, System.getProperty("java.io.tmpdir"));
 		
+		PersisterFactoryImpl.reload();
+		
 		IPersistable<Artist> ip = PersisterFactoryImpl.getInstance().create(Artist.class, x -> true);
 		
 		assertTrue(ip instanceof ArtistCsvPersister);
@@ -53,6 +56,6 @@ public class PersisterFactoryTest {
 	
 	@Test(expected = PersisterException.class)
 	public void testInvalidPersistableClass() throws PersisterException {
-		PersisterFactoryImpl.getInstance().create(Object.class, x -> true);
+		PersisterFactoryImpl.getInstance().create(InvalidEntity.class, x -> true);
 	}
 }

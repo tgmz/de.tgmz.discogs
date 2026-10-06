@@ -52,7 +52,7 @@ public class DiscogsCsvTest extends DiscogsTest {
 	public static void teardownOnce() throws IOException {
 		System.clearProperty("DISCOGS_CSV_TARGET");
 		
-		PersisterFactoryImpl.reset();		
+		PersisterFactoryImpl.reload();		
 		
 		DiscogsContentHandler<Release> dch = new ReleaseContentHandler();
 		

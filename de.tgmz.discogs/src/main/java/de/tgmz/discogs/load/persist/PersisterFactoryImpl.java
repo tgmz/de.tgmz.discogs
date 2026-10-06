@@ -9,90 +9,75 @@
 **********************************************************************/
 package de.tgmz.discogs.load.persist;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.tgmz.discogs.domain.Artist;
+import de.tgmz.discogs.domain.Label;
+import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.PrimaryEntity;
-import io.github.classgraph.ClassGraph;
-import io.github.classgraph.ClassInfo;
-import io.github.classgraph.ScanResult;
+import de.tgmz.discogs.domain.Release;
+import de.tgmz.discogs.load.persist.csv.ArtistCsvPersister;
+import de.tgmz.discogs.load.persist.csv.LabelCsvPersister;
+import de.tgmz.discogs.load.persist.csv.MasterCsvPersister;
+import de.tgmz.discogs.load.persist.csv.ReleaseCsvPersister;
+import de.tgmz.discogs.load.persist.jakarta.ArtistPersistable;
+import de.tgmz.discogs.load.persist.jakarta.LabelPersistable;
+import de.tgmz.discogs.load.persist.jakarta.MasterPersistable;
+import de.tgmz.discogs.load.persist.jakarta.ReleasePersistable;
 
 public final class PersisterFactoryImpl implements IPersisterFactory {
 	private static final Logger LOG = LoggerFactory.getLogger(PersisterFactoryImpl.class);
 
-	private static PersisterFactoryImpl instance;
+	private static final Map<Class<? extends PrimaryEntity>, Class<? extends IPersistable<?>>> PERSISTERS = new HashMap<>();
 
-	private Map<String, Class<IPersistable<?>>> persisters;
+	private static final PersisterFactoryImpl INSTANCE = new PersisterFactoryImpl();
 
 	/**
 	 * Private constructor for security reasons
 	 */
 	private PersisterFactoryImpl() {
-		persisters = new HashMap<>();
-		
-		String persisterPackage = this.getClass().getPackageName() +  
-				(System.getProperty("DISCOGS_CSV_TARGET") != null ? ".csv" : ".jakarta");
-		
-		try (ScanResult scanResult = new ClassGraph().acceptPackagesNonRecursive(persisterPackage).scan()) {
-			for (ClassInfo ci : scanResult.getClassesImplementing(IPersistable.class).filter(x -> !x.isAbstract())) {
-				Entry<String, Class<IPersistable<?>>> cp = computePersistable(ci);
-								
-				if (cp != null) {
-					persisters.put(cp.getKey(), cp.getValue());
-				}
-			}
-		}
+		reload();
 	}
 	
 	public static IPersisterFactory getInstance() {
-		if (instance == null) {
-			instance = new PersisterFactoryImpl();
-		}
-		
-		return instance;
+		return INSTANCE;
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <T> IPersistable<T> create(Class<T> persistableClass, Predicate<T> filter) throws PersisterException {
-		Class<?> clz = persisters.get(persistableClass.getCanonicalName());
+	public <T extends PrimaryEntity> IPersistable<T> create(Class<T> entityClass, Predicate<T> filter) throws PersisterException {
+		Class<?> persitableClass = PERSISTERS.get(entityClass);
 
-		if (clz == null) {
-			throw new PersisterException(String.format("No persistable defined for %s", persistableClass));
+		if (persitableClass == null) {
+			throw new PersisterException(String.format("No persistable defined for %s", entityClass));
 		}
 		
 		try {
-			return (IPersistable<T>) clz.getDeclaredConstructor(Predicate.class).newInstance(filter);
+			return (IPersistable<T>) persitableClass.getDeclaredConstructor(Predicate.class).newInstance(filter);
 		} catch (ReflectiveOperationException e) {
-			throw new PersisterException(String.format("Cannot create persistable for %s", persistableClass), e);
+			throw new PersisterException(String.format("Cannot create persistable for %s", entityClass), e);
 		}
 	}
 	
-	public static void reset() {
-		instance = null;
-	}
-	
-	private Map.Entry<String, Class<IPersistable<?>>> computePersistable(ClassInfo ci) {
-		@SuppressWarnings("unchecked") //Safe: We know from the filtering in CTR that ci implements IPersistable
-		Class<IPersistable<?>> clz = (Class<IPersistable<?>>) ci.loadClass();
-
-		if (clz.getGenericSuperclass() instanceof ParameterizedType pt) {
-			for (Type t : pt.getActualTypeArguments()) {
-				if (t instanceof Class<?> pe && PrimaryEntity.class.isAssignableFrom(pe)) {
-					LOG.info("Using {} for persisting {}", clz, pe);
-						
-					return new AbstractMap.SimpleEntry<>(pe.getName(), clz);
-				}
-			}
+	public static void reload() {
+		PERSISTERS.clear();
+		
+		if (System.getProperty("DISCOGS_CSV_TARGET") != null) {
+			PERSISTERS.put(Artist.class, ArtistCsvPersister.class);
+			PERSISTERS.put(Label.class, LabelCsvPersister.class);
+			PERSISTERS.put(Master.class, MasterCsvPersister.class);
+			PERSISTERS.put(Release.class, ReleaseCsvPersister.class);
+		} else {
+			PERSISTERS.put(Artist.class, ArtistPersistable.class);
+			PERSISTERS.put(Label.class, LabelPersistable.class);
+			PERSISTERS.put(Master.class, MasterPersistable.class);
+			PERSISTERS.put(Release.class, ReleasePersistable.class);
 		}
 		
-		return null;
+		PERSISTERS.forEach((x,y) -> LOG.info("Using {} for persisting {}", y, x));
 	}
 }
