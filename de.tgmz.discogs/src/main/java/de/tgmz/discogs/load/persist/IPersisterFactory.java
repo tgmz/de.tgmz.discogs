@@ -11,6 +11,8 @@ package de.tgmz.discogs.load.persist;
 
 import java.util.function.Predicate;
 
+import de.tgmz.discogs.domain.PrimaryEntity;
+
 public interface IPersisterFactory {
-	<T> IPersistable<T> create(Class<T> persistableClass, Predicate<T> filter) throws PersisterException;
+	<T extends PrimaryEntity> IPersistable<T> create(Class<T> entityClass, Predicate<T> filter) throws PersisterException;
 }
