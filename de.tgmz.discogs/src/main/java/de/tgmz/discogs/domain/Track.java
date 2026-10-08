@@ -195,7 +195,7 @@ public class Track implements Serializable {
 		Iterator<String> it = tracks.iterator();
 		
 		while (it.hasNext() && !applicable) {
-			String[] range = it.next().split("\\sto\\s*");	// e.g. "A1 to A3"
+			String[] range = it.next().split("\\s[Tt]o\\s*");	// e.g. "A1 to A3" case insensitive
 			
 			if (range.length == 2) {
 				applicable = isApplicable(range[0], range[1], this.position);
