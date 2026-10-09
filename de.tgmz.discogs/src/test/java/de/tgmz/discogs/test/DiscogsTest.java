@@ -205,7 +205,7 @@ public abstract class DiscogsTest {
 		assertEquals(4, t.getExtraArtists().size());
 	}
 	@Test
-	public void testApplicableTracks() {
+	public void testApplicableTracksGusGus() {
 		Release r = em.find(Release.class, 2324L);
 		
 		// Mixed by GusGus
@@ -216,6 +216,70 @@ public abstract class DiscogsTest {
 		
 		assertTrue("ExtraArtist applies to tracks 6 to 11 but isApplicable returned false for track 8", r.getTracklist().get(7).isApplicable(applicableTracks));
 	}
+	
+	@Test
+	public void testApplicableTracks() {
+		Track t = new Track();
+		Set<String> applicableTracks = null;
+		
+		// Simple case
+		t.setPosition(null);
+		applicableTracks = Set.of("1");
+		assertFalse(t.isApplicable(applicableTracks));
+
+		t.setPosition("2");
+		applicableTracks = Set.of("1", "2", "3");
+		assertTrue(t.isApplicable(applicableTracks));
+
+		t.setPosition("7");
+		applicableTracks = Set.of("6 to 9");
+		assertTrue(t.isApplicable(applicableTracks));
+
+		t.setPosition("A7");
+		applicableTracks = Set.of("A6 to A9");
+		assertTrue(t.isApplicable(applicableTracks));
+		
+		// Some more sophisticated stuff
+		t.setPosition("1.4");
+		applicableTracks = Set.of("1.1 to 2.4");
+		assertTrue(t.isApplicable(applicableTracks));
+
+		t.setPosition("1.4");
+		applicableTracks = Set.of("1.5 to 1.19");
+		assertFalse(t.isApplicable(applicableTracks));
+
+		applicableTracks = Set.of("2.1 to 2.2");
+		assertFalse(t.isApplicable(applicableTracks));
+		
+		t.setPosition("2.");
+		applicableTracks = Set.of("1. to 13.");
+		assertTrue(t.isApplicable(applicableTracks));
+
+		// The tricky part is that "A7" is lexicographically larger than "A10" but logically "A1 to A10" should apply to position "A7"
+		t.setPosition("A7");
+		applicableTracks = Set.of("A6 to A10");
+		assertTrue(t.isApplicable(applicableTracks));
+
+		t.setPosition("A4");
+		assertFalse(t.isApplicable(applicableTracks));
+
+		t.setPosition("14-9");
+		applicableTracks = Set.of("10-8 to 16-15");
+		assertTrue(t.isApplicable(applicableTracks));
+
+		t.setPosition("1-02");
+		applicableTracks = Set.of("1-2");
+		assertTrue(t.isApplicable(applicableTracks));
+
+		t.setPosition("1.02");
+		applicableTracks = Set.of("1.1 to 2.3");
+		assertTrue(t.isApplicable(applicableTracks));
+
+		t.setPosition("LP1-A2");
+		applicableTracks = Set.of("LP1-A1 to LP1-A4");
+		assertTrue(t.isApplicable(applicableTracks));
+	}
+	
 	@Test
 	public void testDecca() {
 		Release r = em.find(Release.class, 10850325L);
