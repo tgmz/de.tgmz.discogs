@@ -211,73 +211,76 @@ public abstract class DiscogsTest {
 		// Mixed by GusGus
 		ReleaseExtraArtist mbgg = em.find(ReleaseExtraArtist.class, new ReleaseExtraArtistKey(r.getId(), "Mixed By", "", 231513));
 		
-		// "1 to 4, 6 to 11"
 		Set<String> applicableTracks = mbgg.getApplicableTracks();
 		
-		assertTrue("ExtraArtist applies to tracks 6 to 11 but isApplicable returned false for track 8", r.getTracklist().get(7).isApplicable(applicableTracks));
+		assertEquals(Set.of("1 to 4", "6 to 11"), applicableTracks);
+		
+		assertTrue("ExtraArtist applies to tracks 6 to 11 but isApplicable returned false for track 8"
+				, mbgg.isApplicable(r.getTracklist().get(7).getPosition()));
 	}
 	
 	@Test
 	public void testApplicableTracks() {
 		Track t = new Track();
-		Set<String> applicableTracks = null;
+		ReleaseExtraArtist rea = new ReleaseExtraArtist();
 		
 		// Simple case
 		t.setPosition(null);
-		applicableTracks = Set.of("1");
-		assertFalse(t.isApplicable(applicableTracks));
+		rea.setApplicableTracks(Set.of("1"));
+		assertFalse(rea.isApplicable(t.getPosition()));
 
 		t.setPosition("2");
-		applicableTracks = Set.of("1", "2", "3");
-		assertTrue(t.isApplicable(applicableTracks));
+		rea.setApplicableTracks(Set.of("1", "2", "3"));
+		assertTrue(rea.isApplicable(t.getPosition()));
 
 		t.setPosition("7");
-		applicableTracks = Set.of("6 to 9");
-		assertTrue(t.isApplicable(applicableTracks));
+		rea.setApplicableTracks(Set.of("6 to 9"));
+		assertTrue(rea.isApplicable(t.getPosition()));
 
 		t.setPosition("A7");
-		applicableTracks = Set.of("A6 to A9");
-		assertTrue(t.isApplicable(applicableTracks));
+		rea.setApplicableTracks(Set.of("A6 to A9"));
+		assertTrue(rea.isApplicable(t.getPosition()));
 		
 		// Some more sophisticated stuff
 		t.setPosition("1.4");
-		applicableTracks = Set.of("1.1 to 2.4");
-		assertTrue(t.isApplicable(applicableTracks));
+		rea.setApplicableTracks(Set.of("1.1 to 2.4"));
+		assertTrue(rea.isApplicable(t.getPosition()));
 
 		t.setPosition("1.4");
-		applicableTracks = Set.of("1.5 to 1.19");
-		assertFalse(t.isApplicable(applicableTracks));
+		rea.setApplicableTracks(Set.of("1.5 to 1.19"));
+		assertFalse(rea.isApplicable(t.getPosition()));
 
-		applicableTracks = Set.of("2.1 to 2.2");
-		assertFalse(t.isApplicable(applicableTracks));
+		rea.setApplicableTracks(Set.of("2.1 to 2.2"));
+		assertFalse(rea.isApplicable(t.getPosition()));
 		
 		t.setPosition("2.");
-		applicableTracks = Set.of("1. to 13.");
-		assertTrue(t.isApplicable(applicableTracks));
+		rea.setApplicableTracks(Set.of("1. to 13."));
+		assertTrue(rea.isApplicable(t.getPosition()));
 
-		// The tricky part is that "A7" is lexicographically larger than "A10" but logically "A1 to A10" should apply to position "A7"
+		// The tricky part is that "A7" is lexicographically larger than "A10" 
+		// but logically "A1 to A10" should apply to position "A7"
 		t.setPosition("A7");
-		applicableTracks = Set.of("A6 to A10");
-		assertTrue(t.isApplicable(applicableTracks));
+		rea.setApplicableTracks(Set.of("A6 to A10"));
+		assertTrue(rea.isApplicable(t.getPosition()));
 
 		t.setPosition("A4");
-		assertFalse(t.isApplicable(applicableTracks));
+		assertFalse(rea.isApplicable(t.getPosition()));
 
 		t.setPosition("14-9");
-		applicableTracks = Set.of("10-8 to 16-15");
-		assertTrue(t.isApplicable(applicableTracks));
+		rea.setApplicableTracks(Set.of("10-8 to 16-15"));
+		assertTrue(rea.isApplicable(t.getPosition()));
 
 		t.setPosition("1-02");
-		applicableTracks = Set.of("1-2");
-		assertTrue(t.isApplicable(applicableTracks));
+		rea.setApplicableTracks(Set.of("1-2"));
+		assertTrue(rea.isApplicable(t.getPosition()));
 
 		t.setPosition("1.02");
-		applicableTracks = Set.of("1.1 to 2.3");
-		assertTrue(t.isApplicable(applicableTracks));
+		rea.setApplicableTracks(Set.of("1.1 to 2.3"));
+		assertTrue(rea.isApplicable(t.getPosition()));
 
 		t.setPosition("LP1-A2");
-		applicableTracks = Set.of("LP1-A1 to LP1-A4");
-		assertTrue(t.isApplicable(applicableTracks));
+		rea.setApplicableTracks(Set.of("LP1-A1 to LP1-A4"));
+		assertTrue(rea.isApplicable(t.getPosition()));
 	}
 	
 	@Test
@@ -430,6 +433,11 @@ public abstract class DiscogsTest {
 		
 		assertEquals("FLAC", f0.getDescriptions().stream().findFirst().orElseThrow());
 		
+		// Assure that the extremly long position don't cause problems
+		ReleaseExtraArtist rea = new ReleaseExtraArtist();
+		rea.setApplicableTracks(Set.of("1"));
+		assertFalse(rea.isApplicable(r0.getTracklist().getFirst().getPosition()));
+		
 		Release r1 = em.find(Release.class, 4957101);
 		
 		assertEquals(3, r1.getFormats().size());
@@ -530,11 +538,10 @@ public abstract class DiscogsTest {
 		
 		// Mixed By François Kevorkian
 		ReleaseExtraArtist mbfk = getExtraArtist(r, 20662, "Mixed By");
-		Set<String> tracks = mbfk.getApplicableTracks();
 		
-		assertEquals(Set.of("1 to 5", "7 to 9"), tracks);
-		assertTrue(r.getTracklist().getFirst().isApplicable(tracks));
-		assertFalse(r.getTracklist().get(5).isApplicable(tracks));
+		assertEquals(Set.of("1 to 5", "7 to 9"), mbfk.getApplicableTracks());
+		assertTrue(mbfk.isApplicable(r.getTracklist().getFirst().getPosition()));
+		assertFalse(mbfk.isApplicable(r.getTracklist().get(5).getPosition()));
 
 		List<Track> tracklist = r.getUnfilteredTracklist();
 		

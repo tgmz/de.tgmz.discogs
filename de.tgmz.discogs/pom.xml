@@ -15,7 +15,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.tgmz.discogs</groupId>
 	<artifactId>de.tgmz.discogs</artifactId>
-	<version>3.1.1</version>
+	<version>3.1.2</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<hibernate.version>7.4.11.Final</hibernate.version>

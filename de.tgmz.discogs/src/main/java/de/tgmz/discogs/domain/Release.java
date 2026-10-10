@@ -174,7 +174,7 @@ public class Release extends Discogs {
 		
 		for (Track t : tracklist) {
 			for (ReleaseExtraArtist rea : releaseExtraArtists) {
-				i += t.isApplicable(rea.getApplicableTracks()) ? 1 : 0;
+				i += rea.isApplicable(t.getPosition()) ? 1 : 0;
 			}
 			
 			i += t.sizeOf();

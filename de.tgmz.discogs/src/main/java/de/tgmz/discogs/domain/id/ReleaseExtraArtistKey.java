@@ -75,7 +75,7 @@ public final class ReleaseExtraArtistKey implements Serializable {
 
 	@Override
 	public String toString() {
-		return "ReleaseExtraArtistKey [releaseId=" + releaseId + ", creditId=" + creditId + ", detailId=" + detailId
-				+ ", artistId=" + artistId + "]";
+		return "ReleaseExtraArtistKey [releaseId=" + String.format("%,d", releaseId) + ", creditId=" + creditId + ", detailId=" + detailId
+				+ ", artistId=" + String.format("%,d", artistId) + "]";
 	}
 }
