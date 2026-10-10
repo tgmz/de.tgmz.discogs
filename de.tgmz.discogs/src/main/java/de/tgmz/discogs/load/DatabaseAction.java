@@ -64,7 +64,7 @@ public class DatabaseAction extends RecursiveAction {
 			int affected = IntStream.of(stmt.executeBatch()).sum();
 			
 			if (LOG.isInfoEnabled()) {
-				String duration = LogUtil.formatDuration(start, System.currentTimeMillis());
+				String duration = LogUtil.formatDuration(start);
 				
 				if (affected > 0) {
 					LOG.info("{}: {} rows were affected in {}", table, String.format("%,d", affected), duration);

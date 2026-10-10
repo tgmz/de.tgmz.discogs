@@ -23,9 +23,7 @@ public enum Table implements ITable {
 	, label_label_all
 	, Label
 	, Label_Label
-	, Genre
 	, Master_Genre
-	, Style
 	, Master_Style
 	, artist_master_all
 	, Master_Artist
@@ -33,6 +31,8 @@ public enum Table implements ITable {
 	, Release
 	, Release_Genre
 	, Release_Style
+	, Genre
+	, Style
 	, label_release_all
 	, Release_labels
 	, artist_release_all

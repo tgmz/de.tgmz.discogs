@@ -30,8 +30,13 @@ public class LogUtil {
 		}
 	}
 	public static String formatElapsed() {
-		return formatDuration(ManagementFactory.getRuntimeMXBean().getStartTime(), System.currentTimeMillis());
+		return formatDuration(ManagementFactory.getRuntimeMXBean().getStartTime());
 	}
+
+	public static String formatDuration(long start) {
+		return formatDuration(start, System.currentTimeMillis());
+	}
+	
 	public static String formatDuration(long start, long end) {
 		long msecs = (end - start) % 1000;
 		long seconds = (end - start) / 1000;

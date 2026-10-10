@@ -12,15 +12,11 @@ package de.tgmz.discogs.domain;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Strings;
 
 import de.tgmz.discogs.domain.id.TrackKey;
 import jakarta.persistence.CascadeType;
@@ -50,9 +46,6 @@ public class Track implements Serializable {
 	@Transient
 	private static final long serialVersionUID = 5684918391708831387L;
 
-	@Transient
-	private static final Pattern P = Pattern.compile("(\\d+)");
-	
 	@EmbeddedId
 	private TrackKey id;
 	private short trackNumber;
@@ -179,83 +172,6 @@ public class Track implements Serializable {
 		return res;
 	}
 
-	/**
-	 * Computes if the ExatraArtist applies to this track.
-	 * @param ea the ExatraArtist
-	 */
-	public boolean isApplicable(Set<String> applicableTracks) {
-		if (applicableTracks == null || applicableTracks.isEmpty()) {
-			return true;
-		}
-		
-		if (this.position == null) {
-			return false;
-		}
-		
-		if (Strings.CS.containsAny(this.position, applicableTracks.toArray(new String[applicableTracks.size()]))) {	// Obvious
-			return true;
-		}
-		
-		boolean applicable = false;
-		Iterator<String> it = applicableTracks.iterator();
-		
-		while (it.hasNext() && !applicable) {
-			String[] range = it.next().split("\\s[Tt]o\\s*");	// e.g. "A1 to A3" case insensitive
-			
-			switch (range.length) {
-			case 1:
-				// Useful for position = 1.02 and applicable = 1.2
-				applicable = isApplicable(range[0], range[0]);
-				break;
-			case 2:
-				applicable = isApplicable(range[0], range[1]);
-				break;
-			default:
-				break;
-			}
-		}
-		
-		return applicable;
-	}
-
-	private boolean isApplicable(String lowerBound, String upperBound) {
-		try {
-			int ip = Integer.parseInt(this.position);
-			
-			return Integer.parseInt(lowerBound) <= ip && Integer.parseInt(upperBound) >= ip;
-		} catch (NumberFormatException e) {
-			String pf = format(this.position);
-			
-			return format(lowerBound).compareTo(pf) <= 0 && format(upperBound).compareTo(pf) >= 0; 
-		}
-	}
-	
-	private static String format(String input) {
-		StringBuilder sb = new StringBuilder();
-		int offset = 0;
-		
-		Matcher m = P.matcher(input);
-		
-		while (m.find()) {
-			sb.append(input.substring(offset, m.start()));
-			
-			try {
-				sb.append(String.format("%010d", Integer.parseInt(m.group())));	// Integer.MAX_VALUE = 2.147.483.648 (10 digits)
-			} catch (NumberFormatException e) {
-				// Happens if number exeeds Integer.MAX_VALUE. Simply append the original number.
-				// Using Long instead of Integer solves only a few extraordinary situations
-				// but blows up the formatted value
-				sb.append(m.group());
-			}
-			
-			offset = m.end();
-		}
-		
-		sb.append(input.substring(offset));
-		
-		return sb.toString();
-	}
-	
 	@Override
 	public String toString() {
 		return "Track [id=" + id + ", trackNumber=" + trackNumber + ", position=" + position + ", title="

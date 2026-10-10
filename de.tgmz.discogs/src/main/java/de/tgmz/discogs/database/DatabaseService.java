@@ -58,7 +58,7 @@ public final class DatabaseService {
 		entityManagerFactory = Persistence.createEntityManagerFactory("de.tgmz.discogs.domain");
 		
 		if (LOG.isInfoEnabled()) {
-			LOG.info("Startuptime database service: {}", LogUtil.formatDuration(start, System.currentTimeMillis()));
+			LOG.info("Startuptime database service: {}", LogUtil.formatDuration(start));
 		}
 	}
 

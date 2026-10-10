@@ -42,7 +42,7 @@ public final class DdlFactory {
 			for (URI uri : scanResult.getResourcesMatchingPattern(Pattern.compile("^.*\\.ddl$")).getURIs()) {
 				LOG.info("Loaded DDL from {}", uri);
 				
-				ddl0.addAll(IOUtils.toString(uri, StandardCharsets.UTF_8).lines().toList());
+				ddl0.addAll(IOUtils.toString(uri, StandardCharsets.UTF_8).lines().filter(s -> !s.startsWith("--")).toList());
 			}
 		} catch (IOException e) {
 			LOG.error("Cannot get DDL", e);
