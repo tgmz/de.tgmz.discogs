@@ -71,7 +71,7 @@ public final class ActionFactory {
 		switch (a) {
 		case LOAD, LOAD_NO_PK, RECONCILE:
 			return create(a, Mode.PARALLEL);
-		case CONSTRAINT, INDEX, PRIMARY_KEY:
+		case DROP, CONSTRAINT, INDEX, PRIMARY_KEY:
 		default:
 			return create(a, Mode.SEQUENTIAL);
 		}
@@ -125,6 +125,10 @@ public final class ActionFactory {
 		List<String> stmts;
 		
 		switch (a) {
+		case DROP:
+			stmts = new LinkedList<>(getDrop(t));
+			
+			break;
 		case INDEX:
 			stmts = getIndex(t);
 			
@@ -152,7 +156,7 @@ public final class ActionFactory {
 			boolean noPk = (a == Action.LOAD_NO_PK);
 			stmts = new LinkedList<>();
 
-			stmts.add(String.format("DROP TABLE IF EXISTS %s CASCADE", t));
+			stmts.addAll(getDrop(t));
 			
 			if (System.getProperty("jakarta.persistence.jdbc.url")
 					.toLowerCase(Locale.getDefault())
@@ -176,6 +180,10 @@ public final class ActionFactory {
 		}
 		
 		return stmts;
+	}
+
+	private List<String> getDrop(ITable t) {
+		return List.of(String.format("DROP TABLE IF EXISTS %s CASCADE", t));
 	}
 
 	private List<String> getIndex(ITable t) {
