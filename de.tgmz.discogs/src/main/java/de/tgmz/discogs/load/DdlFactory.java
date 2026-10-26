@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Predicate;
-import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -39,7 +38,7 @@ public final class DdlFactory {
 		Set<String> ddl0 = new TreeSet<>();	// Avoid duplicates lines in case a DDL is multiple times in classpath
 		
 		try (ScanResult scanResult = new ClassGraph().scan()) {
-			for (URI uri : scanResult.getResourcesMatchingPattern(Pattern.compile("^.*\\.ddl$")).getURIs()) {
+			for (URI uri : scanResult.getResourcesWithExtension("ddl").getURIs()) {
 				LOG.info("Loaded DDL from {}", uri);
 				
 				ddl0.addAll(IOUtils.toString(uri, StandardCharsets.UTF_8).lines().filter(s -> !s.startsWith("--")).toList());
