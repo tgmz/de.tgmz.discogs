@@ -15,10 +15,7 @@
               xsi:schemaLocation="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.4.xsd
                                   https://dependency-check.github.io/DependencyCheck/dependency-suppression.1.4.xsd">
 <suppress>
-	<!-- Does not apply to in-memory-databases -->
-   <notes><![CDATA[
-   file name: h2-2.4.240.jar
-   ]]></notes>
+   <notes>Does not apply to in-memory-database</notes>
    <packageUrl regex="true">^pkg:maven/com\.h2database/h2@.*$</packageUrl>
    <vulnerabilityName>CVE-2018-14335</vulnerabilityName>
 </suppress>

@@ -23,7 +23,6 @@ import de.tgmz.discogs.load.DdlFactory;
 import de.tgmz.discogs.load.persist.IPersister;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
-import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 import net.sf.jsqlparser.statement.create.table.CreateTable;
 
 public abstract class AbstractCsvPersister<T> implements IPersister<T> {
@@ -37,19 +36,21 @@ public abstract class AbstractCsvPersister<T> implements IPersister<T> {
 		pm = new TreeMap<>();
 		
 		for (Table table : tables) {
-			String s = DdlFactory.getInstance().getDdl(l -> Strings.CI.startsWith(l, String.format("create table %s ", table))).getFirst();
+			List<String> createDdl = DdlFactory.getInstance().getDdl(l -> Strings.CI.startsWith(l, String.format("create table %s ", table)));
+			
+			if (createDdl.size() > 1) {
+				throw new IllegalStateException("Multiple definitions found for table " + table);
+			}
 
 			try {
 				DiscogsCsvPrinter csvp = new DiscogsCsvPrinter(System.getProperty("DISCOGS_CSV_TARGET"), table);
 
-				List<ColumnDefinition> cds = ((CreateTable) CCJSqlParserUtil.parse(s)).getColumnDefinitions();
-
-				int i = 0;
-				Object[] cols = new String[cds.size()];
-				
-				for (ColumnDefinition cd : cds) {
-					cols[i++] = cd.getColumnName();
-				}
+				// If size == 0 enforce IndexOutOfBoundsException
+				Object[] cols = ((CreateTable) CCJSqlParserUtil.parse(createDdl.getFirst()))
+									.getColumnDefinitions()
+									.stream()
+									.map(cd -> cd.getColumnName())
+									.toArray(Object[]::new);
 					
 				csvp.printRecord(cols);
 					
