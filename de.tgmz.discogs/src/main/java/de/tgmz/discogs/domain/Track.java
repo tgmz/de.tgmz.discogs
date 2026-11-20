@@ -52,6 +52,7 @@ public class Track implements Serializable {
 	@Column(length = 512)
 	private String title;
 	private String position;
+	@Column(length = 128)
 	private String duration;
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
 	@JoinTable(name = "Track_Artist", indexes = {

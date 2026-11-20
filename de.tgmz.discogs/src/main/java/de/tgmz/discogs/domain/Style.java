@@ -18,7 +18,7 @@ import jakarta.persistence.Transient;
  * Style entity
  */
 @Entity
-@AttributeOverride(name = "id", column = @Column(length = 31))
+@AttributeOverride(name = "id", column = @Column(length = 32))
 public class Style extends AtomicEntity<String> {
 	@Transient
 	private static final long serialVersionUID = 5684918391708831387L;

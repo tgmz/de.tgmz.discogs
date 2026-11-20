@@ -52,6 +52,7 @@ public class SubTrack implements Serializable {
 		@Index(columnList = "SubTrack_release_id, SubTrack_sequence_id, SubTrack_subtracknumber_id, extraArtists_artist_id, extraArtists_credit_id, extraArtists_detail_id", name = "SubTrack_ExtraArtist_pkey", unique = true),
 	})
 	private Set<ExtraArtist> extraArtists;
+	@Column(length = 10)
 	private String duration;
 	@ManyToOne
 	@MapsId("trackId")

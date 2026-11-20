@@ -75,9 +75,9 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 			, r.getId()
 			, r.getMaster() !=  null && r.getMaster().getId() > 0 ? r.getMaster().getId() : null
 			, ser != null && ser.getId() > 0 ? ser.getId() : null
-			, r.getAlbumArtist()
-			, r.getCountry()
 			, r.getReleased()
+			, r.getCountry()
+			, r.getAlbumArtist()
 			, r.getTitle()
 		);
 		
@@ -152,7 +152,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 			rc.getCompany().getId()
 			, rc.getCompany().getName()
 		);
-			
+
 		pm.get(Table.EntityType).printRecordUsingCache(
 			rc.getEntityType().getId()
 			, rc.getEntityType().getName()	
@@ -163,8 +163,8 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 				t.getRelease().getId()
 				, t.getSequence()
 				, t.getTrackNumber()
-				, t.getTitle()
 				, t.getDuration()
+				, t.getTitle()
 				, t.getPosition()
 			);
 		
@@ -211,8 +211,8 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 				st.getId().getReleaseId()
 				, st.getId().getSequenceId()
 				, st.getSubTrackNumber()
-				, st.getTitle()
 				, st.getDuration()
+				, st.getTitle()
 				, st.getPosition()
 			);
 

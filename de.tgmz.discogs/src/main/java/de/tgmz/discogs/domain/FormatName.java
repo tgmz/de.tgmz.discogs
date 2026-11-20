@@ -15,7 +15,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Transient;
 
 @Entity
-@AttributeOverride(name = "id", column = @Column(length = 31))
+@AttributeOverride(name = "id", column = @Column(length = 32))
 public class FormatName extends AtomicEntity<String> {
 	@Transient
 	private static final long serialVersionUID = -2954766668211762764L;

@@ -9,6 +9,7 @@
 **********************************************************************/
 package de.tgmz.discogs.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
@@ -25,6 +26,7 @@ public class Series extends AtomicEntity<Integer> {
 	@Transient
 	private static final long serialVersionUID = -9147451633557425171L;
 	private String name;
+	@Column(length = 64)
 	private String catno;
 
 	public Series() {

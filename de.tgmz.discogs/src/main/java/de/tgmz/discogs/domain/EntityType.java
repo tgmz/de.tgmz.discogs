@@ -9,6 +9,7 @@
 **********************************************************************/
 package de.tgmz.discogs.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Transient;
 
@@ -20,6 +21,7 @@ public class EntityType extends AtomicEntity<Short> {
 	@Transient
 	private static final long serialVersionUID = -4122244830701398362L;
 
+	@Column(length = 32)
 	private String name;
 	
 	public String getName() {

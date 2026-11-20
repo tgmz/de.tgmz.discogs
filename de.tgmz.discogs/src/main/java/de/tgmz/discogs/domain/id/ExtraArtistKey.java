@@ -21,7 +21,7 @@ public final class ExtraArtistKey implements Serializable {
 	@Transient
 	private static final long serialVersionUID = 5444222193660844182L;
 	
-	@Column(name = "credit_id")
+	@Column(name = "credit_id", length = 128)
 	private String creditId;
 	@Column(name = "detail_id")
 	private String detailId;

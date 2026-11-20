@@ -15,6 +15,7 @@ import java.util.TreeSet;
 
 import org.apache.commons.lang3.StringUtils;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -41,6 +42,7 @@ public class Format implements Serializable {
 	private Float qty;
 	private String text;
 	@ElementCollection(fetch = FetchType.LAZY)
+	@Column(length = 32)
 	private Set<String> descriptions;
 	
 	public Format() {

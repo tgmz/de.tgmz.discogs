@@ -47,12 +47,14 @@ public class Release extends Discogs {
 	private boolean _main;
 	@ManyToOne
 	private Master master;
+	@Column(length = 64)
 	private String country;
+	@Column(length = 10)
 	private String released;
 	@OneToMany(mappedBy = "release", cascade = CascadeType.ALL)
 	private Set<ReleaseExtraArtist> releaseExtraArtists;
 	@ElementCollection(fetch = FetchType.LAZY)
-	@Column(name = "catno")
+	@Column(name = "catno", length = 128)
 	private Map<Label, String> labels;
 	@OneToMany(mappedBy = "release", cascade = CascadeType.ALL)
 	private Set<ReleaseCompany> releaseCompanies;

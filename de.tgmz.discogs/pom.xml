@@ -18,7 +18,7 @@
 	<version>3.1.2</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<hibernate.version>7.4.14.Final</hibernate.version>
+		<hibernate.version>7.4.16.Final</hibernate.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -60,6 +60,18 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-csv</artifactId>
 			<version>1.14.1</version>
+			<exclusions>
+				<exclusion>
+					<!-- CVE-2026-119078 -->
+		    		<groupId>commons-codec</groupId>
+    				<artifactId>commons-codec</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+    		<groupId>commons-codec</groupId>
+    		<artifactId>commons-codec</artifactId>
+    		<version>1.23.0</version>
 		</dependency>
 		<dependency>
     		<groupId>io.github.classgraph</groupId>
