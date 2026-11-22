@@ -57,21 +57,9 @@
 			<version>4.0.7</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-csv</artifactId>
-			<version>1.14.1</version>
-			<exclusions>
-				<exclusion>
-					<!-- CVE-2026-119078 -->
-		    		<groupId>commons-codec</groupId>
-    				<artifactId>commons-codec</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-    		<groupId>commons-codec</groupId>
-    		<artifactId>commons-codec</artifactId>
-    		<version>1.23.0</version>
+    		<groupId>com.opencsv</groupId>
+    		<artifactId>opencsv</artifactId>
+    		<version>5.12.0</version>
 		</dependency>
 		<dependency>
     		<groupId>io.github.classgraph</groupId>

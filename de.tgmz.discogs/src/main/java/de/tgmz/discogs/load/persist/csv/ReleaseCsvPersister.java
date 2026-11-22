@@ -9,7 +9,6 @@
 **********************************************************************/
 package de.tgmz.discogs.load.persist.csv;
 
-import java.io.IOException;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
 
@@ -51,7 +50,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 		);
 	}
 	
-	protected int doSave(Release r) throws IOException {
+	protected int doSave(Release r) {
 		if (!getFilter().test(r)) {
 			fid += r.getFormats().size();
 			iid += r.getIdentifiers().size();
@@ -115,7 +114,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 		return 1;
 	}
 
-	private void saveComplexAttributes(Release r) throws IOException {
+	private void saveComplexAttributes(Release r) {
 		for (Artist a : r.getArtists()) {
 			save(r, a);
 		}
@@ -141,7 +140,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 		}
 	}
 
-	private void save(Release r, ReleaseCompany rc) throws IOException {
+	private void save(Release r, ReleaseCompany rc) {
 		pm.get(Table.ReleaseCompany).printRecord(
 			rc.getCompany().getId()
 			, rc.getEntityType().getId()
@@ -158,7 +157,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 			, rc.getEntityType().getName()	
 		);
 	}
-	private void save(Track t) throws IOException {
+	private void save(Track t) {
 		pm.get(Table.Track).printRecord(
 				t.getRelease().getId()
 				, t.getSequence()
@@ -206,7 +205,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 			save(st);
 		}
 	}
-	private void save(SubTrack st) throws IOException {
+	private void save(SubTrack st) {
 		pm.get(Table.SubTrack).printRecord(
 				st.getId().getReleaseId()
 				, st.getId().getSequenceId()
@@ -240,7 +239,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 			);
 		}
 	}
-	private void save(ReleaseExtraArtist rea) throws IOException {
+	private void save(ReleaseExtraArtist rea) {
 		if (rea.getExtraArtist().getCredit() != null) {
 			pm.get(Table.ReleaseExtraArtist).printRecord(
 					rea.getExtraArtist().getArtist().getId()
@@ -269,7 +268,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 		);
 
 	}
-	private void save(Release r, Artist a) throws IOException {
+	private void save(Release r, Artist a) {
 		pm.get(Table.Release_Artist).printRecord(
 				r.getId()
 				, a.getId()
@@ -281,7 +280,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 		);
 	}
 	
-	private void save(Release r, Format f) throws IOException {
+	private void save(Release r, Format f) {
 		pm.get(Table.Format).printRecord(
 				fid
 				, f.getQty()
@@ -303,7 +302,7 @@ public class ReleaseCsvPersister extends AbstractCsvPersister<Release> {
 			
 		++fid;
 	}
-	private void save(Release r, Identifier i) throws IOException {
+	private void save(Release r, Identifier i) {
 		pm.get(Table.Identifier).printRecord(
 				i.getType().ordinal()
 				, iid

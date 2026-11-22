@@ -9,7 +9,6 @@
 **********************************************************************/
 package de.tgmz.discogs.load.persist.csv;
 
-import java.io.IOException;
 import java.util.function.Predicate;
 
 import de.tgmz.discogs.domain.Label;
@@ -21,7 +20,7 @@ public class LabelCsvPersister extends AbstractCsvPersister<Label> {
 			, Table.Label_Label
 			, Table.label_label_all.useCache(300_000));
 	}
-	protected int doSave(Label l) throws IOException {
+	protected int doSave(Label l) {
 		if (!getFilter().test(l)) {
 			return 0;
 		}

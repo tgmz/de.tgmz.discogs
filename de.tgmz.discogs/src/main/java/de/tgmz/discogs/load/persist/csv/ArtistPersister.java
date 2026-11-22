@@ -9,7 +9,6 @@
 **********************************************************************/
 package de.tgmz.discogs.load.persist.csv;
 
-import java.io.IOException;
 import java.util.function.Predicate;
 
 import de.tgmz.discogs.domain.Artist;
@@ -22,7 +21,7 @@ public class ArtistPersister extends AbstractCsvPersister<Artist> {
 			, Table.Artist_variations, Table.artist_artist_all.useCache(1_000_000));
 	}
 	
-	protected int doSave(Artist a) throws IOException {
+	protected int doSave(Artist a) {
 		if (!getFilter().test(a)) {
 			return 0;
 		}

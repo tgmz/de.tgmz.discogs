@@ -13,19 +13,22 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Set;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.opencsv.CSVWriterBuilder;
+import com.opencsv.ICSVWriter;
 
 public class DiscogsCsvPrinter {
 	@SuppressWarnings("unused")
 	private static final Logger LOG = LoggerFactory.getLogger(DiscogsCsvPrinter.class);
 	private Set<String> cache;
-	private CSVPrinter p;
+	private ICSVWriter p;
 	
 	public DiscogsCsvPrinter(String target, Table table) throws IOException {
 		super();
@@ -34,21 +37,25 @@ public class DiscogsCsvPrinter {
 			cache = new UnlimitedSet<>(table.getCacheSize());
 		}
 		
-		p = new CSVPrinter(new BufferedWriter(new FileWriter(target + File.separator + table.toString() + ".csv", StandardCharsets.UTF_8)), CSVFormat.POSTGRESQL_CSV);
+		Writer w = new BufferedWriter(new FileWriter(target + File.separator + table.toString() + ".csv", StandardCharsets.UTF_8));
+		
+		p = new CSVWriterBuilder(w).build();
 	}
 	
-	public void printRecordUsingCacheWithColumn(int idCol, Object... values) throws IOException {
+	public void printRecordUsingCacheWithColumn(int idCol, Object... values) {
 		if (cache.add(String.valueOf(values[idCol]))) {
-			p.printRecord(values);
+			printRecord(values);
 		}
 	}
 	
-	public void printRecordUsingCache(Object... values) throws IOException {
+	public void printRecordUsingCache(Object... values) {
 		printRecordUsingCacheWithColumn(0, values);
 	}
 	
-	public void printRecord(Object... values) throws IOException {
-		p.printRecord(values);
+	public void printRecord(Object... values) {
+		String[] s0 = Arrays.stream(values).map(o -> o == null ? null : String.valueOf(o)).toArray(String[]::new);
+		
+		p.writeNext(s0);
 	}
 	
 	public void flush() throws IOException {

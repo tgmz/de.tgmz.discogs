@@ -63,13 +63,7 @@ public abstract class AbstractCsvPersister<T> implements IPersister<T> {
 	
 	@Override
 	public int save(int threshold, T o) {
-		try {
-			return doSave(o);
-		} catch (IOException e) {
-			LOG.error("", e);
-		}
-		
-		return 0;
+		return doSave(o);
 	}
 	
 	@Override
@@ -90,5 +84,5 @@ public abstract class AbstractCsvPersister<T> implements IPersister<T> {
 		return filter;
 	}
 	
-	protected abstract int doSave(T l) throws IOException;
+	protected abstract int doSave(T l);
 }
