@@ -17,11 +17,14 @@ import org.junit.Test;
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.domain.PrimaryEntity;
 import de.tgmz.discogs.load.persist.IPersister;
+import de.tgmz.discogs.load.persist.IPersisterFactory;
 import de.tgmz.discogs.load.persist.PersisterException;
 import de.tgmz.discogs.load.persist.PersisterFactoryImpl;
 
 public class PersisterFactoryTest {
 	private static final String CSV_PROP = "DISCOGS_CSV_TARGET";
+	
+	private static IPersisterFactory pf = PersisterFactoryImpl.getInstance();
 
 	@SuppressWarnings("serial")
 	private static class InvalidEntity extends PrimaryEntity {
@@ -36,7 +39,7 @@ public class PersisterFactoryTest {
 	public void testJakarta() throws PersisterException {
 		PersisterFactoryImpl.reload();
 		
-		IPersister<Artist> ip = PersisterFactoryImpl.getInstance().create(Artist.class, x -> true);
+		IPersister<Artist> ip = pf.create(Artist.class, x -> true);
 		
 		assertTrue(ip instanceof de.tgmz.discogs.load.persist.jakarta.ArtistPersister);
 	}
@@ -47,13 +50,13 @@ public class PersisterFactoryTest {
 		
 		PersisterFactoryImpl.reload();
 		
-		IPersister<Artist> ip = PersisterFactoryImpl.getInstance().create(Artist.class, x -> true);
+		IPersister<Artist> ip = pf.create(Artist.class, x -> true);
 		
 		assertTrue(ip instanceof de.tgmz.discogs.load.persist.csv.ArtistPersister);
 	}
 	
 	@Test(expected = PersisterException.class)
 	public void testInvalidPersistableClass() throws PersisterException {
-		PersisterFactoryImpl.getInstance().create(InvalidEntity.class, x -> true);
+		pf.create(InvalidEntity.class, x -> true);
 	}
 }

@@ -12,7 +12,6 @@ package de.tgmz.discogs.load;
 import java.awt.Toolkit;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,6 +34,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import de.tgmz.discogs.domain.PrimaryEntity;
 import de.tgmz.discogs.load.persist.IPersister;
+import de.tgmz.discogs.logging.LogUtil;
 
 public class DiscogsContentHandler<T extends PrimaryEntity> extends DefaultHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(DiscogsContentHandler.class);
@@ -51,6 +51,7 @@ public class DiscogsContentHandler<T extends PrimaryEntity> extends DefaultHandl
 	protected int id;
 	protected IPersister<T> persister;
 	protected Predicate<T> filter;
+	private long start;
 
 	public DiscogsContentHandler(Predicate<T> filter) {
 		this.filter = filter;
@@ -85,6 +86,8 @@ public class DiscogsContentHandler<T extends PrimaryEntity> extends DefaultHandl
 
 	@Override
 	public void startDocument() throws SAXException {
+		start = System.currentTimeMillis();
+		
 		stack = new LinkedList<>();
 		path = "";
 	}
@@ -104,12 +107,7 @@ public class DiscogsContentHandler<T extends PrimaryEntity> extends DefaultHandl
 
 	@Override
 	public void characters(char[] ch, int start, int length) {
-		if ("notes".equals(stack.peek())) {
-		// Ignore irrelevant sections
-			return;
-		}
-		
-		chars.append(String.valueOf(Arrays.copyOfRange(ch, start, start + length)));
+		chars.append(ch, start, length);
 	}
 
 	@Override
@@ -119,7 +117,7 @@ public class DiscogsContentHandler<T extends PrimaryEntity> extends DefaultHandl
 		super.endDocument();
 		
 		if (LOG.isInfoEnabled()) {
-			LOG.info("{} entities added, {} ignored", String.format("%,d", saved), String.format("%,d", count - saved));
+			LOG.info("{} entities added, {} ignored in {}", String.format("%,d", saved), String.format("%,d", count - saved), LogUtil.formatDuration(start));
 		}
 
 		if (!Boolean.getBoolean("DISCOGS_TEST")) {	

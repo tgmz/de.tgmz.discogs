@@ -21,57 +21,58 @@ public class ArtistPersister extends AbstractCsvPersister<Artist> {
 			, Table.Artist_variations, Table.artist_artist_all.useCache(1_000_000));
 	}
 	
-	protected int doSave(Artist a) {
+	@Override
+	public int save(int threshold, Artist a) {
 		if (!getFilter().test(a)) {
 			return 0;
 		}
 		
-		pm.get(Table.Artist).printRecord(
-			a.getDataQuality().ordinal()
+		pm.get(Table.Artist).printRecord(threshold
+			, a.getDataQuality().ordinal()
 			, a.getId()
 			, a.getName()
 			, a.getRealname()
 		);
 		
 		for (Artist aa : a.getAliases()) {
-			pm.get(Table.artist_aliases).printRecord(
-				a.getId()
+			pm.get(Table.artist_aliases).printRecord(threshold
+				, a.getId()
 				, aa.getId()
 			);
 			
-			pm.get(Table.artist_artist_all).printRecordUsingCache(
-					aa.getId()
+			pm.get(Table.artist_artist_all).printRecordUsingCache(threshold 
+					, aa.getId()
 					, aa.getName()
 			);
 		}
 		
 		for (Artist ag : a.getGroups()) {
-			pm.get(Table.artist_groups).printRecord(
-				a.getId()
+			pm.get(Table.artist_groups).printRecord(threshold
+				, a.getId()
 				, ag.getId()
 			);
 			
-			pm.get(Table.artist_artist_all).printRecordUsingCache(
-					ag.getId()
+			pm.get(Table.artist_artist_all).printRecordUsingCache(threshold 
+					, ag.getId()
 					, ag.getName()
 			);
 		}
 		
 		for (Artist am : a.getMembers()) {
-			pm.get(Table.artist_members).printRecord(
-				a.getId()
+			pm.get(Table.artist_members).printRecord(threshold
+				, a.getId()
 				, am.getId()
 			);
 			
-			pm.get(Table.artist_artist_all).printRecordUsingCache(
-					am.getId()
+			pm.get(Table.artist_artist_all).printRecordUsingCache(threshold
+					, am.getId()
 					, am.getName()
 			);
 		}
 		
 		for (String v : a.getVariations()) {
-			pm.get(Table.Artist_variations).printRecord(
-				a.getId()
+			pm.get(Table.Artist_variations).printRecord(threshold
+				, a.getId()
 				, v
 			);
 		}

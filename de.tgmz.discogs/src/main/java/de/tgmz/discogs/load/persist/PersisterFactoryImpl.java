@@ -40,6 +40,7 @@ public final class PersisterFactoryImpl implements IPersisterFactory {
 		return INSTANCE;
 	}
 	
+	@Override
 	@SuppressWarnings("unchecked")
 	public <T extends PrimaryEntity> IPersister<T> create(Class<T> entityClass, Predicate<T> filter) throws PersisterException {
 		Class<?> persitableClass = PERSISTERS.get(entityClass);

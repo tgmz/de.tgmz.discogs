@@ -52,18 +52,13 @@ public abstract class AbstractCsvPersister<T> implements IPersister<T> {
 									.map(cd -> cd.getColumnName())
 									.toArray(Object[]::new);
 					
-				csvp.printRecord(cols);
+				csvp.printRecord(1, cols);
 					
 				pm.put(table, csvp);
 			} catch (JSQLParserException | IOException e) {
 				LOG.warn("Cannot get column list", e);
 			}
 		}
-	}
-	
-	@Override
-	public int save(int threshold, T o) {
-		return doSave(o);
 	}
 	
 	@Override
@@ -83,6 +78,4 @@ public abstract class AbstractCsvPersister<T> implements IPersister<T> {
 	protected Predicate<T> getFilter() {
 		return filter;
 	}
-	
-	protected abstract int doSave(T l);
 }

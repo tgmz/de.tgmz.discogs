@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -29,6 +31,7 @@ public class DiscogsCsvPrinter {
 	private static final Logger LOG = LoggerFactory.getLogger(DiscogsCsvPrinter.class);
 	private Set<String> cache;
 	private ICSVWriter p;
+	private List<String[]> buffer;
 	
 	public DiscogsCsvPrinter(String target, Table table) throws IOException {
 		super();
@@ -40,33 +43,45 @@ public class DiscogsCsvPrinter {
 		Writer w = new BufferedWriter(new FileWriter(target + File.separator + table.toString() + ".csv", StandardCharsets.UTF_8));
 		
 		p = new CSVWriterBuilder(w).build();
+		
+		buffer = new LinkedList<>();
 	}
 	
-	public void printRecordUsingCacheWithColumn(int idCol, Object... values) {
-		if (cache.add(String.valueOf(values[idCol]))) {
-			printRecord(values);
+	public void printRecordUsingCache(int threshold, Object... values) {
+		if (cache.add(String.valueOf(values[0]))) {
+			printRecord(threshold, values);
 		}
 	}
 	
-	public void printRecordUsingCache(Object... values) {
-		printRecordUsingCacheWithColumn(0, values);
-	}
-	
-	public void printRecord(Object... values) {
+	public void printRecord(int threshold, Object... values) {
 		String[] s0 = Arrays.stream(values).map(o -> o == null ? null : String.valueOf(o)).toArray(String[]::new);
 		
-		p.writeNext(s0);
+		buffer.add(s0);
+		
+		if (buffer.size() >= threshold) {
+			writeBuffer();
+		}
 	}
 	
 	public void flush() throws IOException {
+		writeBuffer();
+		
 		p.flush();
 	}
 
 	public void close() throws IOException {
+		this.flush();
+		
 		if (cache != null) {
 			cache.clear();
 		}
 		
 		p.close();
+	}
+	
+	private void writeBuffer() {
+		p.writeAll(buffer);
+		
+		buffer.clear();
 	}
 }

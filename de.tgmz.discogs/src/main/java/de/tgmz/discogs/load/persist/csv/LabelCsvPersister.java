@@ -20,7 +20,9 @@ public class LabelCsvPersister extends AbstractCsvPersister<Label> {
 			, Table.Label_Label
 			, Table.label_label_all.useCache(300_000));
 	}
-	protected int doSave(Label l) {
+	
+	@Override
+	public int save(int threshold, Label l) {
 		if (!getFilter().test(l)) {
 			return 0;
 		}
@@ -29,28 +31,28 @@ public class LabelCsvPersister extends AbstractCsvPersister<Label> {
 		
 		Integer pls = pl != null ? pl.getId() : null;  
 		
-		pm.get(Table.Label).printRecord(
-			l.getDataQuality().ordinal()
+		pm.get(Table.Label).printRecord(threshold
+			, l.getDataQuality().ordinal()
 			, l.getId()
 			, pls
 			, l.getName()
 		);
 		
 		if (pl != null) {
-			pm.get(Table.label_label_all).printRecordUsingCache(
-				pl.getId()
+			pm.get(Table.label_label_all).printRecordUsingCache(threshold
+				, pl.getId()
 				, pl.getName()
 			);
 		}
 		
 		for (Label sl : l.getSubLabels()) {
-			pm.get(Table.Label_Label).printRecord(
-				l.getId()
+			pm.get(Table.Label_Label).printRecord(threshold
+				, l.getId()
 				, sl.getId()
 			);
 			
-			pm.get(Table.label_label_all).printRecordUsingCache(
-				sl.getId()
+			pm.get(Table.label_label_all).printRecordUsingCache(threshold
+				, sl.getId()
 				, sl.getName()
 			);
 			
