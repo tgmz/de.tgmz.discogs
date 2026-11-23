@@ -15,7 +15,7 @@ import de.tgmz.discogs.domain.Release;
 import de.tgmz.discogs.load.factory.ReleaseFactory;
 
 public class ReleasePersister extends AbstractJakartaPersistable<Release> {
-	public ReleasePersister(Predicate<Release> filter) {
-		super(filter, new ReleaseFactory());
+	public ReleasePersister(Predicate<Release> filter, int threshold) {
+		super(filter, new ReleaseFactory(), threshold);
 	}
 }

@@ -20,15 +20,15 @@ import jakarta.persistence.EntityManager;
 public class LabelPersister extends AbstractJakartaPersistable<Label> {
 	private CollectionFactory<Label> lsf;
 	
-	public LabelPersister(Predicate<Label> filter) {
-		super(filter, new BasicEntityFactory<>());
+	public LabelPersister(Predicate<Label> filter, int threshold) {
+		super(filter, new BasicEntityFactory<>(), threshold);
 		
 		lsf = new CollectionFactory<>(getFactory());
 	}
 
 	@Override
 	// Inserting labels in batch mode cause trouble if a label is its own parent label
-	public int save(int threshold, Label label) {
+	public int save(Label label) {
 		if (getFilter().test(label)) {
 			LOG.debug("Save {}", label);
 			

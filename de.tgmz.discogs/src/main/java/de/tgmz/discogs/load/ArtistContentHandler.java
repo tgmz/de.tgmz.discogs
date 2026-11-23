@@ -41,7 +41,7 @@ public class ArtistContentHandler extends DiscogsContentHandler<Artist> {
 		super.startDocument();
 
 		try {
-			persister = PersisterFactoryImpl.getInstance().create(Artist.class, filter);
+			persister = PersisterFactoryImpl.getInstance().create(Artist.class, filter, getSaveThreshold());
 		} catch (PersisterException e) {
 			LOG.error("Cannot get a persister", e);
 			

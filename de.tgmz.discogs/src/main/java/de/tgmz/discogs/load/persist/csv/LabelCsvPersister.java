@@ -14,15 +14,16 @@ import java.util.function.Predicate;
 import de.tgmz.discogs.domain.Label;
 
 public class LabelCsvPersister extends AbstractCsvPersister<Label> {
-	public LabelCsvPersister(Predicate<Label> filter) {
+	public LabelCsvPersister(Predicate<Label> filter, int threshold) {
 		super(filter
+			, threshold
 			, Table.Label
 			, Table.Label_Label
 			, Table.label_label_all.useCache(300_000));
 	}
 	
 	@Override
-	public int save(int threshold, Label l) {
+	public int save(Label l) {
 		if (!getFilter().test(l)) {
 			return 0;
 		}
@@ -31,28 +32,28 @@ public class LabelCsvPersister extends AbstractCsvPersister<Label> {
 		
 		Integer pls = pl != null ? pl.getId() : null;  
 		
-		pm.get(Table.Label).printRecord(threshold
-			, l.getDataQuality().ordinal()
+		pm.get(Table.Label).printRecord(
+			l.getDataQuality().ordinal()
 			, l.getId()
 			, pls
 			, l.getName()
 		);
 		
 		if (pl != null) {
-			pm.get(Table.label_label_all).printRecordUsingCache(threshold
-				, pl.getId()
+			pm.get(Table.label_label_all).printRecordUsingCache(
+				pl.getId()
 				, pl.getName()
 			);
 		}
 		
 		for (Label sl : l.getSubLabels()) {
-			pm.get(Table.Label_Label).printRecord(threshold
-				, l.getId()
+			pm.get(Table.Label_Label).printRecord(
+				l.getId()
 				, sl.getId()
 			);
 			
-			pm.get(Table.label_label_all).printRecordUsingCache(threshold
-				, sl.getId()
+			pm.get(Table.label_label_all).printRecordUsingCache(
+				sl.getId()
 				, sl.getName()
 			);
 			

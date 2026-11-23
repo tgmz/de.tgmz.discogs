@@ -39,7 +39,7 @@ public class LabelContentHandler extends DiscogsContentHandler<Label> {
 		super.startDocument();
 
 		try {
-			persister = PersisterFactoryImpl.getInstance().create(Label.class, filter);
+			persister = PersisterFactoryImpl.getInstance().create(Label.class, filter, getSaveThreshold());
 		} catch (PersisterException e) {
 			LOG.error("Cannot get a persister", e);
 			

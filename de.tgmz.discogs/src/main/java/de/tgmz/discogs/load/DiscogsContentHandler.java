@@ -154,7 +154,7 @@ public class DiscogsContentHandler<T extends PrimaryEntity> extends DefaultHandl
 	
 	@SuppressWarnings("unchecked")
 	public void save(Object o) {
-		saved += persister.save(saveThreshold, (T) o);
+		saved += persister.save((T) o);
 		
 		if (++count % logThreshold == 0 && LOG.isInfoEnabled()) {
 			LOG.info("{}/{} ({}). {}", String.format("%,d", saved), String.format("%,d", count), String.format("%f%%", (float) saved / count * 100), o);
@@ -187,5 +187,9 @@ public class DiscogsContentHandler<T extends PrimaryEntity> extends DefaultHandl
 
 	public void setSaveThreshold(int saveThreshold) {
 		this.saveThreshold = saveThreshold;
+	}
+
+	public int getSaveThreshold() {
+		return saveThreshold;
 	}
 }

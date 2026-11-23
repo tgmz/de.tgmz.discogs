@@ -15,7 +15,7 @@ import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.load.factory.MasterFactory;
 
 public class MasterPersister extends AbstractJakartaPersistable<Master> {
-	public MasterPersister(Predicate<Master> filter) {
-		super(filter, new MasterFactory());
+	public MasterPersister(Predicate<Master> filter, int threshold) {
+		super(filter, new MasterFactory(), threshold);
 	}
 }

@@ -14,65 +14,66 @@ import java.util.function.Predicate;
 import de.tgmz.discogs.domain.Artist;
 
 public class ArtistPersister extends AbstractCsvPersister<Artist> {
-	public ArtistPersister(Predicate<Artist> filter) {
+	public ArtistPersister(Predicate<Artist> filter, int threshold) {
 		super(filter
+			, threshold
 			, Table.Artist
 			, Table.artist_aliases, Table.artist_groups, Table.artist_members
 			, Table.Artist_variations, Table.artist_artist_all.useCache(1_000_000));
 	}
 	
 	@Override
-	public int save(int threshold, Artist a) {
+	public int save(Artist a) {
 		if (!getFilter().test(a)) {
 			return 0;
 		}
 		
-		pm.get(Table.Artist).printRecord(threshold
-			, a.getDataQuality().ordinal()
+		pm.get(Table.Artist).printRecord(
+			a.getDataQuality().ordinal()
 			, a.getId()
 			, a.getName()
 			, a.getRealname()
 		);
 		
 		for (Artist aa : a.getAliases()) {
-			pm.get(Table.artist_aliases).printRecord(threshold
-				, a.getId()
+			pm.get(Table.artist_aliases).printRecord(
+				a.getId()
 				, aa.getId()
 			);
 			
-			pm.get(Table.artist_artist_all).printRecordUsingCache(threshold 
-					, aa.getId()
+			pm.get(Table.artist_artist_all).printRecordUsingCache( 
+					aa.getId()
 					, aa.getName()
 			);
 		}
 		
 		for (Artist ag : a.getGroups()) {
-			pm.get(Table.artist_groups).printRecord(threshold
-				, a.getId()
+			pm.get(Table.artist_groups).printRecord(
+				a.getId()
 				, ag.getId()
 			);
 			
-			pm.get(Table.artist_artist_all).printRecordUsingCache(threshold 
-					, ag.getId()
+			pm.get(Table.artist_artist_all).printRecordUsingCache( 
+					ag.getId()
 					, ag.getName()
 			);
 		}
 		
 		for (Artist am : a.getMembers()) {
-			pm.get(Table.artist_members).printRecord(threshold
-				, a.getId()
+			pm.get(Table.artist_members).printRecord(
+				a.getId()
 				, am.getId()
 			);
 			
-			pm.get(Table.artist_artist_all).printRecordUsingCache(threshold
-					, am.getId()
+			pm.get(Table.artist_artist_all).printRecordUsingCache(
+					am.getId()
 					, am.getName()
 			);
 		}
 		
 		for (String v : a.getVariations()) {
-			pm.get(Table.Artist_variations).printRecord(threshold
-				, a.getId()
+			pm.get(Table.Artist_variations).printRecord(
+				a.getId()
 				, v
 			);
 		}

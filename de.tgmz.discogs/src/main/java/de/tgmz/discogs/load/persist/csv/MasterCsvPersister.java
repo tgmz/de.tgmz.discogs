@@ -17,8 +17,9 @@ import de.tgmz.discogs.domain.Master;
 import de.tgmz.discogs.domain.Style;
 
 public class MasterCsvPersister extends AbstractCsvPersister<Master> {
-	public MasterCsvPersister(Predicate<Master> filter) {
+	public MasterCsvPersister(Predicate<Master> filter, int threshold) {
 		super(filter
+			, threshold
 			, Table.Master
 			, Table.Master_Artist
 			, Table.Genre, Table.Style, Table.Master_Genre, Table.Master_Style
@@ -26,13 +27,13 @@ public class MasterCsvPersister extends AbstractCsvPersister<Master> {
 	}
 
 	@Override
-	public int save(int threshold, Master m) {
+	public int save(Master m) {
 		if (!getFilter().test(m)) {
 			return 0;
 		}
 		
-		pm.get(Table.Master).printRecord(threshold
-			, m.getDataQuality().ordinal()
+		pm.get(Table.Master).printRecord(
+			m.getDataQuality().ordinal()
 			, m.getId()
 			, m.getPublished()
 			, m.getAlbumArtist()
@@ -40,27 +41,27 @@ public class MasterCsvPersister extends AbstractCsvPersister<Master> {
 		);
 		
 		for (Artist a : m.getArtists()) {
-			pm.get(Table.Master_Artist).printRecord(threshold
-				, m.getId()
+			pm.get(Table.Master_Artist).printRecord(
+				m.getId()
 				, a.getId()
 			);
 			
-			pm.get(Table.artist_master_all).printRecordUsingCache(threshold
-					, a.getId()
+			pm.get(Table.artist_master_all).printRecordUsingCache(
+					a.getId()
 					, a.getName()
 			);
 		}
 		
 		for (Genre g : m.getGenres()) {
-			pm.get(Table.Master_Genre).printRecord(threshold
-				, m.getId()
+			pm.get(Table.Master_Genre).printRecord(
+				m.getId()
 				, g.getId()
 			);
 		}
 
 		for (Style s : m.getStyles()) {
-			pm.get(Table.Master_Style).printRecord(threshold
-				, m.getId()
+			pm.get(Table.Master_Style).printRecord(
+				m.getId()
 				, s.getId()
 			);
 		}

@@ -30,17 +30,19 @@ public abstract class AbstractJakartaPersistable<T> implements IPersister<T> {
 	
 	private IFactory<T> factory;
 	private Predicate<T> filter;
+	private int threshold;
 	
 	private List<T> cache = new LinkedList<>();
 	
-	protected AbstractJakartaPersistable(Predicate<T> filter, IFactory<T> factory) {
+	protected AbstractJakartaPersistable(Predicate<T> filter, IFactory<T> factory, int threshold) {
 		super();
 		this.filter = filter;
 		this.factory = factory;
+		this.threshold = threshold;
 	}
 	
 	@Override
-	public int save(int threshold, T o) {
+	public int save(T o) {
 		if (filter.test(o)) {
 			LOG.debug("Cache {}", o);
 			

@@ -39,7 +39,7 @@ public class PersisterFactoryTest {
 	public void testJakarta() throws PersisterException {
 		PersisterFactoryImpl.reload();
 		
-		IPersister<Artist> ip = pf.create(Artist.class, x -> true);
+		IPersister<Artist> ip = pf.create(Artist.class, x -> true, 1);
 		
 		assertTrue(ip instanceof de.tgmz.discogs.load.persist.jakarta.ArtistPersister);
 	}
@@ -50,13 +50,13 @@ public class PersisterFactoryTest {
 		
 		PersisterFactoryImpl.reload();
 		
-		IPersister<Artist> ip = pf.create(Artist.class, x -> true);
+		IPersister<Artist> ip = pf.create(Artist.class, x -> true, 1);
 		
 		assertTrue(ip instanceof de.tgmz.discogs.load.persist.csv.ArtistPersister);
 	}
 	
 	@Test(expected = PersisterException.class)
 	public void testInvalidPersistableClass() throws PersisterException {
-		pf.create(InvalidEntity.class, x -> true);
+		pf.create(InvalidEntity.class, x -> true, 1);
 	}
 }

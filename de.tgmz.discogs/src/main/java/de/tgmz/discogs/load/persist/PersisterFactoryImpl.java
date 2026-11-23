@@ -42,7 +42,7 @@ public final class PersisterFactoryImpl implements IPersisterFactory {
 	
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T extends PrimaryEntity> IPersister<T> create(Class<T> entityClass, Predicate<T> filter) throws PersisterException {
+	public <T extends PrimaryEntity> IPersister<T> create(Class<T> entityClass, Predicate<T> filter, int threshold) throws PersisterException {
 		Class<?> persitableClass = PERSISTERS.get(entityClass);
 
 		if (persitableClass == null) {
@@ -50,7 +50,7 @@ public final class PersisterFactoryImpl implements IPersisterFactory {
 		}
 		
 		try {
-			return (IPersister<T>) persitableClass.getDeclaredConstructor(Predicate.class).newInstance(filter);
+			return (IPersister<T>) persitableClass.getDeclaredConstructor(Predicate.class, int.class).newInstance(filter, threshold);
 		} catch (ReflectiveOperationException e) {
 			throw new PersisterException(String.format("Cannot create persistable for %s", entityClass), e);
 		}

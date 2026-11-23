@@ -84,7 +84,7 @@ public class ReleaseContentHandler extends DiscogsContentHandler<Release> {
 		super.startDocument();
 
 		try {
-			persister = PersisterFactoryImpl.getInstance().create(Release.class, filter);
+			persister = PersisterFactoryImpl.getInstance().create(Release.class, filter, getSaveThreshold());
 		} catch (PersisterException e) {
 			LOG.error("Cannot get a persister", e);
 			

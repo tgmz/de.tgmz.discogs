@@ -15,7 +15,7 @@ import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.load.factory.ArtistFactory;
 
 public class ArtistPersister extends AbstractJakartaPersistable<Artist> {
-	public ArtistPersister(Predicate<Artist> filter) {
-		super(filter, new ArtistFactory());
+	public ArtistPersister(Predicate<Artist> filter, int threshold) {
+		super(filter, new ArtistFactory(), threshold);
 	}
 }

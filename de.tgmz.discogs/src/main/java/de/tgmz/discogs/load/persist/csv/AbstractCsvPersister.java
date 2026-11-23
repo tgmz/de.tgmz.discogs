@@ -30,7 +30,7 @@ public abstract class AbstractCsvPersister<T> implements IPersister<T> {
 	protected Map<Table, DiscogsCsvPrinter> pm;
 	private Predicate<T> filter;
 
-	protected AbstractCsvPersister(Predicate<T> filter, Table... tables) {
+	protected AbstractCsvPersister(Predicate<T> filter, int threshold, Table... tables) {
 		this.filter = filter;
 		
 		pm = new TreeMap<>();
@@ -43,7 +43,7 @@ public abstract class AbstractCsvPersister<T> implements IPersister<T> {
 			}
 
 			try {
-				DiscogsCsvPrinter csvp = new DiscogsCsvPrinter(System.getProperty("DISCOGS_CSV_TARGET"), table);
+				DiscogsCsvPrinter csvp = new DiscogsCsvPrinter(System.getProperty("DISCOGS_CSV_TARGET"), table, threshold);
 
 				// If size == 0 enforce IndexOutOfBoundsException
 				Object[] cols = ((CreateTable) CCJSqlParserUtil.parse(createDdl.getFirst()))
@@ -52,7 +52,7 @@ public abstract class AbstractCsvPersister<T> implements IPersister<T> {
 									.map(cd -> cd.getColumnName())
 									.toArray(Object[]::new);
 					
-				csvp.printRecord(1, cols);
+				csvp.printRecord(cols);
 					
 				pm.put(table, csvp);
 			} catch (JSQLParserException | IOException e) {

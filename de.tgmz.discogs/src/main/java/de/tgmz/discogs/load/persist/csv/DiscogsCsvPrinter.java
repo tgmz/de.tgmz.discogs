@@ -32,9 +32,12 @@ public class DiscogsCsvPrinter {
 	private Set<String> cache;
 	private ICSVWriter p;
 	private List<String[]> buffer;
+	private int threshold;
 	
-	public DiscogsCsvPrinter(String target, Table table) throws IOException {
+	public DiscogsCsvPrinter(String target, Table table, int threshold) throws IOException {
 		super();
+		
+		this.threshold = threshold;
 		
 		if (table.getCacheSize() > -1) {
 			cache = new UnlimitedSet<>(table.getCacheSize());
@@ -47,13 +50,13 @@ public class DiscogsCsvPrinter {
 		buffer = new LinkedList<>();
 	}
 	
-	public void printRecordUsingCache(int threshold, Object... values) {
+	public void printRecordUsingCache(Object... values) {
 		if (cache.add(String.valueOf(values[0]))) {
-			printRecord(threshold, values);
+			printRecord(values);
 		}
 	}
 	
-	public void printRecord(int threshold, Object... values) {
+	public void printRecord(Object... values) {
 		String[] s0 = Arrays.stream(values).map(o -> o == null ? null : String.valueOf(o)).toArray(String[]::new);
 		
 		buffer.add(s0);

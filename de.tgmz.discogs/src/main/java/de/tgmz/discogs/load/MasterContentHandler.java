@@ -47,7 +47,7 @@ public class MasterContentHandler extends DiscogsContentHandler<Master> {
 		super.startDocument();
 
 		try {
-			persister = PersisterFactoryImpl.getInstance().create(Master.class, filter);
+			persister = PersisterFactoryImpl.getInstance().create(Master.class, filter, getSaveThreshold());
 		} catch (PersisterException e) {
 			LOG.error("Cannot get a persister", e);
 			
