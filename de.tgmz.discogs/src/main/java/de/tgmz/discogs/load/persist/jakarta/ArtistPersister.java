@@ -13,22 +13,9 @@ import java.util.function.Predicate;
 
 import de.tgmz.discogs.domain.Artist;
 import de.tgmz.discogs.load.factory.ArtistFactory;
-import de.tgmz.discogs.load.factory.IFactory;
 
 public class ArtistPersister extends AbstractJakartaPersistable<Artist> {
-	private Predicate<Artist> filter;
-	
 	public ArtistPersister(Predicate<Artist> filter) {
-		this.filter = filter;
-	}
-
-	@Override
-	public IFactory<Artist> getFactory() {
-		return new ArtistFactory();
-	}
-
-	@Override
-	public Predicate<Artist> getFilter() {
-		return filter;
+		super(filter, new ArtistFactory());
 	}
 }

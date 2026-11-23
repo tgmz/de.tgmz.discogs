@@ -14,32 +14,28 @@ import java.util.function.Predicate;
 import de.tgmz.discogs.database.DatabaseService;
 import de.tgmz.discogs.domain.Label;
 import de.tgmz.discogs.load.factory.BasicEntityFactory;
-import de.tgmz.discogs.load.factory.IFactory;
 import de.tgmz.discogs.load.factory.collections.CollectionFactory;
 import jakarta.persistence.EntityManager;
 
 public class LabelPersister extends AbstractJakartaPersistable<Label> {
-	private Predicate<Label> filter;
-	private IFactory<Label> lf;
 	private CollectionFactory<Label> lsf;
 	
 	public LabelPersister(Predicate<Label> filter) {
-		this.filter = filter;
+		super(filter, new BasicEntityFactory<>());
 		
-		lf = new BasicEntityFactory<>();
-		lsf = new CollectionFactory<>(lf);
+		lsf = new CollectionFactory<>(getFactory());
 	}
 
 	@Override
 	// Inserting labels in batch mode cause trouble if a label is its own parent label
 	public int save(int threshold, Label label) {
-		if (filter.test(label)) {
+		if (getFilter().test(label)) {
 			LOG.debug("Save {}", label);
 			
 			try (EntityManager em = DatabaseService.getInstance().getEntityManagerFactory().createEntityManager()) {
 				em.getTransaction().begin();
 				
-				Label l = lf.get(em, label);
+				Label l = getFactory().get(em, label);
 				
 				if (l.getDataQuality() == null) {
 					l.setDataQuality(label.getDataQuality());
@@ -52,7 +48,7 @@ public class LabelPersister extends AbstractJakartaPersistable<Label> {
 						// Crazy, but happens (label.id = 219423, name=RDM Edition)
 						l.setParentLabel(l);
 					} else {
-						l.setParentLabel(lf.get(em, pl));
+						l.setParentLabel(getFactory().get(em, pl));
 					}
 				}
 				
@@ -67,15 +63,5 @@ public class LabelPersister extends AbstractJakartaPersistable<Label> {
 		} else {
 			return 0;
 		}
-	}
-
-	@Override
-	public IFactory<Label> getFactory() {
-		return null;
-	}
-
-	@Override
-	public Predicate<Label> getFilter() {
-		return filter;
 	}
 }

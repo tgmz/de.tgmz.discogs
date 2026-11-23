@@ -12,27 +12,10 @@ package de.tgmz.discogs.load.persist.jakarta;
 import java.util.function.Predicate;
 
 import de.tgmz.discogs.domain.Master;
-import de.tgmz.discogs.load.factory.IFactory;
 import de.tgmz.discogs.load.factory.MasterFactory;
 
 public class MasterPersister extends AbstractJakartaPersistable<Master> {
-	private Predicate<Master> filter;
-	private IFactory<Master> mf;
-	
 	public MasterPersister(Predicate<Master> filter) {
-		this.filter = filter;
-		
-		mf = new MasterFactory();
+		super(filter, new MasterFactory());
 	}
-	
-	@Override
-	public IFactory<Master> getFactory() {
-		return mf;
-	}
-
-	@Override
-	public Predicate<Master> getFilter() {
-		return filter;
-	}
-
 }

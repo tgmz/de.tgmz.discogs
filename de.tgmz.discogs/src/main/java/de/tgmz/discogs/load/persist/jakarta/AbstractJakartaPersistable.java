@@ -28,14 +28,20 @@ import jakarta.persistence.PersistenceException;
 public abstract class AbstractJakartaPersistable<T> implements IPersister<T> {
 	static final Logger LOG = LoggerFactory.getLogger(AbstractJakartaPersistable.class);
 	
+	private IFactory<T> factory;
+	private Predicate<T> filter;
+	
 	private List<T> cache = new LinkedList<>();
 	
-	public abstract IFactory<T> getFactory();
-	public abstract Predicate<T> getFilter();
+	protected AbstractJakartaPersistable(Predicate<T> filter, IFactory<T> factory) {
+		super();
+		this.filter = filter;
+		this.factory = factory;
+	}
 	
 	@Override
 	public int save(int threshold, T o) {
-		if (getFilter().test(o)) {
+		if (filter.test(o)) {
 			LOG.debug("Cache {}", o);
 			
 			cache.add(o);
@@ -95,5 +101,13 @@ public abstract class AbstractJakartaPersistable<T> implements IPersister<T> {
 		}
 		
 		return cache.size();
+	}
+
+	public IFactory<T> getFactory() {
+		return factory;
+	}
+
+	public Predicate<T> getFilter() {
+		return filter;
 	}
 }
