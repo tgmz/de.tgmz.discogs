@@ -111,7 +111,7 @@ public class DiscogsFileHandler implements ProgressBarConsumer {
 			try (InputStream is = DiscogsTest.class.getClassLoader().getResourceAsStream("discogs_CHECKSUM.txt")) {
 				String crcs = IOUtils.toString(is, StandardCharsets.UTF_8);
 
-				crcs.lines().forEach(x -> hashes.put(x.substring(65), x.substring(0, 64)));
+				crcs.lines().filter(line -> !line.startsWith("#")).forEach(x -> hashes.put(x.substring(65), x.substring(0, 64)));
 			}
 		}
 

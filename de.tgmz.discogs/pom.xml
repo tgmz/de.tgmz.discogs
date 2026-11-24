@@ -130,7 +130,7 @@
 						<configuration>
 							<rules>
 								<requireMavenVersion>
-									<version>3.6.3</version>
+									<version>3.9</version>
 								</requireMavenVersion>
 							</rules>    
 						</configuration>
@@ -342,7 +342,7 @@
 					<plugin>
 						<groupId>org.apache.rat</groupId>
 						<artifactId>apache-rat-plugin</artifactId>
-						<version>0.13</version>
+						<version>0.18</version>
 						<executions>
 							<execution>
 								<id>rat-check</id>
@@ -350,42 +350,10 @@
 									<goal>check</goal>
 								</goals>
 								<configuration>
-									<consoleOutput>true</consoleOutput>
-									<ignoreErrors>false</ignoreErrors>
-									<licenses>
-										<license
-											implementation="org.apache.rat.analysis.license.SimplePatternBasedLicense">
-											<licenseFamilyCategory>TGMZ</licenseFamilyCategory>
-											<licenseFamilyName>this</licenseFamilyName>
-											<notes></notes>
-											<patterns>
-												<pattern>Thomas Zierer</pattern>
-											</patterns>
-										</license>
-									</licenses>
-									<licenseFamilies>
-										<licenseFamily
-											implementation="org.apache.rat.license.SimpleLicenseFamily">
-											<familyName>this</familyName>
-										</licenseFamily>
-									</licenseFamilies>
-									<excludes combine.children="append">
-										<!-- Eclipse stuff -->
-										<!-- z/OS stuff w/o comments -->
-										<!-- Generated -->
-										<!-- Maven -->
-										<!-- Not distributed -->
-										<!-- Templates -->
-										<!-- Test resources -->
-										<exclude>src/test/resources/</exclude>
-										<!-- Sonarsource stuff -->
-										<exclude>
-											src/main/xsd/sonar/sonar-generic-coverage.xsd</exclude>
-										<!-- Dummies -->
-										<!-- Binaries -->
-										<!-- GitHub -->
-										<exclude>env.MAVEN_CACHE_FOLDER/**</exclude>
-									</excludes>
+									<configs>
+										<config>src/main/rat/default.xml</config>
+									</configs>
+									<inputExcludeFile>src/main/rat/ratignore.txt</inputExcludeFile>
 								</configuration>
 							</execution>
 						</executions>
