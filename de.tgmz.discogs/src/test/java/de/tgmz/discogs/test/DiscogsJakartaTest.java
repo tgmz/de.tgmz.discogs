@@ -34,13 +34,13 @@ public class DiscogsJakartaTest extends DiscogsTest {
 		DiscogsContentHandler<?> dch;
 		
 		dch = new ArtistContentHandler();
-		extractAndProcess("discogs_artists.xml.gz", dch);
+		process("discogs_artists.xml", dch);
 		
 		dch = new LabelContentHandler();
-		extractAndProcess("discogs_labels.xml.gz", dch);
+		process("discogs_labels.xml", dch);
 		
 		dch = new MasterContentHandler(x -> x.getId() != 115L);
-		extractAndProcess("discogs_masters.xml.gz", dch);
+		process("discogs_masters.xml", dch);
 		
 		Predicate<Release> p0 = new IgnoreUpToFilter();
 		Predicate<Release> p1 = new MainFilter();
@@ -51,11 +51,11 @@ public class DiscogsJakartaTest extends DiscogsTest {
 		
 		dch = new ReleaseContentHandler(p);
 		dch.setSaveThreshold(2);
-		extractAndProcess("discogs_releases.xml.gz", dch);
+		process("discogs_releases.xml", dch);
 
 		// Force second load to check if updates work
 		dch = new ReleaseContentHandler();
-		extractAndProcess("discogs_releases.xml.gz", dch);
+		process("discogs_releases.xml", dch);
 	}
 	
 	@AfterClass

@@ -6,3 +6,8 @@
 #
 # SPDX-License-Identifier: EPL-2.0
 log/
+src/test/resources/discogs_artists.xml
+src/test/resources/discogs_labels.xml
+src/test/resources/discogs_masters.xml
+src/test/resources/discogs_releases.xml
+
