@@ -17,11 +17,8 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -30,7 +27,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import org.jline.utils.Log;
 import org.junit.Test;
 
 import de.tgmz.discogs.database.DatabaseService;
@@ -458,23 +454,9 @@ public abstract class DiscogsTest {
 		assertEquals(4, r3.getFormats().size());
 	}
 
-	protected static void extractAndProcess(String resource, DiscogsContentHandler<?> dch) throws IOException {
-		URL aUrl = null;
-		
-		try (DiscogsFileHandler dfh = new DiscogsFileHandler()) {
-			aUrl = DiscogsTest.class.getClassLoader().getResource(resource);
-			
-			File zipped = new File(aUrl.toURI());
-			
-			dfh.verify(zipped);
-			
-			File extracted = dfh.extract(zipped, dataDir);
-			
-			try (InputStream is = new FileInputStream(extracted)) {
-				dch.run(is);
-			}
-		} catch (URISyntaxException e) {
-			Log.error("Invalid URI {}", aUrl);
+	protected static void process(String resource, DiscogsContentHandler<?> dch) throws IOException {
+		try (InputStream is = DiscogsTest.class.getClassLoader().getResourceAsStream(resource)) {
+			dch.run(is);
 		}
 	}
 	

@@ -57,7 +57,7 @@ public class DiscogsCsvTest extends DiscogsTest {
 		DiscogsContentHandler<Release> dch = new ReleaseContentHandler();
 		
 		dch.setSaveThreshold(Integer.MAX_VALUE);
-		extractAndProcess("discogs_releases.xml.gz", dch);
+		process("discogs_releases.xml", dch);
 		DiscogsTest.teardownOnce();
 	}
 	
@@ -73,15 +73,15 @@ public class DiscogsCsvTest extends DiscogsTest {
 		DiscogsContentHandler<?> dch;
 		
 		dch = new ArtistContentHandler();
-		extractAndProcess("discogs_artists.xml.gz", dch);
+		process("discogs_artists.xml", dch);
 		
 		dch = new LabelContentHandler();
-		extractAndProcess("discogs_labels.xml.gz", dch);
+		process("discogs_labels.xml", dch);
 		
 		dch = new MasterContentHandler();
-		extractAndProcess("discogs_masters.xml.gz", dch);
+		process("discogs_masters.xml", dch);
 		
 		dch = new ReleaseContentHandler();
-		extractAndProcess("discogs_releases.xml.gz", dch);
+		process("discogs_releases.xml", dch);
 	}
 }
